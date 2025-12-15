@@ -241,25 +241,8 @@
     $("blocTapisPreventif").style.display = isDebord ? "block" : "none";
   }
 
-  function updateUIForType() {
-    const isBac = $("typeFeu").value === "bac";
-
-    // visibilité surface cuvette
-    $("blocCuvette").style.display = isBac ? "block" : "none";
-
-    // visibilité débordement uniquement en bac/cuvette
-    $("blocDebordement").style.display = isBac ? "block" : "none";
-
-    // ✅ DEMANDE : masquer ces 2 champs quand "bac" est sélectionné
-    $("blocReflexe").style.display = isBac ? "none" : "block";
-    $("blocTexPoi").style.display  = isBac ? "none" : "block";
-
-    // Valeurs par défaut / sécurité
-    if (isBac) {
-      // on force un état cohérent même si les champs sont masqués
-   function updateUIForType() {
+ function updateUIForType() {
   const isBac = $("typeFeu").value === "bac";
-  const isReflechi = $("reflexe").value === "reflechi";
 
   // Surface cuvette visible uniquement en bac
   $("blocCuvette").style.display = isBac ? "block" : "none";
@@ -267,33 +250,33 @@
   // Débordement uniquement en bac
   $("blocDebordement").style.display = isBac ? "block" : "none";
 
-  // Champs Réflexe / Réfléchi visibles uniquement en bac
+  // Réflexe / Réfléchi : visible uniquement en bac
   $("blocReflexe").style.display = isBac ? "block" : "none";
 
-  // Tex POI visible uniquement si bac + réfléchi
-  $("blocTexPoi").style.display = (isBac && isReflechi) ? "block" : "none";
-  $("texPoi").disabled = !(isBac && isReflechi);
-
-  // Si on quitte le mode bac, on nettoie
+  // Si on est en nappe : on cache tout ce qui est POI et on reset
   if (!isBac) {
     $("reflexe").value = "reflexe";
+    $("blocTexPoi").style.display = "none";
     $("texPoi").value = "";
+    $("texPoi").disabled = true;
+    setDebordUI(false);
+    return;
   }
 
-  // Si on repasse en réflexe, on vide Tex POI
-  if (!isReflechi) {
-    $("texPoi").value = "";
-  }
+  // Si bac : on laisse choisir réflexe/réfléchi
+  $("texPoi").disabled = false;
+
+  const isReflechi = $("reflexe").value === "reflechi";
+
+  // Tex POI : visible uniquement si bac + réfléchi
+  $("blocTexPoi").style.display = isReflechi ? "block" : "none";
+  $("texPoi").disabled = !isReflechi;
+
+  // Si réflexe : on vide Tex POI
+  if (!isReflechi) $("texPoi").value = "";
 
   setDebordUI(false);
 }
-
-    } else {
-      // en nappe, ces champs sont visibles mais non nécessaires : on les désactive
-      $("texPoi").disabled = true;
-      $("texPoi").value = "";
-      $("reflexe").value = "reflexe";
-    }
 
     // tapis préventif caché si pas débordement
     setDebordUI(false);
@@ -458,5 +441,6 @@
 
 </body>
 </html>
+
 
 

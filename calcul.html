@@ -173,14 +173,14 @@
         <div class="lif-split">
           <div class="lif-panel">
             <div class="lif-panel-title">EXTINCTION</div>
-            <div class="lif-row"><span>Qext (L/min)</span><span id="oQext">—</span></div>
+            <div class="lif-row"><span>Q ext (L/min)</span><span id="oQext">—</span></div>
             <div class="lif-row"><span>V émulseur (L)</span><span id="oVemul">—</span></div>
-            <div class="lif-row"><span>Entretien du tapis de mousse (L/min)</span><span id="oEntExt">—</span></div>
+            <div class="lif-row"><span>V émulseur pour entretien du tapis de mousse (L)</span><span id="oEntExt">—</span></div>
           </div>
 
           <div class="lif-panel">
             <div class="lif-panel-title">TEMPORISATION</div>
-            <div class="lif-row"><span>Qtempo (L/min)</span><span id="oQtempo">—</span></div>
+            <div class="lif-row"><span>Q tempo (L/min)</span><span id="oQtempo">—</span></div>
             <div class="lif-row"><span>V tempo (L)</span><span id="oVtempo">—</span></div>
           </div>
         </div>
@@ -257,9 +257,37 @@
     // Valeurs par défaut / sécurité
     if (isBac) {
       // on force un état cohérent même si les champs sont masqués
-      $("reflexe").value = "reflexe";
-      $("texPoi").value = "";
-      $("texPoi").disabled = true;
+   function updateUIForType() {
+  const isBac = $("typeFeu").value === "bac";
+  const isReflechi = $("reflexe").value === "reflechi";
+
+  // Surface cuvette visible uniquement en bac
+  $("blocCuvette").style.display = isBac ? "block" : "none";
+
+  // Débordement uniquement en bac
+  $("blocDebordement").style.display = isBac ? "block" : "none";
+
+  // Champs Réflexe / Réfléchi visibles uniquement en bac
+  $("blocReflexe").style.display = isBac ? "block" : "none";
+
+  // Tex POI visible uniquement si bac + réfléchi
+  $("blocTexPoi").style.display = (isBac && isReflechi) ? "block" : "none";
+  $("texPoi").disabled = !(isBac && isReflechi);
+
+  // Si on quitte le mode bac, on nettoie
+  if (!isBac) {
+    $("reflexe").value = "reflexe";
+    $("texPoi").value = "";
+  }
+
+  // Si on repasse en réflexe, on vide Tex POI
+  if (!isReflechi) {
+    $("texPoi").value = "";
+  }
+
+  setDebordUI(false);
+}
+
     } else {
       // en nappe, ces champs sont visibles mais non nécessaires : on les désactive
       $("texPoi").disabled = true;
@@ -430,4 +458,5 @@
 
 </body>
 </html>
+
 

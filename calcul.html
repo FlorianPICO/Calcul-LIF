@@ -145,10 +145,17 @@
             <small class="lif-help">Visible uniquement si “Réfléchi (POI)”</small>
           </div>
 
-          <div class="lif-field">
-            <label>Temporisation estimée (min)</label>
-            <input id="tTempo" type="number" min="0" step="0.1" placeholder="Ex : 30">
-          </div>
+          <div class="lif-grid" style="grid-template-columns:1fr 1fr;">
+  <div class="lif-field">
+    <label>Heure de début de temporisation</label>
+    <input id="tempoDebut" type="time">
+  </div>
+
+  <div class="lif-field">
+    <label>Heure de fin de temporisation</label>
+    <input id="tempoFin" type="time">
+  </div>
+</div>
 
           <!-- Cuvette : uniquement en bac -->
           <div class="lif-field" id="blocCuvette" style="display:none;">
@@ -239,6 +246,22 @@
     const x = Number(s);
     return Number.isFinite(x) ? x : NaN;
   };
+function getTempoMinutes() {
+  const d = $("tempoDebut").value;
+  const f = $("tempoFin").value;
+  if (!d || !f) return NaN;
+
+  const [hd, md] = d.split(":").map(Number);
+  const [hf, mf] = f.split(":").map(Number);
+
+  let debut = hd * 60 + md;
+  let fin = hf * 60 + mf;
+
+  // Si passage minuit (ex : 23:50 → 00:20)
+  if (fin < debut) fin += 24 * 60;
+
+  return fin - debut;
+}
 
   function setDebordUI(isDebord) {
     $("blocTapisPreventif").style.display = isDebord ? "block" : "none";
@@ -304,7 +327,12 @@
     $("oQext").textContent = String(Math.round(Qext));
     $("oVemul").textContent = String(Math.round(Qext * tExt * 0.03));
     $("oQtempo").textContent = String(Math.round(Qtempo));
-    $("oVtempo").textContent = String(Math.round(Qtempo * n($("tTempo").value || 0) * 0.03));
+const tTempoMin = getTempoMinutes();
+$("oVtempo").textContent =
+  Number.isFinite(tTempoMin)
+    ? String(Math.round(Qtempo * tTempoMin * 0.03))
+    : "—";
+
     $("oEntExt").textContent = String(Math.round(entretien));
 
     // ----------------- Débordement (BAC uniquement) -----------------
@@ -380,7 +408,8 @@
     $("produit").value = "non_miscible";
     $("reflexe").value = "reflexe";
     $("texPoi").value = "";
-    $("tTempo").value = "";
+    $("tempoDebut").value = "";
+$("tempoFin").value = "";
     $("surfaceCuvette").value = "";
 
     $("vPresent").value = "";
@@ -416,3 +445,4 @@
 
 </body>
 </html>
+

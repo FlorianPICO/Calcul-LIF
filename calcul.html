@@ -28,7 +28,7 @@
       font-size: 1.1em;
       margin: 10px 0 0 0;
     }
-    section {
+    section.page {
       max-width: 900px;
       margin: auto;
       padding: 30px 20px;
@@ -55,6 +55,27 @@
       text-decoration: none;
       font-weight: 700;
     }
+
+    /* -------- Styles de l'outil LIF -------- */
+    .lif-container{max-width:760px;margin:auto;padding:12px}
+    .lif-card{background:#fff;border-radius:14px;padding:14px;margin-top:12px;border:1px solid #ddd}
+    .lif-card-title{font-weight:900;margin-bottom:10px}
+    .lif-grid{display:grid;grid-template-columns:1fr;gap:10px}
+    .lif-field input,.lif-field select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc}
+    .lif-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .lif-btn{padding:12px;border-radius:12px;font-weight:700;cursor:pointer}
+    .lif-btn-primary{background:#2563eb;color:#fff;border:0}
+    .lif-btn-ghost{background:#fff;border:1px solid #ccc}
+    .lif-badges{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .lif-badge{background:#f5f5f5;padding:12px;border-radius:12px;text-align:center;font-weight:800}
+    .lif-split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .lif-panel{border:1px solid #ddd;border-radius:12px;padding:12px}
+    .lif-panel-title{font-weight:900;margin-bottom:8px}
+    .lif-panel-muted{background:#fafafa}
+    .lif-row{display:flex;justify-content:space-between;padding:6px 0;font-weight:700;gap:10px}
+    .lif-debord{margin-top:10px;padding:12px;border-radius:12px;text-align:center;font-weight:900;border:1px solid #ddd;background:#fff}
+    .lif-help{display:block;margin-top:6px;font-size:12px;color:#5b5b5b}
+    @media(max-width:640px){.lif-split{grid-template-columns:1fr}}
   </style>
 </head>
 
@@ -67,175 +88,160 @@
   <a class="backlink" href="index.html">← Retour à l’accueil</a>
 </header>
 
-<section>
+<section class="page">
   <div class="card">
 
+    <div class="lif-container">
 
-  <!-- ================== SAISIE ================== -->
-  <section class="lif-card">
-    <div class="lif-card-title">1) Saisie</div>
+      <!-- ================== SAISIE ================== -->
+      <section class="lif-card">
+        <div class="lif-card-title">1) Saisie</div>
 
-    <div class="lif-grid">
-      <div class="lif-field">
-        <label>Surface en feu S (m²)</label>
-        <input id="surfaceFeu" type="number" min="0" step="0.01" placeholder="Ex : 300">
-      </div>
+        <div class="lif-grid">
+          <div class="lif-field">
+            <label>Surface en feu S (m²)</label>
+            <input id="surfaceFeu" type="number" min="0" step="0.01" placeholder="Ex : 300">
+          </div>
 
-      <div class="lif-field">
-        <label>Type de feu</label>
-        <select id="typeFeu">
-          <option value="nappe">Feu de nappe</option>
-          <option value="bac">Feu de bac / cuvette</option>
-        </select>
-      </div>
+          <div class="lif-field">
+            <label>Type de feu</label>
+            <select id="typeFeu">
+              <option value="nappe">Feu de nappe</option>
+              <option value="bac">Feu de bac / cuvette</option>
+            </select>
+          </div>
 
-      <div class="lif-field">
-        <label>Mode d’attaque</label>
-        <select id="attaque">
-          <option value="indirect">Indirect</option>
-          <option value="direct">Direct</option>
-        </select>
-      </div>
+          <div class="lif-field">
+            <label>Mode d’attaque</label>
+            <select id="attaque">
+              <option value="indirect">Indirect</option>
+              <option value="direct">Direct</option>
+            </select>
+          </div>
 
-      <div class="lif-field">
-        <label>Produit</label>
-        <select id="produit">
-          <option value="non_miscible">Non miscible</option>
-          <option value="miscible">Miscible (alcool)</option>
-        </select>
-        <small class="lif-help">Concentration fixée à 3 %</small>
-      </div>
+          <div class="lif-field">
+            <label>Produit</label>
+            <select id="produit">
+              <option value="non_miscible">Non miscible</option>
+              <option value="miscible">Miscible (alcool)</option>
+            </select>
+            <small class="lif-help">Concentration fixée à 3 %</small>
+          </div>
 
-      <div class="lif-field">
-        <label>Bac : Réfléchi / Réflexe</label>
-        <select id="reflexe" disabled>
-          <option value="reflexe">Réflexe</option>
-          <option value="reflechi">Réfléchi (POI)</option>
-        </select>
-      </div>
+          <!-- ✅ Champs à masquer quand "bac" est sélectionné -->
+          <div class="lif-field" id="blocReflexe">
+            <label>Bac : Réfléchi / Réflexe</label>
+            <select id="reflexe">
+              <option value="reflexe">Réflexe</option>
+              <option value="reflechi">Réfléchi (POI)</option>
+            </select>
+          </div>
 
-      <div class="lif-field">
-        <label>Tex POI (L/min/m²)</label>
-        <input id="texPoi" type="number" min="0" step="0.1" placeholder="Ex : 8" disabled>
-        <small class="lif-help">Uniquement si Bac + Réfléchi</small>
-      </div>
+          <div class="lif-field" id="blocTexPoi">
+            <label>Tex POI (L/min/m²)</label>
+            <input id="texPoi" type="number" min="0" step="0.1" placeholder="Ex : 8">
+            <small class="lif-help">Uniquement si Bac + Réfléchi</small>
+          </div>
 
-      <div class="lif-field">
-        <label>Temporisation estimée (min)</label>
-        <input id="tTempo" type="number" min="0" step="0.1" placeholder="Ex : 30">
-      </div>
+          <div class="lif-field">
+            <label>Temporisation estimée (min)</label>
+            <input id="tTempo" type="number" min="0" step="0.1" placeholder="Ex : 30">
+          </div>
 
-      <div class="lif-field" id="blocCuvette" style="display:none;">
-        <label>Surface cuvette (m²)</label>
-        <input id="surfaceCuvette" type="number" min="0" step="0.01" placeholder="Ex : 200">
-      </div>
-    </div>
-
-    <div class="lif-actions">
-      <button id="btnCalculer" class="lif-btn lif-btn-primary" type="button">Calculer</button>
-      <button id="btnReset" class="lif-btn lif-btn-ghost" type="button">Réinitialiser</button>
-    </div>
-  </section>
-
-  <!-- ================== RESULTATS ================== -->
-  <section class="lif-card">
-    <div class="lif-card-title">2) Résultats</div>
-
-    <div class="lif-badges">
-      <div class="lif-badge"><div>Tex</div><div id="oTex">—</div></div>
-      <div class="lif-badge"><div>Durée ext.</div><div id="oT">—</div></div>
-      <div class="lif-badge"><div>Concentration</div><div>3 %</div></div>
-    </div>
-
-    <div class="lif-split">
-      <div class="lif-panel">
-        <div class="lif-panel-title">EXTINCTION</div>
-        <div class="lif-row"><span>Qext (L/min)</span><span id="oQext">—</span></div>
-        <div class="lif-row"><span>V émulseur (L)</span><span id="oVemul">—</span></div>
-        <div class="lif-row"><span>Entretien du tapis de mousse (L/min)</span><span id="oEntExt">—</span></div>
-      </div>
-
-      <div class="lif-panel">
-        <div class="lif-panel-title">TEMPORISATION</div>
-        <div class="lif-row"><span>Qtempo (L/min)</span><span id="oQtempo">—</span></div>
-        <div class="lif-row"><span>V tempo (L)</span><span id="oVtempo">—</span></div>
-      </div>
-    </div>
-
-    <!-- ================== RISQUE DE DEBORDEMENT (BAC UNIQUEMENT) ================== -->
-    <div class="lif-panel lif-panel-muted" id="blocDebordement" style="display:none;margin-top:12px;">
-      <div class="lif-panel-title">RISQUE DE DÉBORDEMENT</div>
-
-      <div class="lif-grid">
-        <div class="lif-field">
-          <label>Volume présent (L)</label>
-          <input id="vPresent" type="number" min="0">
+          <div class="lif-field" id="blocCuvette" style="display:none;">
+            <label>Surface cuvette (m²)</label>
+            <input id="surfaceCuvette" type="number" min="0" step="0.01" placeholder="Ex : 200">
+          </div>
         </div>
-        <div class="lif-field">
-          <label>Volume total bac (L)</label>
-          <input id="vTotal" type="number" min="0">
+
+        <div class="lif-actions">
+          <button id="btnCalculer" class="lif-btn lif-btn-primary" type="button">Calculer</button>
+          <button id="btnReset" class="lif-btn lif-btn-ghost" type="button">Réinitialiser</button>
         </div>
-        <div class="lif-field">
-          <label>Durée réelle temporisation (min)</label>
-          <input id="tReel" type="number" min="0" step="0.1">
+      </section>
+
+      <!-- ================== RESULTATS ================== -->
+      <section class="lif-card">
+        <div class="lif-card-title">2) Résultats</div>
+
+        <div class="lif-badges">
+          <div class="lif-badge"><div>Tex</div><div id="oTex">—</div></div>
+          <div class="lif-badge"><div>Durée ext.</div><div id="oT">—</div></div>
+          <div class="lif-badge"><div>Concentration</div><div>3 %</div></div>
         </div>
-      </div>
 
-      <div class="lif-row"><span>Ajout temporisation (L)</span><span id="oAjTempo">—</span></div>
-      <div class="lif-row"><span>Ajout extinction (40 min) (L)</span><span id="oAjExt">—</span></div>
-      <div class="lif-row"><span>Marge avant débordement (L)</span><span id="oMarge">—</span></div>
-      <div class="lif-row"><span>Temps avant débordement</span><span id="oTemps">—</span></div>
+        <div class="lif-split">
+          <div class="lif-panel">
+            <div class="lif-panel-title">EXTINCTION</div>
+            <div class="lif-row"><span>Qext (L/min)</span><span id="oQext">—</span></div>
+            <div class="lif-row"><span>V émulseur (L)</span><span id="oVemul">—</span></div>
+            <div class="lif-row"><span>Entretien du tapis de mousse (L/min)</span><span id="oEntExt">—</span></div>
+          </div>
 
-      <div class="lif-debord" id="oDebord">—</div>
+          <div class="lif-panel">
+            <div class="lif-panel-title">TEMPORISATION</div>
+            <div class="lif-row"><span>Qtempo (L/min)</span><span id="oQtempo">—</span></div>
+            <div class="lif-row"><span>V tempo (L)</span><span id="oVtempo">—</span></div>
+          </div>
+        </div>
+
+        <!-- ================== RISQUE DE DEBORDEMENT (BAC UNIQUEMENT) ================== -->
+        <div class="lif-panel lif-panel-muted" id="blocDebordement" style="display:none;margin-top:12px;">
+          <div class="lif-panel-title">RISQUE DE DÉBORDEMENT</div>
+
+          <div class="lif-grid">
+            <div class="lif-field">
+              <label>Volume présent (L)</label>
+              <input id="vPresent" type="number" min="0">
+            </div>
+            <div class="lif-field">
+              <label>Volume total bac (L)</label>
+              <input id="vTotal" type="number" min="0">
+            </div>
+            <div class="lif-field">
+              <label>Durée réelle temporisation (min)</label>
+              <input id="tReel" type="number" min="0" step="0.1">
+            </div>
+          </div>
+
+          <div class="lif-row"><span>Ajout temporisation (L)</span><span id="oAjTempo">—</span></div>
+          <div class="lif-row"><span>Ajout extinction (40 min) (L)</span><span id="oAjExt">—</span></div>
+          <div class="lif-row"><span>Marge avant débordement (L)</span><span id="oMarge">—</span></div>
+          <div class="lif-row"><span>Temps avant débordement</span><span id="oTemps">—</span></div>
+
+          <div class="lif-debord" id="oDebord">—</div>
+        </div>
+
+        <!-- ================== TAPIS PREVENTIF (SI DEBORDEMENT) ================== -->
+        <div class="lif-panel lif-panel-muted" id="blocTapisPreventif" style="display:none;margin-top:12px;">
+          <div class="lif-panel-title">TAPIS PRÉVENTIF</div>
+          <div class="lif-row"><span>Volume émulseur (L)</span><span id="oVtapis">—</span></div>
+          <div class="lif-row"><span>Débit entretien (L/min)</span><span id="oDentretien">—</span></div>
+        </div>
+
+      </section>
+
     </div>
-
-    <!-- ================== TAPIS PREVENTIF (SI DEBORDEMENT) ================== -->
-    <div class="lif-panel lif-panel-muted" id="blocTapisPreventif" style="display:none;margin-top:12px;">
-      <div class="lif-panel-title">TAPIS PRÉVENTIF</div>
-      <div class="lif-row"><span>Volume émulseur (L)</span><span id="oVtapis">—</span></div>
-      <div class="lif-row"><span>Débit entretien (L/min)</span><span id="oDentretien">—</span></div>
-    </div>
-
-  </section>
-</div>
-
-<style>
-.lif-container{max-width:760px;margin:auto;padding:12px;font-family:system-ui}
-.lif-header{background:#0b1220;color:#fff;padding:14px;border-radius:14px}
-.lif-card{background:#fff;border-radius:14px;padding:14px;margin-top:12px;border:1px solid #ddd}
-.lif-grid{display:grid;grid-template-columns:1fr;gap:10px}
-.lif-field input,.lif-field select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc}
-.lif-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.lif-btn{padding:12px;border-radius:12px;font-weight:700}
-.lif-btn-primary{background:#2563eb;color:#fff}
-.lif-btn-ghost{background:#fff;border:1px solid #ccc}
-.lif-badges{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.lif-badge{background:#f5f5f5;padding:12px;border-radius:12px;text-align:center;font-weight:800}
-.lif-split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.lif-panel{border:1px solid #ddd;border-radius:12px;padding:12px}
-.lif-panel-muted{background:#fafafa}
-.lif-row{display:flex;justify-content:space-between;padding:6px 0;font-weight:700}
-.lif-debord{margin-top:10px;padding:12px;border-radius:12px;text-align:center;font-weight:900;border:1px solid #ddd;background:#fff}
-.lif-help{display:block;margin-top:6px;font-size:12px;color:#5b5b5b}
-@media(max-width:640px){.lif-split{grid-template-columns:1fr}}
-</style>
+  </div>
+</section>
 
 <script>
-(()=>{
-  const $=id=>document.getElementById(id);
-  const n=v=>{
-    if(v===null||v===undefined) return NaN;
-    const s=String(v).replace(",",".").trim();
-    if(!s) return NaN;
-    const x=Number(s);
-    return Number.isFinite(x)?x:NaN;
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  const n = (v) => {
+    if (v === null || v === undefined) return NaN;
+    const s = String(v).replace(",", ".").trim();
+    if (!s) return NaN;
+    const x = Number(s);
+    return Number.isFinite(x) ? x : NaN;
   };
 
-  function setDebordUI(isDebord){
+  function setDebordUI(isDebord) {
     $("blocTapisPreventif").style.display = isDebord ? "block" : "none";
   }
 
-  function updateUIForType(){
+  function updateUIForType() {
     const isBac = $("typeFeu").value === "bac";
 
     // visibilité surface cuvette
@@ -244,186 +250,40 @@
     // visibilité débordement uniquement en bac/cuvette
     $("blocDebordement").style.display = isBac ? "block" : "none";
 
-    // options bac : activer le select et mettre reflexe par défaut
-    $("reflexe").disabled = !isBac;
-    if(isBac && !$("reflexe").value) $("reflexe").value="reflexe";
-    if(isBac) $("reflexe").value="reflexe"; // par défaut
+    // ✅ DEMANDE : masquer ces 2 champs quand "bac" est sélectionné
+    $("blocReflexe").style.display = isBac ? "none" : "block";
+    $("blocTexPoi").style.display  = isBac ? "none" : "block";
 
-    // tex POI seulement si bac + réfléchi
-    const isReflechi = $("reflexe").value === "reflechi";
-    $("texPoi").disabled = !(isBac && isReflechi);
-    if(!(isBac && isReflechi)) $("texPoi").value="";
+    // Valeurs par défaut / sécurité
+    if (isBac) {
+      // on force un état cohérent même si les champs sont masqués
+      $("reflexe").value = "reflexe";
+      $("texPoi").value = "";
+      $("texPoi").disabled = true;
+    } else {
+      // en nappe, ces champs sont visibles mais non nécessaires : on les désactive
+      $("texPoi").disabled = true;
+      $("texPoi").value = "";
+      $("reflexe").value = "reflexe";
+    }
 
     // tapis préventif caché si pas débordement
     setDebordUI(false);
 
     // si nappe, vider surface cuvette (pour éviter confusions)
-    if(!isBac) $("surfaceCuvette").value="";
+    if (!isBac) $("surfaceCuvette").value = "";
   }
 
-  function compute(){
-    const S=n($("surfaceFeu").value);
-    if(!Number.isFinite(S) || S<=0) return;
+  function compute() {
+    const S = n($("surfaceFeu").value);
+    if (!Number.isFinite(S) || S <= 0) return;
 
-    const type=$("typeFeu").value;
-    const atk=$("attaque").value;
-    const prod=$("produit").value;
-    const ref=$("reflexe").value;
-    const texPoi=n($("texPoi").value);
+    const type = $("typeFeu").value;
+    const atk = $("attaque").value;
+    const prod = $("produit").value;
+    const ref = $("reflexe").value;
+    const texPoi = n($("texPoi").value);
 
     let Tex;
 
-    // nappe
-    if(type==="nappe"){
-      Tex = (atk==="indirect")
-        ? (prod==="miscible" ? 10 : 5)
-        : (prod==="miscible" ? 20 : 10);
-    } else {
-      // bac
-      if(ref==="reflechi"){
-        Tex = texPoi;
-      } else {
-        // réflexe : non miscible 5/10 ; miscible 10/20
-        Tex = (atk==="indirect")
-          ? (prod==="miscible" ? 10 : 5)
-          : (prod==="miscible" ? 20 : 10);
-      }
-    }
-
-    if(!Number.isFinite(Tex) || Tex<=0) return;
-
-    const tExt = (type==="bac") ? 40 : (S<400 ? 20 : 40);
-    const Qext = S*Tex;
-    const Qtempo = S*(Tex/2);
-
-    // entretien tapis mousse demandé (uniquement extinction)
-    const entretien = S * 0.2;
-
-    $("oTex").textContent = Tex.toFixed(2);
-    $("oT").textContent = String(Math.round(tExt));
-    $("oQext").textContent = String(Math.round(Qext));
-    $("oVemul").textContent = String(Math.round(Qext*tExt*0.03));
-    $("oQtempo").textContent = String(Math.round(Qtempo));
-    $("oVtempo").textContent = String(Math.round(Qtempo*n($("tTempo").value||0)*0.03));
-    $("oEntExt").textContent = String(Math.round(entretien));
-
-    // ----------------- Débordement (BAC uniquement) -----------------
-    if(type!=="bac"){
-      // si nappe, masquer tapis et vider l'affichage débordement
-      setDebordUI(false);
-      return;
-    }
-
-    const Vp=n($("vPresent").value);
-    const Vt=n($("vTotal").value);
-    const tr=n($("tReel").value);
-
-    if(![Vp,Vt,tr].every(Number.isFinite) || Vt<=0){
-      $("oAjTempo").textContent="—";
-      $("oAjExt").textContent="—";
-      $("oMarge").textContent="—";
-      $("oTemps").textContent="—";
-      $("oDebord").textContent="—";
-      setDebordUI(false);
-      return;
-    }
-
-    const Vtempo = Qtempo*tr;
-    const Vext = Qext*40;
-    const marge = Vt-(Vp+Vtempo+Vext);
-
-    $("oAjTempo").textContent = String(Math.round(Vtempo));
-    $("oAjExt").textContent = String(Math.round(Vext));
-    $("oMarge").textContent = String(Math.round(marge));
-
-    // temps avant débordement (tempo puis extinction)
-    let deb=false;
-    let msg="Pas de débordement";
-
-    if(Vp>=Vt){
-      deb=true;
-      msg="Débordement immédiat (0 min)";
-    } else {
-      const margeInitiale = Vt - Vp;
-
-      if(Qtempo*tr >= margeInitiale){
-        const tDeb = margeInitiale / Qtempo;
-        deb=true;
-        msg = `Débordement pendant temporisation (~${tDeb.toFixed(1)} min)`;
-      } else {
-        const reste = margeInitiale - Qtempo*tr;
-        const tDebExt = reste / Qext;
-        if(tDebExt <= 40){
-          deb=true;
-          msg = `Débordement pendant extinction (~${(tr + tDebExt).toFixed(1)} min)`;
-        }
-      }
-    }
-
-    $("oTemps").textContent = msg;
-    $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
-    $("oDebord").style.background = deb ? "#fee2e2" : "#dcfce7";
-    $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
-    $("oDebord").style.color = deb ? "#7f1d1d" : "#065f46";
-
-    // Tapis préventif visible seulement si débordement
-    setDebordUI(deb);
-
-    if(deb){
-      const Sc=n($("surfaceCuvette").value);
-      $("oVtapis").textContent = Number.isFinite(Sc) ? String(Math.round(Sc*0.15*3)) : "—";
-      $("oDentretien").textContent = Number.isFinite(Sc) ? String(Math.round(Sc*0.2)) : "—";
-    }
-  }
-
-  function resetAll(){
-    $("surfaceFeu").value="";
-    $("typeFeu").value="nappe";
-    $("attaque").value="indirect";
-    $("produit").value="non_miscible";
-    $("reflexe").value="reflexe";
-    $("texPoi").value="";
-    $("tTempo").value="";
-    $("surfaceCuvette").value="";
-
-    $("vPresent").value="";
-    $("vTotal").value="";
-    $("tReel").value="";
-
-    // reset affichages
-    ["oTex","oT","oQext","oVemul","oQtempo","oVtempo","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oDebord","oVtapis","oDentretien"]
-      .forEach(id => { const e=$(id); if(e) e.textContent="—"; });
-
-    $("oDebord").style.background="#fff";
-    $("oDebord").style.borderColor="#ddd";
-    $("oDebord").style.color="#111";
-
-    updateUIForType();
-  }
-
-  // handlers
-  $("typeFeu").addEventListener("change", ()=>{ updateUIForType(); compute(); });
-  $("reflexe").addEventListener("change", ()=>{ updateUIForType(); compute(); });
-  document.querySelectorAll("input,select").forEach(e=>{
-    e.addEventListener("input", compute);
-    e.addEventListener("change", compute);
-  });
-
-  $("btnCalculer").addEventListener("click", compute);
-  $("btnReset").addEventListener("click", resetAll);
-
-  // init
-  resetAll();
-})();
-</script>
-</body>
-</html>
-  </div>
-</section>
-
-</body>
-</html>
-
-
-
-
+    /

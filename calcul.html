@@ -82,7 +82,8 @@
 <body>
 
 <header>
-  <img src="Logo.png" alt="Logo SDIS 27" class="Logo">
+  <!-- ⚠️ Si ton fichier s'appelle Logo.jpg, change juste l'extension -->
+  <img src="Logo.png" alt="Logo SDIS 27" class="logo">
   <h1>Calcul LIF – Outil opérationnel – Feux de liquides inflammables</h1>
   <p>SDIS 27 – GGOC – Cne Florian PICO</p>
   <a class="backlink" href="index.html">← Retour à l’accueil</a>
@@ -128,19 +129,20 @@
             <small class="lif-help">Concentration fixée à 3 %</small>
           </div>
 
-          <!-- ✅ Champs à masquer quand "bac" est sélectionné -->
+          <!-- POI : visible pour NAPPE + BAC (selon ta logique) -->
           <div class="lif-field" id="blocReflexe">
-            <label>Bac : Réfléchi / Réflexe</label>
+            <label>Réfléchi / Réflexe</label>
             <select id="reflexe">
               <option value="reflexe">Réflexe</option>
               <option value="reflechi">Réfléchi (POI)</option>
             </select>
           </div>
 
-          <div class="lif-field" id="blocTexPoi">
+          <!-- Tex POI : visible seulement si "Réfléchi (POI)" -->
+          <div class="lif-field" id="blocTexPoi" style="display:none;">
             <label>Tex POI (L/min/m²)</label>
             <input id="texPoi" type="number" min="0" step="0.1" placeholder="Ex : 8">
-            <small class="lif-help">Uniquement si Bac + Réfléchi</small>
+            <small class="lif-help">Visible uniquement si “Réfléchi (POI)”</small>
           </div>
 
           <div class="lif-field">
@@ -148,9 +150,10 @@
             <input id="tTempo" type="number" min="0" step="0.1" placeholder="Ex : 30">
           </div>
 
+          <!-- Cuvette : uniquement en bac -->
           <div class="lif-field" id="blocCuvette" style="display:none;">
-            <label>Surface cuvette de rétention (m²)</label>
-            <input id="surfaceCuvettederetention" type="number" min="0" step="0.01" placeholder="Ex : 200">
+            <label>Surface cuvette (m²)</label>
+            <input id="surfaceCuvette" type="number" min="0" step="0.01" placeholder="Ex : 200">
           </div>
         </div>
 
@@ -173,14 +176,14 @@
         <div class="lif-split">
           <div class="lif-panel">
             <div class="lif-panel-title">EXTINCTION</div>
-            <div class="lif-row"><span>Q ext (L/min)</span><span id="oQext">—</span></div>
+            <div class="lif-row"><span>Qext (L/min)</span><span id="oQext">—</span></div>
             <div class="lif-row"><span>V émulseur (L)</span><span id="oVemul">—</span></div>
-            <div class="lif-row"><span>V émulseur pour entretien du tapis de mousse (L)</span><span id="oEntExt">—</span></div>
+            <div class="lif-row"><span>Entretien du tapis de mousse (L/min)</span><span id="oEntExt">—</span></div>
           </div>
 
           <div class="lif-panel">
             <div class="lif-panel-title">TEMPORISATION</div>
-            <div class="lif-row"><span>Q tempo (L/min)</span><span id="oQtempo">—</span></div>
+            <div class="lif-row"><span>Qtempo (L/min)</span><span id="oQtempo">—</span></div>
             <div class="lif-row"><span>V tempo (L)</span><span id="oVtempo">—</span></div>
           </div>
         </div>
@@ -241,47 +244,29 @@
     $("blocTapisPreventif").style.display = isDebord ? "block" : "none";
   }
 
- function updateUIForType() {
-  const isBac = $("typeFeu").value === "bac";
+  // ✅ LOGIQUE DEMANDÉE :
+  // - NAPPE : réflexe/réfléchi disponible
+  // - BAC : réflexe/réfléchi disponible
+  // - Tex POI visible + saisissable UNIQUEMENT si "réfléchi (POI)"
+  function updateUI() {
+    const isBac = $("typeFeu").value === "bac";
+    const isReflechi = $("reflexe").value === "reflechi";
 
-  // Surface cuvette visible uniquement en bac
-  $("blocCuvette").style.display = isBac ? "block" : "none";
+    // Bac : afficher cuvette + débordement
+    $("blocCuvette").style.display = isBac ? "block" : "none";
+    $("blocDebordement").style.display = isBac ? "block" : "none";
 
-  // Débordement uniquement en bac
-  $("blocDebordement").style.display = isBac ? "block" : "none";
+    // Tex POI : visible/saisissable seulement si réfléchi
+    $("blocTexPoi").style.display = isReflechi ? "block" : "none";
+    $("texPoi").disabled = !isReflechi;
 
-  // Réflexe / Réfléchi : visible uniquement en bac
-  $("blocReflexe").style.display = isBac ? "block" : "none";
+    // Si on repasse en réflexe : on vide Tex POI
+    if (!isReflechi) $("texPoi").value = "";
 
-  // Si on est en nappe : on cache tout ce qui est POI et on reset
-  if (!isBac) {
-    $("reflexe").value = "reflexe";
-    $("blocTexPoi").style.display = "none";
-    $("texPoi").value = "";
-    $("texPoi").disabled = true;
-    setDebordUI(false);
-    return;
-  }
-
-  // Si bac : on laisse choisir réflexe/réfléchi
-  $("texPoi").disabled = false;
-
-  const isReflechi = $("reflexe").value === "reflechi";
-
-  // Tex POI : visible uniquement si bac + réfléchi
-  $("blocTexPoi").style.display = isReflechi ? "block" : "none";
-  $("texPoi").disabled = !isReflechi;
-
-  // Si réflexe : on vide Tex POI
-  if (!isReflechi) $("texPoi").value = "";
-
-  setDebordUI(false);
-}
-
-    // tapis préventif caché si pas débordement
+    // Tapis préventif caché tant que pas de calcul débordement
     setDebordUI(false);
 
-    // si nappe, vider surface cuvette (pour éviter confusions)
+    // Si nappe, vider surface cuvette pour éviter confusion
     if (!isBac) $("surfaceCuvette").value = "";
   }
 
@@ -289,38 +274,29 @@
     const S = n($("surfaceFeu").value);
     if (!Number.isFinite(S) || S <= 0) return;
 
-    const type = $("typeFeu").value;
-    const atk = $("attaque").value;
-    const prod = $("produit").value;
-    const ref = $("reflexe").value;
+    const type = $("typeFeu").value;       // nappe | bac
+    const atk = $("attaque").value;        // indirect | direct
+    const prod = $("produit").value;       // non_miscible | miscible
+    const ref = $("reflexe").value;        // reflexe | reflechi
     const texPoi = n($("texPoi").value);
 
     let Tex;
 
-    // nappe
-    if (type === "nappe") {
+    // Si "réfléchi", on impose Tex = Tex POI (dans nappe ou bac)
+    if (ref === "reflechi") {
+      if (!Number.isFinite(texPoi) || texPoi <= 0) return; // Tex POI obligatoire
+      Tex = texPoi;
+    } else {
+      // Réflexe : barème standard
       Tex = (atk === "indirect")
         ? (prod === "miscible" ? 10 : 5)
         : (prod === "miscible" ? 20 : 10);
-    } else {
-      // bac
-      if (ref === "reflechi") {
-        Tex = texPoi;
-      } else {
-        // réflexe : non miscible 5/10 ; miscible 10/20
-        Tex = (atk === "indirect")
-          ? (prod === "miscible" ? 10 : 5)
-          : (prod === "miscible" ? 20 : 10);
-      }
     }
-
-    if (!Number.isFinite(Tex) || Tex <= 0) return;
 
     const tExt = (type === "bac") ? 40 : (S < 400 ? 20 : 40);
     const Qext = S * Tex;
     const Qtempo = S * (Tex / 2);
 
-    // entretien tapis mousse demandé (uniquement extinction)
     const entretien = S * 0.2;
 
     $("oTex").textContent = Tex.toFixed(2);
@@ -359,7 +335,6 @@
     $("oAjExt").textContent = String(Math.round(Vext));
     $("oMarge").textContent = String(Math.round(marge));
 
-    // temps avant débordement (tempo puis extinction)
     let deb = false;
     let msg = "Pas de débordement";
 
@@ -389,7 +364,6 @@
     $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
     $("oDebord").style.color = deb ? "#7f1d1d" : "#065f46";
 
-    // Tapis préventif visible seulement si débordement
     setDebordUI(deb);
 
     if (deb) {
@@ -420,12 +394,13 @@
     $("oDebord").style.borderColor = "#ddd";
     $("oDebord").style.color = "#111";
 
-    updateUIForType();
+    updateUI();
   }
 
   // handlers
-  $("typeFeu").addEventListener("change", () => { updateUIForType(); compute(); });
-  $("reflexe").addEventListener("change", () => { updateUIForType(); compute(); });
+  $("typeFeu").addEventListener("change", () => { updateUI(); compute(); });
+  $("reflexe").addEventListener("change", () => { updateUI(); compute(); });
+
   document.querySelectorAll("input,select").forEach(e => {
     e.addEventListener("input", compute);
     e.addEventListener("change", compute);
@@ -441,6 +416,3 @@
 
 </body>
 </html>
-
-
-

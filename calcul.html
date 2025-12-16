@@ -63,16 +63,28 @@
     text-align: center;
   }
 
-  /* ✅ LOGO RESPONSIVE + centrage parfait */
-.logo {
-  display: block;
-  height: auto;
-  width: 150px;
-  max-height: none;
-  object-fit: contain;
-  margin: 0;
-  flex-shrink: 0; /* ✅ empêche le logo de rapetisser */
-}
+  /* ===== LOGO RESPONSIVE ===== */
+  .logo {
+    display: block;
+    height: auto;
+    width: min(150px, 45vw);
+    max-height: 80px;
+    object-fit: contain;
+    margin: 0;
+  }
+
+  /* ===== AJUSTEMENTS MOBILE ===== */
+  @media (max-width: 420px) {
+    header {
+      padding: 34px 14px;
+    }
+    header h1 {
+      max-width: 20ch;
+    }
+    .logo {
+      width: min(135px, 42vw);
+    }
+  }
 
 
 
@@ -175,7 +187,7 @@
 <body>
 
 <header>
-  <img src="Logo.png" alt="Logo SDIS 27" class="logo">
+  <img src="Logo.png" alt="Logo SDIS 27" class="Logo">
 
   <h1 class="hero-title">
     <span>Calcul LIF</span>
@@ -665,6 +677,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

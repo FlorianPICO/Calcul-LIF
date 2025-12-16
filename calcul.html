@@ -435,7 +435,6 @@ function updateLockUI() {
     "concentrationPct",
     "texIndNonMisc", "texDirNonMisc",
     "texIndMisc", "texDirMisc",
-    "poiNote"
   ];
 
   ids.forEach(id => { const el = $(id); if (el) el.disabled = !custom; });
@@ -447,7 +446,6 @@ function updateLockUI() {
     $("texDirNonMisc").value = 10;
     $("texIndMisc").value = 10;
     $("texDirMisc").value = 20;
-    $("poiNote").value = "";
   }
 
   compute();
@@ -664,6 +662,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

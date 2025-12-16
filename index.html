@@ -35,6 +35,20 @@
     line-height: 1.2;
     max-width: 28ch;
   }
+.hero-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.hero-title span {
+  display: block;
+  white-space: nowrap;
+}
 
   header p {
     opacity: 0.9;
@@ -114,11 +128,12 @@
 
 <header>
    <img src="Logo.png" alt="Logo SDIS 27" class="Logo">
-<h1>
-  Calcul LIF<br>
-  Outil opérationnel<br>
-  Feux de liquides&nbsp;inflammables
+<h1 class="hero-title">
+  <span>Calcul LIF</span>
+  <span>Outil opérationnel</span>
+  <span>Feux de liquides inflammables</span>
 </h1>
+
   <p style="margin-top:10px;font-size:1.1em;">
     SDIS 27 – GGOC – Capitaine Florian PICO
   </p>

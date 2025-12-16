@@ -103,6 +103,26 @@
   }
 
   .lif-grid { display:grid; grid-template-columns:1fr; gap:10px }
+  /* Grille 2 colonnes (heures début / fin) */
+.lif-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+/* Mobile : on repasse en 1 colonne */
+@media (max-width: 520px) {
+  .lif-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .lif-card { padding: 12px; }
+  .lif-container { padding: 10px; }
+  .lif-field input, .lif-field select { padding: 12px; } /* plus “tap friendly” */
+}
+
   .lif-field input, .lif-field select { width:100%; padding:10px; border-radius:10px; border:1px solid #ccc }
   .lif-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px }
   .lif-btn { padding:12px; border-radius:12px; font-weight:700; cursor:pointer }
@@ -205,7 +225,7 @@
             <small class="lif-help">Visible uniquement si “Réfléchi (POI)”</small>
           </div>
 
-          <div class="lif-grid" style="grid-template-columns:1fr 1fr;">
+         <div class="lif-grid lif-grid-2">
   <div class="lif-field">
     <label>Heure de début de temporisation :</label>
     <input id="tempoDebut" type="time">
@@ -216,6 +236,7 @@
     <input id="tempoFin" type="time">
   </div>
 </div>
+
 
           <!-- Cuvette : uniquement en bac -->
           <div class="lif-field" id="blocCuvette" style="display:none;">
@@ -524,6 +545,7 @@ $("tempoFin").value = "";
 </footer>
 </body>
 </html>
+
 
 
 

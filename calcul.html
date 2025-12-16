@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html> 
 <html lang="fr">
 <head>
   <meta charset="utf-8">
@@ -54,13 +54,14 @@
     padding: 20px;
     border: 1px solid #ddd;
   }
-.lif-signature {
-  margin-top: 18px;
-  padding-top: 6px;
-  font-size: 12px;
-  color: #666;
-  text-align: center;
-}
+
+  .lif-signature {
+    margin-top: 18px;
+    padding-top: 6px;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+  }
 
   /* ✅ LOGO RESPONSIVE + centrage parfait */
   .logo {
@@ -71,20 +72,21 @@
     object-fit: contain;
     margin: 0;
   }
-.hero-title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  line-height: 1.2;
-  text-align: center;
-}
 
-.hero-title span {
-  display: block;
-  white-space: nowrap;
-}
+  .hero-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .hero-title span {
+    display: block;
+    white-space: nowrap;
+  }
 
   .backlink {
     display: inline-block;
@@ -117,25 +119,25 @@
   }
 
   .lif-grid { display:grid; grid-template-columns:1fr; gap:10px }
-  /* Grille 2 colonnes (heures début / fin) */
-.lif-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  align-items: start;
-}
 
-/* Mobile : on repasse en 1 colonne */
-@media (max-width: 520px) {
+  /* Grille 2 colonnes (heures début / fin) */
   .lif-grid-2 {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: start;
   }
-}
-@media (max-width: 520px) {
-  .lif-card { padding: 12px; }
-  .lif-container { padding: 10px; }
-  .lif-field input, .lif-field select { padding: 12px; } /* plus “tap friendly” */
-}
+
+  /* Mobile : on repasse en 1 colonne */
+  @media (max-width: 520px) {
+    .lif-grid-2 { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 520px) {
+    .lif-card { padding: 12px; }
+    .lif-container { padding: 10px; }
+    .lif-field input, .lif-field select { padding: 12px; } /* plus “tap friendly” */
+  }
 
   .lif-field input, .lif-field select { width:100%; padding:10px; border-radius:10px; border:1px solid #ccc }
   .lif-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px }
@@ -170,15 +172,13 @@
 <body>
 
 <header>
-  <!-- ⚠️ Si ton fichier s'appelle Logo.jpg, change juste l'extension -->
   <img src="Logo.png" alt="Logo SDIS 27" class="logo">
- <h1 class="hero-title">
-  <span>Calcul LIF</span>
-  <span>Outil opérationnel</span>
-  <span>Feux de liquides inflammables</span>
-</h1>
 
-
+  <h1 class="hero-title">
+    <span>Calcul LIF</span>
+    <span>Outil opérationnel</span>
+    <span>Feux de liquides inflammables</span>
+  </h1>
 
   <p>SDIS 27 – GGOC – Capitaine Florian PICO</p>
   <a class="backlink" href="index.html">← Retour à l’accueil</a>
@@ -188,6 +188,56 @@
   <div class="card">
 
     <div class="lif-container">
+
+      <!-- ================== PARAMÈTRES INTER-SDIS (AJOUT) ================== -->
+      <section class="lif-card">
+        <div class="lif-card-title">0) Paramètres</div>
+
+        <div class="lif-grid">
+          <div class="lif-field">
+            <label>Mode :</label>
+            <select id="modeSdis">
+              <option value="lock" selected>SDIS 27 (verrouillé)</option>
+              <option value="custom">Autre SDIS (personnalisable)</option>
+            </select>
+            <small class="lif-help">
+              Par défaut, les valeurs SDIS 27 sont appliquées. En mode “Autre SDIS”, vous pouvez saisir votre doctrine.
+            </small>
+          </div>
+
+          <div class="lif-field">
+            <label>Concentration émulseur (%) :</label>
+            <input id="concentrationPct" type="number" min="0" step="0.1" value="3" disabled>
+            <small class="lif-help">Déverrouillé uniquement en mode “Autre SDIS”.</small>
+          </div>
+
+          <div class="lif-field">
+            <label>Tex Réflexe – Indirect – Non miscible (L/min/m²) :</label>
+            <input id="texIndNonMisc" type="number" min="0" step="0.1" value="5" disabled>
+          </div>
+
+          <div class="lif-field">
+            <label>Tex Réflexe – Direct – Non miscible (L/min/m²) :</label>
+            <input id="texDirNonMisc" type="number" min="0" step="0.1" value="10" disabled>
+          </div>
+
+          <div class="lif-field">
+            <label>Tex Réflexe – Indirect – Miscible (L/min/m²) :</label>
+            <input id="texIndMisc" type="number" min="0" step="0.1" value="10" disabled>
+          </div>
+
+          <div class="lif-field">
+            <label>Tex Réflexe – Direct – Miscible (L/min/m²) :</label>
+            <input id="texDirMisc" type="number" min="0" step="0.1" value="20" disabled>
+          </div>
+
+          <div class="lif-field">
+            <label>Rappel POI exploitant (Réfléchi) :</label>
+            <input id="poiNote" type="text" placeholder="En mode Réfléchi, le Tex est celui défini par le POI exploitant" disabled>
+            <small class="lif-help">Le champ “Taux d'extinction défini dans POI” reste prioritaire en “Réfléchi (POI)”.</small>
+          </div>
+        </div>
+      </section>
 
       <!-- ================== SAISIE ================== -->
       <section class="lif-card">
@@ -221,10 +271,10 @@
               <option value="non_miscible">Non miscible</option>
               <option value="miscible">Miscible (alcool)</option>
             </select>
-            <small class="lif-help">Concentration fixée à 3 %</small>
+            <small class="lif-help">Concentration par défaut : 3 % (modifiable en mode “Autre SDIS”).</small>
           </div>
 
-          <!-- POI : visible pour NAPPE + BAC (selon ta logique) -->
+          <!-- POI : visible pour NAPPE + BAC -->
           <div class="lif-field" id="blocReflexe">
             <label>Réflexe / Réfléchi :</label>
             <select id="reflexe">
@@ -240,18 +290,17 @@
             <small class="lif-help">Visible uniquement si “Réfléchi (POI)”</small>
           </div>
 
-         <div class="lif-grid lif-grid-2">
-  <div class="lif-field">
-    <label>Heure de début de temporisation :</label>
-    <input id="tempoDebut" type="time">
-  </div>
+          <div class="lif-grid lif-grid-2">
+            <div class="lif-field">
+              <label>Heure de début de temporisation :</label>
+              <input id="tempoDebut" type="time">
+            </div>
 
-  <div class="lif-field">
-    <label>Heure de fin de temporisation :</label>
-    <input id="tempoFin" type="time">
-  </div>
-</div>
-
+            <div class="lif-field">
+              <label>Heure de fin de temporisation :</label>
+              <input id="tempoFin" type="time">
+            </div>
+          </div>
 
           <!-- Cuvette : uniquement en bac -->
           <div class="lif-field" id="blocCuvette" style="display:none;">
@@ -273,23 +322,23 @@
         <div class="lif-badges">
           <div class="lif-badge"><div>Tex</div><div id="oTex">—</div></div>
           <div class="lif-badge"><div>Durée ext.</div><div id="oT">—</div></div>
-          <div class="lif-badge"><div>Concentration</div><div>3 %</div></div>
+          <div class="lif-badge"><div>Concentration</div><div id="oConc">3 %</div></div>
         </div>
 
         <div class="lif-split">
           <div class="lif-panel">
             <div class="lif-panel-title">EXTINCTION</div>
-           <div class="lif-row"><span>Q ext (L/min) :</span><span id="oQext">—</span></div>
+            <div class="lif-row"><span>Q ext (L/min) :</span><span id="oQext">—</span></div>
             <div class="lif-row"><span>V émulseur (L) :</span><span id="oVemul">—</span></div>
             <div class="lif-row">
-  <span>V émulseur pour entretien du tapis de mousse (L) :</span>
-  <span id="oEntExt">—</span>
-</div>
+              <span>V émulseur pour entretien du tapis de mousse (L) :</span>
+              <span id="oEntExt">—</span>
+            </div>
           </div>
 
           <div class="lif-panel">
             <div class="lif-panel-title">TEMPORISATION</div>
-           <div class="lif-row"><span>Q tempo (L/min) :</span><span id="oQtempo">—</span></div>
+            <div class="lif-row"><span>Q tempo (L/min) :</span><span id="oQtempo">—</span></div>
             <div class="lif-row"><span>V tempo (L) :</span><span id="oVtempo">—</span></div>
           </div>
         </div>
@@ -329,9 +378,10 @@
         </div>
 
       </section>
-<div class="lif-signature">
-  © Capitaine Florian PICO – Outil MEMO LIF – Usage professionnel
-</div>
+
+      <div class="lif-signature">
+        © Capitaine Florian PICO – Outil MEMO LIF – Usage professionnel
+      </div>
 
     </div>
   </div>
@@ -348,25 +398,56 @@
     const x = Number(s);
     return Number.isFinite(x) ? x : NaN;
   };
-function getTempoMinutes() {
-  const d = $("tempoDebut").value;
-  const f = $("tempoFin").value;
-  if (!d || !f) return NaN;
 
-  const [hd, md] = d.split(":").map(Number);
-  const [hf, mf] = f.split(":").map(Number);
+  function getTempoMinutes() {
+    const d = $("tempoDebut").value;
+    const f = $("tempoFin").value;
+    if (!d || !f) return NaN;
 
-  let debut = hd * 60 + md;
-  let fin = hf * 60 + mf;
+    const [hd, md] = d.split(":").map(Number);
+    const [hf, mf] = f.split(":").map(Number);
 
-  // Si passage minuit (ex : 23:50 → 00:20)
-  if (fin < debut) fin += 24 * 60;
+    let debut = hd * 60 + md;
+    let fin = hf * 60 + mf;
 
-  return fin - debut;
-}
+    // Si passage minuit (ex : 23:50 → 00:20)
+    if (fin < debut) fin += 24 * 60;
+
+    return fin - debut;
+  }
 
   function setDebordUI(isDebord) {
     $("blocTapisPreventif").style.display = isDebord ? "block" : "none";
+  }
+
+  /* ================== PARAMÈTRES INTER-SDIS (AJOUT) ================== */
+  function isCustomMode() {
+    return $("modeSdis").value === "custom";
+  }
+
+  function updateLockUI() {
+    const custom = isCustomMode();
+
+    const ids = [
+      "concentrationPct",
+      "texIndNonMisc", "texDirNonMisc",
+      "texIndMisc", "texDirMisc",
+      "poiNote"
+    ];
+
+    ids.forEach(id => { const el = $(id); if (el) el.disabled = !custom; });
+
+    // Sécurité : en mode SDIS27, on force les valeurs doctrine
+    if (!custom) {
+      $("concentrationPct").value = 3;
+      $("texIndNonMisc").value = 5;
+      $("texDirNonMisc").value = 10;
+      $("texIndMisc").value = 10;
+      $("texDirMisc").value = 20;
+      $("poiNote").value = "";
+    }
+
+    compute();
   }
 
   // ✅ LOGIQUE DEMANDÉE :
@@ -395,125 +476,135 @@ function getTempoMinutes() {
     if (!isBac) $("surfaceCuvette").value = "";
   }
 
-function compute() {
-  const S = n($("surfaceFeu").value);
-  if (!Number.isFinite(S) || S <= 0) return;
+  function compute() {
+    const S = n($("surfaceFeu").value);
+    if (!Number.isFinite(S) || S <= 0) return;
 
-  const type = $("typeFeu").value;       // nappe | bac
-  const atk  = $("attaque").value;       // indirect | direct
-  const prod = $("produit").value;       // non_miscible | miscible
-  const ref  = $("reflexe").value;       // reflexe | reflechi
-  const texPoi = n($("texPoi").value);
+    const type = $("typeFeu").value;       // nappe | bac
+    const atk  = $("attaque").value;       // indirect | direct
+    const prod = $("produit").value;       // non_miscible | miscible
+    const ref  = $("reflexe").value;       // reflexe | reflechi
+    const texPoi = n($("texPoi").value);
 
-  /* ================== TEX ================== */
-  let Tex;
+    // Paramètres (toujours lisibles même si disabled)
+    const concPct = n($("concentrationPct").value);
+    const conc = (Number.isFinite(concPct) && concPct >= 0) ? (concPct / 100) : 0.03;
+    $("oConc").textContent = (Number.isFinite(concPct) ? `${concPct} %` : "3 %");
 
-  if (ref === "reflechi") {
-    if (!Number.isFinite(texPoi) || texPoi <= 0) return;
-    Tex = texPoi;
-  } else {
-    Tex = (atk === "indirect")
-      ? (prod === "miscible" ? 10 : 5)
-      : (prod === "miscible" ? 20 : 10);
-  }
+    const texIndNonMisc = n($("texIndNonMisc").value);
+    const texDirNonMisc = n($("texDirNonMisc").value);
+    const texIndMisc    = n($("texIndMisc").value);
+    const texDirMisc    = n($("texDirMisc").value);
 
-  if (!Number.isFinite(Tex) || Tex <= 0) return;
+    /* ================== TEX ================== */
+    let Tex;
 
-  /* ================== DURÉES / DÉBITS ================== */
-  const tExt = (type === "bac") ? 40 : (S < 400 ? 20 : 40);
-  const Qext = S * Tex;
-  const Qtempo = S * (Tex / 2);
-
-  /* ================== AFFICHAGE DE BASE ================== */
-  $("oTex").textContent    = Tex.toFixed(2);
-  $("oT").textContent      = String(Math.round(tExt));
-  $("oQext").textContent   = String(Math.round(Qext));
-  $("oQtempo").textContent = String(Math.round(Qtempo));
-  $("oEntExt").textContent = String(Math.round(S * 0.2));
-
-  /* ================== V ÉMULSEUR EXTINCTION ================== */
-  const Vemul = Qext * tExt * 0.03;
-  $("oVemul").textContent = String(Math.round(Vemul));
-
-  /* ================== V TEMPO (LOGIQUE DEMANDÉE) ================== */
-  const finRenseignee = !!$("tempoFin").value;
-  const tTempoMin = getTempoMinutes(); // durée réelle si début + fin
-
-  if (!finRenseignee) {
-    // 🔹 Nappe OU Bac + fin vide
-    $("oVtempo").textContent = String(Math.round(Vemul / 2));
-  } else {
-    // 🔹 Nappe OU Bac + fin remplie → calcul réel
-    $("oVtempo").textContent =
-      Number.isFinite(tTempoMin)
-        ? String(Math.round(Qtempo * tTempoMin * 0.03))
-        : "—";
-  }
-
-  /* ================== DÉBORDEMENT (BAC UNIQUEMENT) ================== */
-  if (type !== "bac") {
-    setDebordUI(false);
-    return;
-  }
-
-  const Vp = n($("vPresent").value);
-  const Vt = n($("vTotal").value);
-  const tr = n($("tReel").value);
-
-  if (![Vp, Vt, tr].every(Number.isFinite) || Vt <= 0) {
-    $("oAjTempo").textContent = "—";
-    $("oAjExt").textContent   = "—";
-    $("oMarge").textContent   = "—";
-    $("oTemps").textContent   = "—";
-    $("oDebord").textContent  = "—";
-    setDebordUI(false);
-    return;
-  }
-
-  const Vtempo = Qtempo * tr;
-  const Vext   = Qext * 40;
-  const marge  = Vt - (Vp + Vtempo + Vext);
-
-  $("oAjTempo").textContent = String(Math.round(Vtempo));
-  $("oAjExt").textContent   = String(Math.round(Vext));
-  $("oMarge").textContent   = String(Math.round(marge));
-
-  let deb = false;
-  let msg = "Pas de débordement";
-
-  if (Vp >= Vt) {
-    deb = true;
-    msg = "Débordement immédiat (0 min)";
-  } else {
-    const margeInit = Vt - Vp;
-    if (Qtempo * tr >= margeInit) {
-      deb = true;
-      msg = `Débordement pendant temporisation (~${(margeInit / Qtempo).toFixed(1)} min)`;
+    if (ref === "reflechi") {
+      if (!Number.isFinite(texPoi) || texPoi <= 0) return;
+      Tex = texPoi;
     } else {
-      const reste = margeInit - Qtempo * tr;
-      const tDebExt = reste / Qext;
-      if (tDebExt <= 40) {
+      // Réflexe : barème (SDIS27 verrouillé ou valeurs custom)
+      const ind = (prod === "miscible") ? texIndMisc : texIndNonMisc;
+      const dir = (prod === "miscible") ? texDirMisc : texDirNonMisc;
+      Tex = (atk === "indirect") ? ind : dir;
+    }
+
+    if (!Number.isFinite(Tex) || Tex <= 0) return;
+
+    /* ================== DURÉES / DÉBITS ================== */
+    const tExt = (type === "bac") ? 40 : (S < 400 ? 20 : 40);
+    const Qext = S * Tex;
+    const Qtempo = S * (Tex / 2);
+
+    /* ================== AFFICHAGE DE BASE ================== */
+    $("oTex").textContent    = Tex.toFixed(2);
+    $("oT").textContent      = String(Math.round(tExt));
+    $("oQext").textContent   = String(Math.round(Qext));
+    $("oQtempo").textContent = String(Math.round(Qtempo));
+    $("oEntExt").textContent = String(Math.round(S * 0.2));
+
+    /* ================== V ÉMULSEUR EXTINCTION (concentration paramétrable) ================== */
+    const Vemul = Qext * tExt * conc;
+    $("oVemul").textContent = String(Math.round(Vemul));
+
+    /* ================== V TEMPO (LOGIQUE DEMANDÉE) ================== */
+    const finRenseignee = !!$("tempoFin").value;
+    const tTempoMin = getTempoMinutes(); // durée réelle si début + fin
+
+    if (!finRenseignee) {
+      // 🔹 Nappe OU Bac + fin vide
+      $("oVtempo").textContent = String(Math.round(Vemul / 2));
+    } else {
+      // 🔹 Nappe OU Bac + fin remplie → calcul réel
+      $("oVtempo").textContent =
+        Number.isFinite(tTempoMin)
+          ? String(Math.round(Qtempo * tTempoMin * conc))
+          : "—";
+    }
+
+    /* ================== DÉBORDEMENT (BAC UNIQUEMENT) ================== */
+    if (type !== "bac") {
+      setDebordUI(false);
+      return;
+    }
+
+    const Vp = n($("vPresent").value);
+    const Vt = n($("vTotal").value);
+    const tr = n($("tReel").value);
+
+    if (![Vp, Vt, tr].every(Number.isFinite) || Vt <= 0) {
+      $("oAjTempo").textContent = "—";
+      $("oAjExt").textContent   = "—";
+      $("oMarge").textContent   = "—";
+      $("oTemps").textContent   = "—";
+      $("oDebord").textContent  = "—";
+      setDebordUI(false);
+      return;
+    }
+
+    const Vtempo = Qtempo * tr;
+    const Vext   = Qext * 40;
+    const marge  = Vt - (Vp + Vtempo + Vext);
+
+    $("oAjTempo").textContent = String(Math.round(Vtempo));
+    $("oAjExt").textContent   = String(Math.round(Vext));
+    $("oMarge").textContent   = String(Math.round(marge));
+
+    let deb = false;
+    let msg = "Pas de débordement";
+
+    if (Vp >= Vt) {
+      deb = true;
+      msg = "Débordement immédiat (0 min)";
+    } else {
+      const margeInit = Vt - Vp;
+      if (Qtempo * tr >= margeInit) {
         deb = true;
-        msg = `Débordement pendant extinction (~${(tr + tDebExt).toFixed(1)} min)`;
+        msg = `Débordement pendant temporisation (~${(margeInit / Qtempo).toFixed(1)} min)`;
+      } else {
+        const reste = margeInit - Qtempo * tr;
+        const tDebExt = reste / Qext;
+        if (tDebExt <= 40) {
+          deb = true;
+          msg = `Débordement pendant extinction (~${(tr + tDebExt).toFixed(1)} min)`;
+        }
       }
     }
+
+    $("oTemps").textContent = msg;
+    $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
+    $("oDebord").style.background  = deb ? "#fee2e2" : "#dcfce7";
+    $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
+    $("oDebord").style.color       = deb ? "#7f1d1d" : "#065f46";
+
+    setDebordUI(deb);
+
+    if (deb) {
+      const Sc = n($("surfaceCuvette").value);
+      $("oVtapis").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.15 * 3)) : "—";
+      $("oDentretien").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.2)) : "—";
+    }
   }
-
-  $("oTemps").textContent = msg;
-  $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
-  $("oDebord").style.background  = deb ? "#fee2e2" : "#dcfce7";
-  $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
-  $("oDebord").style.color       = deb ? "#7f1d1d" : "#065f46";
-
-  setDebordUI(deb);
-
-  if (deb) {
-    const Sc = n($("surfaceCuvette").value);
-    $("oVtapis").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.15 * 3)) : "—";
-    $("oDentretien").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.2)) : "—";
-  }
-}
-
 
   function resetAll() {
     $("surfaceFeu").value = "";
@@ -523,24 +614,33 @@ function compute() {
     $("reflexe").value = "reflexe";
     $("texPoi").value = "";
     $("tempoDebut").value = "";
-$("tempoFin").value = "";
+    $("tempoFin").value = "";
     $("surfaceCuvette").value = "";
 
     $("vPresent").value = "";
     $("vTotal").value = "";
     $("tReel").value = "";
 
+    // reset affichages
     ["oTex","oT","oQext","oVemul","oQtempo","oVtempo","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oDebord","oVtapis","oDentretien"]
       .forEach(id => { const e = $(id); if (e) e.textContent = "—"; });
+
+    $("oConc").textContent = "3 %";
 
     $("oDebord").style.background = "#fff";
     $("oDebord").style.borderColor = "#ddd";
     $("oDebord").style.color = "#111";
 
+    // reset mode + paramètres (sécurisé SDIS27)
+    $("modeSdis").value = "lock";
+    updateLockUI();
+
     updateUI();
   }
 
   // handlers
+  $("modeSdis").addEventListener("change", updateLockUI);
+
   $("typeFeu").addEventListener("change", () => { updateUI(); compute(); });
   $("reflexe").addEventListener("change", () => { updateUI(); compute(); });
 
@@ -560,26 +660,3 @@ $("tempoFin").value = "";
 </footer>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

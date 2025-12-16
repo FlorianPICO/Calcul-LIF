@@ -106,8 +106,14 @@
 
 .hero-title span {
   display: block;
-  white-space: normal; /* ✅ autorise l’adaptation écran */
+  white-space: normal;   /* ✅ autorise l’adaptation si besoin */
 }
+
+/* ✅ ligne 3 : on empêche la coupure entre "liquides" et "inflammables" */
+.hero-title span:last-child {
+  white-space: nowrap;
+}
+
 
 
   .backlink {
@@ -221,7 +227,7 @@
   <h1 class="hero-title">
     <span>Calcul LIF</span>
     <span>Outil opérationnel</span>
-    <span>Feux de liquides inflammables</span>
+    <span>Feux de liquides&nbsp;inflammables</span>
   </h1>
 
     <p style="margin-top:10px;font-size:1.1em;">
@@ -707,6 +713,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

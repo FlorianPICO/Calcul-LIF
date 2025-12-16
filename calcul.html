@@ -55,6 +55,13 @@
       text-decoration: none;
       font-weight: 700;
     }
+.lif-field input,
+.lif-field select {
+  box-sizing: border-box;
+}
+* {
+  box-sizing: border-box;
+}
 
     /* -------- Styles de l'outil LIF -------- */
     .lif-container{max-width:760px;margin:auto;padding:12px}
@@ -105,12 +112,12 @@
 
         <div class="lif-grid">
           <div class="lif-field">
-            <label>Surface en feu S (m²)</label>
+            <label>Surface en feu (m²) :</label>
             <input id="surfaceFeu" type="number" min="0" step="0.01" placeholder="Ex : 300">
           </div>
 
           <div class="lif-field">
-            <label>Type de feu</label>
+            <label>Type de feu :</label>
             <select id="typeFeu">
               <option value="nappe">Feu de nappe</option>
               <option value="bac">Feu de bac / cuvette</option>
@@ -118,7 +125,7 @@
           </div>
 
           <div class="lif-field">
-            <label>Mode d’attaque</label>
+            <label>Mode d’attaque :</label>
             <select id="attaque">
               <option value="indirect">Indirect</option>
               <option value="direct">Direct</option>
@@ -126,7 +133,7 @@
           </div>
 
           <div class="lif-field">
-            <label>Produit</label>
+            <label>Produit :</label>
             <select id="produit">
               <option value="non_miscible">Non miscible</option>
               <option value="miscible">Miscible (alcool)</option>
@@ -136,7 +143,7 @@
 
           <!-- POI : visible pour NAPPE + BAC (selon ta logique) -->
           <div class="lif-field" id="blocReflexe">
-            <label>Réfléchi / Réflexe</label>
+            <label>Réflexe / Réfléchi :</label>
             <select id="reflexe">
               <option value="reflexe">Réflexe</option>
               <option value="reflechi">Réfléchi (POI)</option>
@@ -152,12 +159,12 @@
 
           <div class="lif-grid" style="grid-template-columns:1fr 1fr;">
   <div class="lif-field">
-    <label>Heure de début de temporisation</label>
+    <label>Heure de début de temporisation :</label>
     <input id="tempoDebut" type="time">
   </div>
 
   <div class="lif-field">
-    <label>Heure de fin de temporisation</label>
+    <label>Heure de fin de temporisation :</label>
     <input id="tempoFin" type="time">
   </div>
 </div>
@@ -189,7 +196,7 @@
           <div class="lif-panel">
             <div class="lif-panel-title">EXTINCTION</div>
            <div class="lif-row"><span>Q ext (L/min) :</span><span id="oQext">—</span></div>
-            <div class="lif-row"><span>V émulseur (L)</span><span id="oVemul">—</span></div>
+            <div class="lif-row"><span>V émulseur (L) :</span><span id="oVemul">—</span></div>
             <div class="lif-row">
   <span>V émulseur pour entretien du tapis de mousse (L) :</span>
   <span id="oEntExt">—</span>
@@ -199,7 +206,7 @@
           <div class="lif-panel">
             <div class="lif-panel-title">TEMPORISATION</div>
            <div class="lif-row"><span>Q tempo (L/min) :</span><span id="oQtempo">—</span></div>
-            <div class="lif-row"><span>V tempo (L)</span><span id="oVtempo">—</span></div>
+            <div class="lif-row"><span>V tempo (L) :</span><span id="oVtempo">—</span></div>
           </div>
         </div>
 
@@ -453,6 +460,7 @@ $("tempoFin").value = "";
 
 </body>
 </html>
+
 
 
 

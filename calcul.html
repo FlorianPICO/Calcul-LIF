@@ -189,55 +189,61 @@
 
     <div class="lif-container">
 
-      <!-- ================== PARAMÈTRES INTER-SDIS (AJOUT) ================== -->
-      <section class="lif-card">
-        <div class="lif-card-title">0) Paramètres</div>
+<!-- ================== PARAMÈTRES INTER-SDIS (AJOUT) ================== -->
+<section class="lif-card">
+  <div class="lif-card-title">0) Paramètres</div>
 
-        <div class="lif-grid">
-          <div class="lif-field">
-            <label>Mode :</label>
-            <select id="modeSdis">
-              <option value="lock" selected>SDIS 27 (verrouillé)</option>
-              <option value="custom">Autre SDIS (personnalisable)</option>
-            </select>
-            <small class="lif-help">
-              Par défaut, les valeurs SDIS 27 sont appliquées. En mode “Autre SDIS”, vous pouvez saisir votre doctrine.
-            </small>
-          </div>
+  <div class="lif-grid">
+    <div class="lif-field">
+      <label>Mode :</label>
+      <select id="modeSdis">
+        <option value="lock" selected>SDIS 27 (verrouillé)</option>
+        <option value="custom">Autre SDIS (personnalisable)</option>
+      </select>
+      <small class="lif-help">
+        Par défaut, les valeurs SDIS 27 sont appliquées. En mode “Autre SDIS”, vous pouvez saisir votre doctrine.
+      </small>
+    </div>
 
-          <div class="lif-field">
-            <label>Concentration émulseur (%) :</label>
-            <input id="concentrationPct" type="number" min="0" step="0.1" value="3" disabled>
-            <small class="lif-help">Déverrouillé uniquement en mode “Autre SDIS”.</small>
-          </div>
-
-          <div class="lif-field">
-            <label>Tex Réflexe – Indirect – Non miscible (L/min/m²) :</label>
-            <input id="texIndNonMisc" type="number" min="0" step="0.1" value="5" disabled>
-          </div>
-
-          <div class="lif-field">
-            <label>Tex Réflexe – Direct – Non miscible (L/min/m²) :</label>
-            <input id="texDirNonMisc" type="number" min="0" step="0.1" value="10" disabled>
-          </div>
-
-          <div class="lif-field">
-            <label>Tex Réflexe – Indirect – Miscible (L/min/m²) :</label>
-            <input id="texIndMisc" type="number" min="0" step="0.1" value="10" disabled>
-          </div>
-
-          <div class="lif-field">
-            <label>Tex Réflexe – Direct – Miscible (L/min/m²) :</label>
-            <input id="texDirMisc" type="number" min="0" step="0.1" value="20" disabled>
-          </div>
-
-          <div class="lif-field">
-            <label>Rappel POI exploitant (Réfléchi) :</label>
-            <input id="poiNote" type="text" placeholder="En mode Réfléchi, le Tex est celui défini par le POI exploitant" disabled>
-            <small class="lif-help">Le champ “Taux d'extinction défini dans POI” reste prioritaire en “Réfléchi (POI)”.</small>
-          </div>
+    <!-- ✅ Tout ce bloc est caché en SDIS27, visible en "Autre SDIS" -->
+    <div id="customParams" style="display:none;">
+      <div class="lif-grid">
+        <div class="lif-field">
+          <label>Concentration émulseur (%) :</label>
+          <input id="concentrationPct" type="number" min="0" step="0.1" value="3" disabled>
+          <small class="lif-help">Déverrouillé uniquement en mode “Autre SDIS”.</small>
         </div>
-      </section>
+
+        <div class="lif-field">
+          <label>Tex Réflexe – Indirect – Non miscible (L/min/m²) :</label>
+          <input id="texIndNonMisc" type="number" min="0" step="0.1" value="5" disabled>
+        </div>
+
+        <div class="lif-field">
+          <label>Tex Réflexe – Direct – Non miscible (L/min/m²) :</label>
+          <input id="texDirNonMisc" type="number" min="0" step="0.1" value="10" disabled>
+        </div>
+
+        <div class="lif-field">
+          <label>Tex Réflexe – Indirect – Miscible (L/min/m²) :</label>
+          <input id="texIndMisc" type="number" min="0" step="0.1" value="10" disabled>
+        </div>
+
+        <div class="lif-field">
+          <label>Tex Réflexe – Direct – Miscible (L/min/m²) :</label>
+          <input id="texDirMisc" type="number" min="0" step="0.1" value="20" disabled>
+        </div>
+
+        <div class="lif-field">
+          <label>Rappel POI exploitant (Réfléchi) :</label>
+          <input id="poiNote" type="text" placeholder="En mode Réfléchi, le Tex est celui défini par le POI exploitant" disabled>
+          <small class="lif-help">Le champ “Taux d'extinction défini dans POI” reste prioritaire en “Réfléchi (POI)”.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       <!-- ================== SAISIE ================== -->
       <section class="lif-card">
@@ -660,3 +666,4 @@
 </footer>
 </body>
 </html>
+

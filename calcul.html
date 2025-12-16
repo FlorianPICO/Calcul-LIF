@@ -186,6 +186,20 @@
     header { padding: 34px 14px; }
     header h1 { max-width: 20ch; }
   }
+  /* ✅ CORRECTION DEBORDEMENT HEURES (MOBILE) */
+.lif-grid-2 {
+  width: 100%;
+}
+
+.lif-grid-2 .lif-field {
+  min-width: 0;
+}
+
+.lif-grid-2 input[type="time"] {
+  width: 100%;
+  min-width: 0;
+}
+
 </style>
 
 </head>
@@ -312,7 +326,7 @@
             <small class="lif-help">Visible uniquement si “Réfléchi (POI)”</small>
           </div>
 
-          <div class="lif-grid lif-grid-2">
+          <div class="lif-grid-2">
             <div class="lif-field">
               <label>Heure de début de temporisation :</label>
               <input id="tempoDebut" type="time">
@@ -684,6 +698,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

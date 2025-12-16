@@ -359,113 +359,125 @@ function getTempoMinutes() {
     if (!isBac) $("surfaceCuvette").value = "";
   }
 
-  function compute() {
-    const S = n($("surfaceFeu").value);
-    if (!Number.isFinite(S) || S <= 0) return;
+function compute() {
+  const S = n($("surfaceFeu").value);
+  if (!Number.isFinite(S) || S <= 0) return;
 
-    const type = $("typeFeu").value;       // nappe | bac
-    const atk = $("attaque").value;        // indirect | direct
-    const prod = $("produit").value;       // non_miscible | miscible
-    const ref = $("reflexe").value;        // reflexe | reflechi
-    const texPoi = n($("texPoi").value);
+  const type = $("typeFeu").value;       // nappe | bac
+  const atk  = $("attaque").value;       // indirect | direct
+  const prod = $("produit").value;       // non_miscible | miscible
+  const ref  = $("reflexe").value;       // reflexe | reflechi
+  const texPoi = n($("texPoi").value);
 
-    let Tex;
+  /* ================== TEX ================== */
+  let Tex;
 
-    // Si "réfléchi", on impose Tex = Tex POI (dans nappe ou bac)
-    if (ref === "reflechi") {
-      if (!Number.isFinite(texPoi) || texPoi <= 0) return; // Tex POI obligatoire
-      Tex = texPoi;
-    } else {
-      // Réflexe : barème standard
-      Tex = (atk === "indirect")
-        ? (prod === "miscible" ? 10 : 5)
-        : (prod === "miscible" ? 20 : 10);
-    }
+  if (ref === "reflechi") {
+    if (!Number.isFinite(texPoi) || texPoi <= 0) return;
+    Tex = texPoi;
+  } else {
+    Tex = (atk === "indirect")
+      ? (prod === "miscible" ? 10 : 5)
+      : (prod === "miscible" ? 20 : 10);
+  }
 
-    const tExt = (type === "bac") ? 40 : (S < 400 ? 20 : 40);
-    const Qext = S * Tex;
-    const Qtempo = S * (Tex / 2);
+  if (!Number.isFinite(Tex) || Tex <= 0) return;
 
-    const entretien = S * 0.2;
+  /* ================== DURÉES / DÉBITS ================== */
+  const tExt = (type === "bac") ? 40 : (S < 400 ? 20 : 40);
+  const Qext = S * Tex;
+  const Qtempo = S * (Tex / 2);
 
-    $("oTex").textContent = Tex.toFixed(2);
-    $("oT").textContent = String(Math.round(tExt));
-    $("oQext").textContent = String(Math.round(Qext));
-    $("oVemul").textContent = String(Math.round(Qext * tExt * 0.03));
-    $("oQtempo").textContent = String(Math.round(Qtempo));
-const tTempoMin = getTempoMinutes();
-$("oVtempo").textContent =
-  Number.isFinite(tTempoMin)
-    ? String(Math.round(Qtempo * tTempoMin * 0.03))
-    : "—";
+  /* ================== AFFICHAGE DE BASE ================== */
+  $("oTex").textContent    = Tex.toFixed(2);
+  $("oT").textContent      = String(Math.round(tExt));
+  $("oQext").textContent   = String(Math.round(Qext));
+  $("oQtempo").textContent = String(Math.round(Qtempo));
+  $("oEntExt").textContent = String(Math.round(S * 0.2));
 
-    $("oEntExt").textContent = String(Math.round(entretien));
+  /* ================== V ÉMULSEUR EXTINCTION ================== */
+  const Vemul = Qext * tExt * 0.03;
+  $("oVemul").textContent = String(Math.round(Vemul));
 
-    // ----------------- Débordement (BAC uniquement) -----------------
-    if (type !== "bac") {
-      setDebordUI(false);
-      return;
-    }
+  /* ================== V TEMPO (LOGIQUE DEMANDÉE) ================== */
+  const finRenseignee = !!$("tempoFin").value;
+  const tTempoMin = getTempoMinutes(); // durée réelle si début + fin
 
-    const Vp = n($("vPresent").value);
-    const Vt = n($("vTotal").value);
-    const tr = n($("tReel").value);
+  if (!finRenseignee) {
+    // 🔹 Nappe OU Bac + fin vide
+    $("oVtempo").textContent = String(Math.round(Vemul / 2));
+  } else {
+    // 🔹 Nappe OU Bac + fin remplie → calcul réel
+    $("oVtempo").textContent =
+      Number.isFinite(tTempoMin)
+        ? String(Math.round(Qtempo * tTempoMin * 0.03))
+        : "—";
+  }
 
-    if (![Vp, Vt, tr].every(Number.isFinite) || Vt <= 0) {
-      $("oAjTempo").textContent = "—";
-      $("oAjExt").textContent = "—";
-      $("oMarge").textContent = "—";
-      $("oTemps").textContent = "—";
-      $("oDebord").textContent = "—";
-      setDebordUI(false);
-      return;
-    }
+  /* ================== DÉBORDEMENT (BAC UNIQUEMENT) ================== */
+  if (type !== "bac") {
+    setDebordUI(false);
+    return;
+  }
 
-    const Vtempo = Qtempo * tr;
-    const Vext = Qext * 40;
-    const marge = Vt - (Vp + Vtempo + Vext);
+  const Vp = n($("vPresent").value);
+  const Vt = n($("vTotal").value);
+  const tr = n($("tReel").value);
 
-    $("oAjTempo").textContent = String(Math.round(Vtempo));
-    $("oAjExt").textContent = String(Math.round(Vext));
-    $("oMarge").textContent = String(Math.round(marge));
+  if (![Vp, Vt, tr].every(Number.isFinite) || Vt <= 0) {
+    $("oAjTempo").textContent = "—";
+    $("oAjExt").textContent   = "—";
+    $("oMarge").textContent   = "—";
+    $("oTemps").textContent   = "—";
+    $("oDebord").textContent  = "—";
+    setDebordUI(false);
+    return;
+  }
 
-    let deb = false;
-    let msg = "Pas de débordement";
+  const Vtempo = Qtempo * tr;
+  const Vext   = Qext * 40;
+  const marge  = Vt - (Vp + Vtempo + Vext);
 
-    if (Vp >= Vt) {
+  $("oAjTempo").textContent = String(Math.round(Vtempo));
+  $("oAjExt").textContent   = String(Math.round(Vext));
+  $("oMarge").textContent   = String(Math.round(marge));
+
+  let deb = false;
+  let msg = "Pas de débordement";
+
+  if (Vp >= Vt) {
+    deb = true;
+    msg = "Débordement immédiat (0 min)";
+  } else {
+    const margeInit = Vt - Vp;
+    if (Qtempo * tr >= margeInit) {
       deb = true;
-      msg = "Débordement immédiat (0 min)";
+      msg = `Débordement pendant temporisation (~${(margeInit / Qtempo).toFixed(1)} min)`;
     } else {
-      const margeInitiale = Vt - Vp;
-
-      if (Qtempo * tr >= margeInitiale) {
-        const tDeb = margeInitiale / Qtempo;
+      const reste = margeInit - Qtempo * tr;
+      const tDebExt = reste / Qext;
+      if (tDebExt <= 40) {
         deb = true;
-        msg = `Débordement pendant temporisation (~${tDeb.toFixed(1)} min)`;
-      } else {
-        const reste = margeInitiale - Qtempo * tr;
-        const tDebExt = reste / Qext;
-        if (tDebExt <= 40) {
-          deb = true;
-          msg = `Débordement pendant extinction (~${(tr + tDebExt).toFixed(1)} min)`;
-        }
+        msg = `Débordement pendant extinction (~${(tr + tDebExt).toFixed(1)} min)`;
       }
     }
-
-    $("oTemps").textContent = msg;
-    $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
-    $("oDebord").style.background = deb ? "#fee2e2" : "#dcfce7";
-    $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
-    $("oDebord").style.color = deb ? "#7f1d1d" : "#065f46";
-
-    setDebordUI(deb);
-
-    if (deb) {
-      const Sc = n($("surfaceCuvette").value);
-      $("oVtapis").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.15 * 3)) : "—";
-      $("oDentretien").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.2)) : "—";
-    }
   }
+
+  $("oTemps").textContent = msg;
+  $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
+  $("oDebord").style.background  = deb ? "#fee2e2" : "#dcfce7";
+  $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
+  $("oDebord").style.color       = deb ? "#7f1d1d" : "#065f46";
+
+  setDebordUI(deb);
+
+  if (deb) {
+    const Sc = n($("surfaceCuvette").value);
+    $("oVtapis").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.15 * 3)) : "—";
+    $("oDentretien").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.2)) : "—";
+  }
+}
+
 
   function resetAll() {
     $("surfaceFeu").value = "";
@@ -513,6 +525,7 @@ $("tempoFin").value = "";
 </footer>
 </body>
 </html>
+
 
 
 

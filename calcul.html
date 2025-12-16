@@ -5,90 +5,125 @@
   <title>Calcul MEMO LIF – SDIS 27</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, Arial, sans-serif;
-      background: #f5f7fa;
-      color: #111;
-      line-height: 1.6;
-    }
-    header {
-      background: #0b1220;
-      color: white;
-      padding: 50px 20px;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2.2em;
-    }
-    header p {
-      opacity: 0.9;
-      font-size: 1.1em;
-      margin: 10px 0 0 0;
-    }
-    section.page {
-      max-width: 900px;
-      margin: auto;
-      padding: 30px 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid #ddd;
-    }
-    .logo {
-      max-height: 90px;
-      width: auto;
-      display: block;
-      margin: 0 auto 15px auto;
-    }
-    .backlink {
-      display: inline-block;
-      margin-top: 14px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.12);
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-    }
-.lif-field input,
-.lif-field select {
-  box-sizing: border-box;
-}
-* {
-  box-sizing: border-box;
-}
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, Arial, sans-serif;
+    background: #f5f7fa;
+    color: #111;
+    line-height: 1.6;
+  }
 
-    /* -------- Styles de l'outil LIF -------- */
-    .lif-container{max-width:760px;margin:auto;padding:12px}
-    .lif-card{background:#fff;border-radius:14px;padding:14px;margin-top:12px;border:1px solid #ddd}
-    .lif-card-title {
-  font-size: 1.4rem;      /* ⬅️ taille du texte */
-  font-weight: 900;
-  margin-bottom: 14px;
-}
+  /* ✅ HEADER RESPONSIVE (logo centré + texte adaptable) */
+  header {
+    background: #0b1220;
+    color: white;
+    padding: 42px 16px;
+    text-align: center;
 
-    .lif-grid{display:grid;grid-template-columns:1fr;gap:10px}
-    .lif-field input,.lif-field select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc}
-    .lif-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-    .lif-btn{padding:12px;border-radius:12px;font-weight:700;cursor:pointer}
-    .lif-btn-primary{background:#2563eb;color:#fff;border:0}
-    .lif-btn-ghost{background:#fff;border:1px solid #ccc}
-    .lif-badges{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-    .lif-badge{background:#f5f5f5;padding:12px;border-radius:12px;text-align:center;font-weight:800}
-    .lif-split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .lif-panel{border:1px solid #ddd;border-radius:12px;padding:12px}
-    .lif-panel-title{font-weight:900;margin-bottom:8px}
-    .lif-panel-muted{background:#fafafa}
-    .lif-row{display:flex;justify-content:space-between;padding:6px 0;font-weight:700;gap:10px}
-    .lif-debord{margin-top:10px;padding:12px;border-radius:12px;text-align:center;font-weight:900;border:1px solid #ddd;background:#fff}
-    .lif-help{display:block;margin-top:6px;font-size:12px;color:#5b5b5b}
-    @media(max-width:640px){.lif-split{grid-template-columns:1fr}}
-  </style>
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: clamp(1.3rem, 4.8vw, 2.2rem);
+    line-height: 1.15;
+    max-width: 22ch;
+  }
+
+  header p {
+    opacity: 0.9;
+    font-size: clamp(0.95rem, 3.2vw, 1.1rem);
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  section.page {
+    max-width: 900px;
+    margin: auto;
+    padding: 30px 20px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #ddd;
+  }
+
+  /* ✅ LOGO RESPONSIVE + centrage parfait */
+  .logo {
+    display: block;
+    height: auto;
+    width: min(160px, 45vw);
+    max-height: 90px;
+    object-fit: contain;
+    margin: 0;
+  }
+
+  .backlink {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.12);
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .lif-field input,
+  .lif-field select {
+    box-sizing: border-box;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* -------- Styles de l'outil LIF -------- */
+  .lif-container { max-width:760px; margin:auto; padding:12px }
+  .lif-card { background:#fff; border-radius:14px; padding:14px; margin-top:12px; border:1px solid #ddd }
+
+  .lif-card-title {
+    font-size: 1.4rem;
+    font-weight: 900;
+    margin-bottom: 14px;
+  }
+
+  .lif-grid { display:grid; grid-template-columns:1fr; gap:10px }
+  .lif-field input, .lif-field select { width:100%; padding:10px; border-radius:10px; border:1px solid #ccc }
+  .lif-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px }
+  .lif-btn { padding:12px; border-radius:12px; font-weight:700; cursor:pointer }
+  .lif-btn-primary { background:#2563eb; color:#fff; border:0 }
+  .lif-btn-ghost { background:#fff; border:1px solid #ccc }
+  .lif-badges { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px }
+  .lif-badge { background:#f5f5f5; padding:12px; border-radius:12px; text-align:center; font-weight:800 }
+  .lif-split { display:grid; grid-template-columns:1fr 1fr; gap:12px }
+  .lif-panel { border:1px solid #ddd; border-radius:12px; padding:12px }
+  .lif-panel-title { font-weight:900; margin-bottom:8px }
+  .lif-panel-muted { background:#fafafa }
+  .lif-row { display:flex; justify-content:space-between; padding:6px 0; font-weight:700; gap:10px }
+  .lif-debord { margin-top:10px; padding:12px; border-radius:12px; text-align:center; font-weight:900; border:1px solid #ddd; background:#fff }
+  .lif-help { display:block; margin-top:6px; font-size:12px; color:#5b5b5b }
+
+  @media (max-width: 640px) {
+    .lif-split { grid-template-columns: 1fr; }
+    section.page { padding: 20px 14px; }
+  }
+
+  /* Petit bonus : encore plus propre sur très petits téléphones */
+  @media (max-width: 420px) {
+    header { padding: 34px 14px; }
+    header h1 { max-width: 20ch; }
+    .logo { width: min(140px, 42vw); }
+  }
+</style>
+
 </head>
 
 <body>
@@ -460,6 +495,7 @@ $("tempoFin").value = "";
 
 </body>
 </html>
+
 
 
 

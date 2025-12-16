@@ -186,19 +186,28 @@
     header { padding: 34px 14px; }
     header h1 { max-width: 20ch; }
   }
-  /* ✅ CORRECTION DEBORDEMENT HEURES (MOBILE) */
+/* ✅ FIX définitif : le bloc des heures ne déborde plus */
+.lif-grid > .lif-grid-2 {
+  grid-column: 1 / -1; /* prend toute la largeur de la grille parent */
+}
+
 .lif-grid-2 {
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;    /* empêche tout débordement visuel */
 }
 
 .lif-grid-2 .lif-field {
-  min-width: 0;
+  min-width: 0;        /* autorise le rétrécissement */
 }
 
 .lif-grid-2 input[type="time"] {
   width: 100%;
+  max-width: 100%;
   min-width: 0;
+  box-sizing: border-box;
 }
+
 
 </style>
 
@@ -698,6 +707,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

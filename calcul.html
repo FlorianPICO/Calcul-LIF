@@ -43,10 +43,16 @@
   }
 
   section.page {
-    max-width: 900px;
-    margin: auto;
-    padding: 30px 20px;
-  }
+  max-width: 900px;
+  margin: auto;
+  padding: 30px 20px;
+}
+
+@media (max-width: 520px) {
+  section.page { padding: 14px 8px; }   /* ✅ moins de marge sur mobile */
+  .card { padding: 12px; }             /* ✅ la carte prend plus de largeur */
+}
+
 
   .card {
     background: white;
@@ -678,6 +684,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

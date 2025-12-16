@@ -71,7 +71,9 @@
   max-height: 80px;
   object-fit: contain;
   margin: 0;
+  flex-shrink: 0; /* ✅ empêche le logo de rapetisser */
 }
+
 
 
   .hero-title {
@@ -84,10 +86,11 @@
     text-align: center;
   }
 
-  .hero-title span {
-    display: block;
-    white-space: nowrap;
-  }
+.hero-title span {
+  display: block;
+  white-space: normal; /* ✅ autorise l’adaptation écran */
+}
+
 
   .backlink {
     display: inline-block;
@@ -662,6 +665,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

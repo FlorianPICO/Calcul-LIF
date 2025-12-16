@@ -71,6 +71,20 @@
     object-fit: contain;
     margin: 0;
   }
+.hero-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.hero-title span {
+  display: block;
+  white-space: nowrap;
+}
 
   .backlink {
     display: inline-block;
@@ -158,11 +172,12 @@
 <header>
   <!-- ⚠️ Si ton fichier s'appelle Logo.jpg, change juste l'extension -->
   <img src="Logo.png" alt="Logo SDIS 27" class="logo">
- <h1>
-  Calcul LIF<br>
-  Outil opérationnel<br>
-  Feux de liquides&nbsp;inflammables
+ <h1 class="hero-title">
+  <span>Calcul LIF</span>
+  <span>Outil opérationnel</span>
+  <span>Feux de liquides inflammables</span>
 </h1>
+
 
 
   <p>SDIS 27 – GGOC – Capitaine Florian PICO</p>
@@ -545,6 +560,7 @@ $("tempoFin").value = "";
 </footer>
 </body>
 </html>
+
 
 
 

@@ -430,31 +430,35 @@
   function isCustomMode() {
     return $("modeSdis").value === "custom";
   }
+function updateLockUI() {
+  const custom = isCustomMode();
 
-  function updateLockUI() {
-    const custom = isCustomMode();
+  // ✅ Afficher/masquer le bloc complet des paramètres
+  $("customParams").style.display = custom ? "block" : "none";
 
-    const ids = [
-      "concentrationPct",
-      "texIndNonMisc", "texDirNonMisc",
-      "texIndMisc", "texDirMisc",
-      "poiNote"
-    ];
+  // champs custom à déverrouiller
+  const ids = [
+    "concentrationPct",
+    "texIndNonMisc", "texDirNonMisc",
+    "texIndMisc", "texDirMisc",
+    "poiNote"
+  ];
 
-    ids.forEach(id => { const el = $(id); if (el) el.disabled = !custom; });
+  ids.forEach(id => { const el = $(id); if (el) el.disabled = !custom; });
 
-    // Sécurité : en mode SDIS27, on force les valeurs doctrine
-    if (!custom) {
-      $("concentrationPct").value = 3;
-      $("texIndNonMisc").value = 5;
-      $("texDirNonMisc").value = 10;
-      $("texIndMisc").value = 10;
-      $("texDirMisc").value = 20;
-      $("poiNote").value = "";
-    }
-
-    compute();
+  // Sécurité : en mode SDIS27, on force les valeurs doctrine
+  if (!custom) {
+    $("concentrationPct").value = 3;
+    $("texIndNonMisc").value = 5;
+    $("texDirNonMisc").value = 10;
+    $("texIndMisc").value = 10;
+    $("texDirMisc").value = 20;
+    $("poiNote").value = "";
   }
+
+  compute();
+}
+
 
   // ✅ LOGIQUE DEMANDÉE :
   // - NAPPE : réflexe/réfléchi disponible
@@ -666,4 +670,5 @@
 </footer>
 </body>
 </html>
+
 

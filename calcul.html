@@ -61,27 +61,31 @@
     border: 1px solid #ddd;
   }
 
- .lif-signature {
+.lif-signature {
   margin-top: 18px;
   padding-top: 6px;
   font-size: 12px;
   color: #666;
-  text-align: center;
 
-  white-space: nowrap;     /* 1 seule ligne */
-  overflow-x: auto;        /* ✅ si ça ne rentre pas, on peut scroller */
+  white-space: nowrap;
+  overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
 
-  scrollbar-width: none;   /* Firefox : cache la barre */
+  text-align: left;     /* ✅ évite d’être “coupé” au milieu */
+  padding-left: 12px;   /* petit confort visuel */
+  padding-right: 12px;
+
+  scrollbar-width: none;
 }
 .lif-signature::-webkit-scrollbar {
-  display: none;           /* Chrome/Safari : cache la barre */
+  display: none;
 }
 
 @media (max-width: 420px) {
   .lif-signature { font-size: 10.5px; }
 }
+
 
 }
 
@@ -730,6 +734,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

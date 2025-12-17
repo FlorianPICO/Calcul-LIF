@@ -491,7 +491,6 @@ Volume émulseur total : —</pre>
     const isBac = $("typeFeu").value === "bac";
     const isReflechi = $("reflexe").value === "reflechi";
 
-    $("blocCuvette").style.display = isBac ? "block" : "none";
     $("blocDebordement").style.display = isBac ? "block" : "none";
 
     $("blocTexPoi").style.display = isReflechi ? "block" : "none";
@@ -499,7 +498,7 @@ Volume émulseur total : —</pre>
     if (!isReflechi) $("texPoi").value = "";
 
     setDebordUI(false);
-    if (!isBac) $("surfaceCuvette").value = "";
+if (!isBac) $("surfaceCuvette").value = "";
   }
 
 function compute() {
@@ -727,6 +726,7 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 
 

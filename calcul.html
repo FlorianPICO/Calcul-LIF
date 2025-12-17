@@ -234,6 +234,23 @@
   min-width: 0;
   box-sizing: border-box;
 }
+/* ===== Résumé commandement ===== */
+.lif-resume {
+  background: #fff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  font-family: system-ui, Arial, sans-serif;
+  color: #111;
+  margin: 0 0 10px 0;
+}
+
+@media (max-width: 520px) {
+  .lif-resume { font-size: 0.9rem; }
+}
 
 
 </style>
@@ -451,6 +468,25 @@
 
       </section>
 
+      <!-- ================== RÉSUMÉ COMMANDEMENT ================== -->
+<section class="lif-card" id="blocResumeCmd">
+  <div class="lif-card-title">4) Résumé commandement (COS / PC)</div>
+
+  <pre id="resumeCmd" class="lif-resume">
+Surface estimée (m²) : —
+Tex retenu (L/min/m²) : —
+Concentration retenue (%) : —
+Débit extinction (L/min) : —
+Volume émulseur total (L) : —
+  </pre>
+
+  <button id="btnCopyResume" class="lif-btn lif-btn-ghost" type="button">
+    Copier le résumé
+  </button>
+
+  <small class="lif-help">Résumé prêt à transmettre (radio / PC / main courante).</small>
+</section>
+
       <div class="lif-signature">
         © Capitaine Florian PICO – Tous droits réservés
       </div>
@@ -623,6 +659,25 @@ function updateLockUI() {
           ? String(Math.round(Qtempo * tTempoMin * conc))
           : "—";
     }
+/* ================== RÉSUMÉ COMMANDEMENT ================== */
+
+// Récupération des valeurs déjà calculées
+const vExt = Math.round(Vemul);
+const vTempo = Number($("oVtempo").textContent.replace(/\s/g, "")) || 0;
+const vEntretien = Number($("oEntExt").textContent.replace(/\s/g, "")) || 0;
+
+// Volume émulseur total = extinction + tempo + entretien
+const vTotalEmulseur = vExt + vTempo + vEntretien;
+
+const resume =
+`Surface estimée : ${Math.round(S)} m²
+Tex retenu : ${Tex.toFixed(1)} L/min/m²
+Concentration retenue : ${Number.isFinite(concPct) ? concPct : 3} %
+Débit extinction : ${Math.round(Qext)} L/min
+Volume émulseur total : ${vTotalEmulseur} L`;
+
+$("resumeCmd").textContent = resume;
+
 
     /* ================== DÉBORDEMENT (BAC UNIQUEMENT) ================== */
     if (type !== "bac") {
@@ -733,6 +788,11 @@ function updateLockUI() {
 
   $("btnCalculer").addEventListener("click", compute);
   $("btnReset").addEventListener("click", resetAll);
+$("btnCopyResume").addEventListener("click", () => {
+  const text = $("resumeCmd").textContent;
+  navigator.clipboard.writeText(text);
+  alert("Résumé commandement copié");
+});
 
   // init
   resetAll();
@@ -742,6 +802,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

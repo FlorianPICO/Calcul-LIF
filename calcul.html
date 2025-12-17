@@ -577,13 +577,14 @@ function compute() {
   const updateResume = (vTapisPreventif = 0) => {
     const vTotal = Math.round(Vemul) + Math.round(VtempoAff) + Math.round(VemulEntretien) + Math.round(vTapisPreventif);
 
-    $("resumeCmd").textContent =
+$("resumeCmd").textContent =
 `Surface estimée : ${Math.round(S)} m²
 Tex retenu : ${Tex.toFixed(1)} L/min/m²
 Concentration retenue : ${Number.isFinite(concPct) ? concPct : 3} %
 Débit extinction : ${Math.round(Qext)} L/min
-Volume émulseur total : ${vTotal} L`;
-  };
+Volume émulseur total : ${vTotalEmulseur} L
+Détail volume : Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L`;
+
 
   // ✅ résumé dispo tout de suite (sans tapis préventif)
   updateResume(0);
@@ -725,4 +726,5 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 

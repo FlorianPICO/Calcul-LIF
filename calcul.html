@@ -498,143 +498,172 @@ Volume émulseur total : —</pre>
     if (!isBac) $("surfaceCuvette").value = "";
   }
 
-  function compute() {
-    const S = n($("surfaceFeu").value);
-    if (!Number.isFinite(S) || S <= 0) return;
+function compute() {
+  const S = n($("surfaceFeu").value);
+  if (!Number.isFinite(S) || S <= 0) return;
 
-    const type = $("typeFeu").value;
-    const atk  = $("attaque").value;
-    const prod = $("produit").value;
-    const ref  = $("reflexe").value;
-    const texPoi = n($("texPoi").value);
+  const type = $("typeFeu").value;       // nappe | bac
+  const atk  = $("attaque").value;       // indirect | direct
+  const prod = $("produit").value;       // non_miscible | miscible
+  const ref  = $("reflexe").value;       // reflexe | reflechi
+  const texPoi = n($("texPoi").value);
 
-    const concPct = n($("concentrationPct").value);
-    const conc = (Number.isFinite(concPct) && concPct >= 0) ? (concPct / 100) : 0.03;
-    $("oConc").textContent = (Number.isFinite(concPct) ? `${concPct} %` : "3 %");
+  // Paramètres (toujours lisibles même si disabled)
+  const concPct = n($("concentrationPct").value);
+  const conc = (Number.isFinite(concPct) && concPct >= 0) ? (concPct / 100) : 0.03;
+  $("oConc").textContent = (Number.isFinite(concPct) ? `${concPct} %` : "3 %");
 
-    const texIndNonMisc = n($("texIndNonMisc").value);
-    const texDirNonMisc = n($("texDirNonMisc").value);
-    const texIndMisc    = n($("texIndMisc").value);
-    const texDirMisc    = n($("texDirMisc").value);
+  const texIndNonMisc = n($("texIndNonMisc").value);
+  const texDirNonMisc = n($("texDirNonMisc").value);
+  const texIndMisc    = n($("texIndMisc").value);
+  const texDirMisc    = n($("texDirMisc").value);
 
-    let Tex;
-    if (ref === "reflechi") {
-      if (!Number.isFinite(texPoi) || texPoi <= 0) return;
-      Tex = texPoi;
-    } else {
-      const ind = (prod === "miscible") ? texIndMisc : texIndNonMisc;
-      const dir = (prod === "miscible") ? texDirMisc : texDirNonMisc;
-      Tex = (atk === "indirect") ? ind : dir;
-    }
-    if (!Number.isFinite(Tex) || Tex <= 0) return;
+  /* ================== TEX ================== */
+  let Tex;
 
-    const tExt = (type === "bac") ? 40 : (S < 400 ? 20 : 40);
-    const Qext = S * Tex;
-    const Qtempo = S * (Tex / 2);
+  if (ref === "reflechi") {
+    if (!Number.isFinite(texPoi) || texPoi <= 0) return;
+    Tex = texPoi;
+  } else {
+    // Réflexe : barème (SDIS27 verrouillé ou valeurs custom)
+    const ind = (prod === "miscible") ? texIndMisc : texIndNonMisc;
+    const dir = (prod === "miscible") ? texDirMisc : texDirNonMisc;
+    Tex = (atk === "indirect") ? ind : dir;
+  }
 
-    $("oTex").textContent    = Tex.toFixed(2);
-    $("oT").textContent      = String(Math.round(tExt));
-    $("oQext").textContent   = String(Math.round(Qext));
-    $("oQtempo").textContent = String(Math.round(Qtempo));
+  if (!Number.isFinite(Tex) || Tex <= 0) return;
 
-    // V émulseur extinction
-    const Vemul = Qext * tExt * conc;
-    $("oVemul").textContent = String(Math.round(Vemul));
+  /* ================== DURÉES / DÉBITS ================== */
+  const tExt = (type === "bac") ? 40 : (S < 400 ? 20 : 40);
+  const Qext = S * Tex;
+  const Qtempo = S * (Tex / 2);
 
-    // ✅ Volume émulseur pour entretien du tapis de mousse (cohérent en L)
-    // Hypothèse conservée : débit entretien = S * 0.2 (L/min de solution)
-    // Volume émulseur = débit_sol * durée_ext * concentration
-    const VemulEntretien = (S * 0.2) * tExt * conc;
-    $("oEntExt").textContent = String(Math.round(VemulEntretien));
+  /* ================== AFFICHAGE DE BASE ================== */
+  $("oTex").textContent    = Tex.toFixed(2);
+  $("oT").textContent      = String(Math.round(tExt));
+  $("oQext").textContent   = String(Math.round(Qext));
+  $("oQtempo").textContent = String(Math.round(Qtempo));
 
-    // V tempo
-    const finRenseignee = !!$("tempoFin").value;
-    const tTempoMin = getTempoMinutes();
-    let VtempoAff = 0;
+  /* ================== V ÉMULSEUR EXTINCTION (concentration paramétrable) ================== */
+  const Vemul = Qext * tExt * conc;
+  $("oVemul").textContent = String(Math.round(Vemul));
 
-    if (!finRenseignee) {
-      VtempoAff = Vemul / 2;
+  /* ================== ENTRETIEN TAPIS MOUSSE (V ÉMULSEUR en L) ==================
+     Hypothèse : débit solution entretien = S * 0.2 (L/min)
+     Volume émulseur entretien = débit_solution * durée_ext * concentration
+  */
+  const VemulEntretien = (S * 0.2) * tExt * conc;
+  $("oEntExt").textContent = String(Math.round(VemulEntretien));
+
+  /* ================== V TEMPO (LOGIQUE DEMANDÉE) ================== */
+  const finRenseignee = !!$("tempoFin").value;
+  const tTempoMin = getTempoMinutes(); // durée réelle si début + fin
+  let VtempoAff = 0;
+
+  if (!finRenseignee) {
+    VtempoAff = Vemul / 2;
+    $("oVtempo").textContent = String(Math.round(VtempoAff));
+  } else {
+    if (Number.isFinite(tTempoMin)) {
+      VtempoAff = Qtempo * tTempoMin * conc;
       $("oVtempo").textContent = String(Math.round(VtempoAff));
     } else {
-      if (Number.isFinite(tTempoMin)) {
-        VtempoAff = Qtempo * tTempoMin * conc;
-        $("oVtempo").textContent = String(Math.round(VtempoAff));
-      } else {
-        $("oVtempo").textContent = "—";
-        VtempoAff = 0;
-      }
+      $("oVtempo").textContent = "—";
+      VtempoAff = 0;
     }
+  }
 
-    // ✅ Résumé commandement : total = extinction + tempo + entretien
-    const vTotalEmulseur = Math.round(Vemul) + Math.round(VtempoAff) + Math.round(VemulEntretien);
+  /* ================== RÉSUMÉ COMMANDEMENT (affiché immédiatement) ================== */
+  const updateResume = (vTapisPreventif = 0) => {
+    const vTotal = Math.round(Vemul) + Math.round(VtempoAff) + Math.round(VemulEntretien) + Math.round(vTapisPreventif);
 
     $("resumeCmd").textContent =
 `Surface estimée : ${Math.round(S)} m²
 Tex retenu : ${Tex.toFixed(1)} L/min/m²
 Concentration retenue : ${Number.isFinite(concPct) ? concPct : 3} %
 Débit extinction : ${Math.round(Qext)} L/min
-Volume émulseur total : ${vTotalEmulseur} L`;
+Volume émulseur total : ${vTotal} L`;
+  };
 
-    // Débordement bac uniquement
-    if (type !== "bac") { setDebordUI(false); return; }
+  // ✅ résumé dispo tout de suite (sans tapis préventif)
+  updateResume(0);
 
-    const Vp = n($("vPresent").value);
-    const Vt = n($("vTotal").value);
-    const tr = n($("tReel").value);
+  /* ================== DÉBORDEMENT (BAC UNIQUEMENT) ================== */
+  if (type !== "bac") {
+    setDebordUI(false);
+    return;
+  }
 
-    if (![Vp, Vt, tr].every(Number.isFinite) || Vt <= 0) {
-      $("oAjTempo").textContent = "—";
-      $("oAjExt").textContent   = "—";
-      $("oMarge").textContent   = "—";
-      $("oTemps").textContent   = "—";
-      $("oDebord").textContent  = "—";
-      setDebordUI(false);
-      return;
-    }
+  const Vp = n($("vPresent").value);
+  const Vt = n($("vTotal").value);
+  const tr = n($("tReel").value);
 
-    const Vtempo = Qtempo * tr;
-    const Vext   = Qext * 40;
-    const marge  = Vt - (Vp + Vtempo + Vext);
+  if (![Vp, Vt, tr].every(Number.isFinite) || Vt <= 0) {
+    $("oAjTempo").textContent = "—";
+    $("oAjExt").textContent   = "—";
+    $("oMarge").textContent   = "—";
+    $("oTemps").textContent   = "—";
+    $("oDebord").textContent  = "—";
+    setDebordUI(false);
+    // ✅ on garde le résumé déjà affiché
+    return;
+  }
 
-    $("oAjTempo").textContent = String(Math.round(Vtempo));
-    $("oAjExt").textContent   = String(Math.round(Vext));
-    $("oMarge").textContent   = String(Math.round(marge));
+  const Vtempo = Qtempo * tr;
+  const Vext   = Qext * 40;
+  const marge  = Vt - (Vp + Vtempo + Vext);
 
-    let deb = false;
-    let msg = "Pas de débordement";
+  $("oAjTempo").textContent = String(Math.round(Vtempo));
+  $("oAjExt").textContent   = String(Math.round(Vext));
+  $("oMarge").textContent   = String(Math.round(marge));
 
-    if (Vp >= Vt) {
+  let deb = false;
+  let msg = "Pas de débordement";
+
+  if (Vp >= Vt) {
+    deb = true;
+    msg = "Débordement immédiat (0 min)";
+  } else {
+    const margeInit = Vt - Vp;
+
+    if (Qtempo * tr >= margeInit) {
       deb = true;
-      msg = "Débordement immédiat (0 min)";
+      msg = `Débordement pendant temporisation (~${(margeInit / Qtempo).toFixed(1)} min)`;
     } else {
-      const margeInit = Vt - Vp;
-      if (Qtempo * tr >= margeInit) {
+      const reste = margeInit - Qtempo * tr;
+      const tDebExt = reste / Qext;
+      if (tDebExt <= 40) {
         deb = true;
-        msg = `Débordement pendant temporisation (~${(margeInit / Qtempo).toFixed(1)} min)`;
-      } else {
-        const reste = margeInit - Qtempo * tr;
-        const tDebExt = reste / Qext;
-        if (tDebExt <= 40) {
-          deb = true;
-          msg = `Débordement pendant extinction (~${(tr + tDebExt).toFixed(1)} min)`;
-        }
+        msg = `Débordement pendant extinction (~${(tr + tDebExt).toFixed(1)} min)`;
       }
     }
-
-    $("oTemps").textContent = msg;
-    $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
-    $("oDebord").style.background  = deb ? "#fee2e2" : "#dcfce7";
-    $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
-    $("oDebord").style.color       = deb ? "#7f1d1d" : "#065f46";
-
-    setDebordUI(deb);
-
-    if (deb) {
-      const Sc = n($("surfaceCuvette").value);
-      $("oVtapis").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.15 * 3)) : "—";
-      $("oDentretien").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.2)) : "—";
-    }
   }
+
+  $("oTemps").textContent = msg;
+  $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
+  $("oDebord").style.background  = deb ? "#fee2e2" : "#dcfce7";
+  $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
+  $("oDebord").style.color       = deb ? "#7f1d1d" : "#065f46";
+
+  setDebordUI(deb);
+
+  if (deb) {
+    const Sc = n($("surfaceCuvette").value);
+
+    // Valeurs existantes (ton outil) :
+    const vTapis = Number.isFinite(Sc) ? (Sc * 0.15 * 3) : NaN;
+
+    $("oVtapis").textContent = Number.isFinite(Sc) ? String(Math.round(vTapis)) : "—";
+    $("oDentretien").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.2)) : "—";
+
+    // ✅ seulement SI débordement : on ajoute Vtapis au total
+    updateResume(Number.isFinite(vTapis) ? vTapis : 0);
+  } else {
+    // ✅ si pas de débordement, total sans tapis préventif (déjà OK)
+    updateResume(0);
+  }
+}
+
 
   function resetAll() {
     $("surfaceFeu").value = "";
@@ -696,3 +725,4 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+

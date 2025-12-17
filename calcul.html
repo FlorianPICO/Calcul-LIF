@@ -62,12 +62,23 @@
   }
 
   .lif-signature {
-    margin-top: 18px;
-    padding-top: 6px;
-    font-size: 12px;
-    color: #666;
-    text-align: center;
+  margin-top: 18px;
+  padding-top: 6px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+
+  white-space: nowrap;        /* ✅ empêche le retour à la ligne */
+  overflow: hidden;           /* sécurité */
+}
+
+/* 📱 Téléphone : on réduit légèrement la taille pour que tout tienne */
+@media (max-width: 420px) {
+  .lif-signature {
+    font-size: 10.5px;
   }
+}
+
 
   /* ===== LOGO RESPONSIVE ===== */
   .logo {
@@ -713,6 +724,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

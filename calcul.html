@@ -198,6 +198,14 @@ header img {
     }
     @media (max-width: 520px) { .lif-resume { font-size: 0.9rem; } }
     .logo { width: min(150px, 45vw) !important; max-height: 80px !important; height: auto !important; }
+/* ✅ Force le logo comme sur l’index (au cas où une règle l’écrase) */
+header img.logo{
+  width: min(150px, 45vw) !important;
+  max-height: 80px !important;
+  height: auto !important;
+  object-fit: contain !important;
+  margin: 0 !important;
+}
 
   </style>
 </head>
@@ -738,6 +746,7 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 
 

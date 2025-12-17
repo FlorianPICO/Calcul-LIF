@@ -242,13 +242,13 @@
 
 <!-- ================== PARAMÈTRES INTER-SDIS (AJOUT) ================== -->
 <section class="lif-card">
-  <div class="lif-card-title">0) Paramètres</div>
+  <div class="lif-card-title">1) Paramètres</div>
 
   <div class="lif-grid">
     <div class="lif-field">
       <label>Mode :</label>
       <select id="modeSdis">
-        <option value="lock" selected>SDIS 27 (verrouillé)</option>
+        <option value="lock" selected>SDIS 27 (taux d'extinction verrouillés et taux concentration fixe à 3%)</option>
         <option value="custom">Autre SDIS (personnalisable)</option>
       </select>
       <small class="lif-help">
@@ -292,7 +292,7 @@
 
       <!-- ================== SAISIE ================== -->
       <section class="lif-card">
-        <div class="lif-card-title">1) Saisie</div>
+        <div class="lif-card-title">2) Saisie</div>
 
         <div class="lif-grid">
           <div class="lif-field">
@@ -368,7 +368,7 @@
 
       <!-- ================== RESULTATS ================== -->
       <section class="lif-card">
-        <div class="lif-card-title">2) Résultats</div>
+        <div class="lif-card-title">3) Résultats</div>
 
         <div class="lif-badges">
           <div class="lif-badge"><div>Tex</div><div id="oTex">—</div></div>
@@ -713,6 +713,7 @@ function updateLockUI() {
 </footer>
 </body>
 </html>
+
 
 
 

@@ -508,7 +508,7 @@ function compute() {
   const ref  = $("reflexe").value;       // reflexe | reflechi
   const texPoi = n($("texPoi").value);
 
-  // Paramètres (toujours lisibles même si disabled)
+  // Paramètres (lisibles même si disabled)
   const concPct = n($("concentrationPct").value);
   const conc = (Number.isFinite(concPct) && concPct >= 0) ? (concPct / 100) : 0.03;
   $("oConc").textContent = (Number.isFinite(concPct) ? `${concPct} %` : "3 %");
@@ -520,17 +520,14 @@ function compute() {
 
   /* ================== TEX ================== */
   let Tex;
-
   if (ref === "reflechi") {
     if (!Number.isFinite(texPoi) || texPoi <= 0) return;
     Tex = texPoi;
   } else {
-    // Réflexe : barème (SDIS27 verrouillé ou valeurs custom)
     const ind = (prod === "miscible") ? texIndMisc : texIndNonMisc;
     const dir = (prod === "miscible") ? texDirMisc : texDirNonMisc;
     Tex = (atk === "indirect") ? ind : dir;
   }
-
   if (!Number.isFinite(Tex) || Tex <= 0) return;
 
   /* ================== DURÉES / DÉBITS ================== */
@@ -544,20 +541,20 @@ function compute() {
   $("oQext").textContent   = String(Math.round(Qext));
   $("oQtempo").textContent = String(Math.round(Qtempo));
 
-  /* ================== V ÉMULSEUR EXTINCTION (concentration paramétrable) ================== */
+  /* ================== V ÉMULSEUR EXTINCTION ================== */
   const Vemul = Qext * tExt * conc;
   $("oVemul").textContent = String(Math.round(Vemul));
 
   /* ================== ENTRETIEN TAPIS MOUSSE (V ÉMULSEUR en L) ==================
-     Hypothèse : débit solution entretien = S * 0.2 (L/min)
-     Volume émulseur entretien = débit_solution * durée_ext * concentration
+     débit solution entretien = S * 0.2 (L/min)
+     volume émulseur entretien = débit_solution * durée_ext * concentration
   */
   const VemulEntretien = (S * 0.2) * tExt * conc;
   $("oEntExt").textContent = String(Math.round(VemulEntretien));
 
-  /* ================== V TEMPO (LOGIQUE DEMANDÉE) ================== */
+  /* ================== V TEMPO ================== */
   const finRenseignee = !!$("tempoFin").value;
-  const tTempoMin = getTempoMinutes(); // durée réelle si début + fin
+  const tTempoMin = getTempoMinutes();
   let VtempoAff = 0;
 
   if (!finRenseignee) {
@@ -573,20 +570,25 @@ function compute() {
     }
   }
 
-  /* ================== RÉSUMÉ COMMANDEMENT (affiché immédiatement) ================== */
+  /* ================== RÉSUMÉ COMMANDEMENT ================== */
   const updateResume = (vTapisPreventif = 0) => {
-    const vTotal = Math.round(Vemul) + Math.round(VtempoAff) + Math.round(VemulEntretien) + Math.round(vTapisPreventif);
+    const vExt = Math.round(Vemul);
+    const vTempo = Math.round(VtempoAff);
+    const vEntretien = Math.round(VemulEntretien);
+    const vTapis = Math.round(vTapisPreventif);
 
-$("resumeCmd").textContent =
+    const vTotal = vExt + vTempo + vEntretien + vTapis;
+
+    $("resumeCmd").textContent =
 `Surface estimée : ${Math.round(S)} m²
 Tex retenu : ${Tex.toFixed(1)} L/min/m²
 Concentration retenue : ${Number.isFinite(concPct) ? concPct : 3} %
 Débit extinction : ${Math.round(Qext)} L/min
-Volume émulseur total : ${vTotalEmulseur} L
+Volume émulseur total : ${vTotal} L
 Détail volume : Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L`;
+  };
 
-
-  // ✅ résumé dispo tout de suite (sans tapis préventif)
+  // ✅ résumé dispo immédiatement (sans tapis préventif)
   updateResume(0);
 
   /* ================== DÉBORDEMENT (BAC UNIQUEMENT) ================== */
@@ -606,8 +608,7 @@ Détail volume : Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L /
     $("oTemps").textContent   = "—";
     $("oDebord").textContent  = "—";
     setDebordUI(false);
-    // ✅ on garde le résumé déjà affiché
-    return;
+    return; // résumé déjà affiché
   }
 
   const Vtempo = Qtempo * tr;
@@ -626,7 +627,6 @@ Détail volume : Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L /
     msg = "Débordement immédiat (0 min)";
   } else {
     const margeInit = Vt - Vp;
-
     if (Qtempo * tr >= margeInit) {
       deb = true;
       msg = `Débordement pendant temporisation (~${(margeInit / Qtempo).toFixed(1)} min)`;
@@ -650,20 +650,17 @@ Détail volume : Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L /
 
   if (deb) {
     const Sc = n($("surfaceCuvette").value);
-
-    // Valeurs existantes (ton outil) :
     const vTapis = Number.isFinite(Sc) ? (Sc * 0.15 * 3) : NaN;
 
     $("oVtapis").textContent = Number.isFinite(Sc) ? String(Math.round(vTapis)) : "—";
     $("oDentretien").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.2)) : "—";
 
-    // ✅ seulement SI débordement : on ajoute Vtapis au total
     updateResume(Number.isFinite(vTapis) ? vTapis : 0);
   } else {
-    // ✅ si pas de débordement, total sans tapis préventif (déjà OK)
     updateResume(0);
   }
 }
+
 
 
   function resetAll() {
@@ -726,5 +723,6 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 

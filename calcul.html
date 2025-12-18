@@ -204,6 +204,10 @@ header img.Logo {
     border-radius: 14px;
   }
 }
+/* Résumé commandement : libellés en gras */
+.resume-label {
+  font-weight: 700;
+}
 
   </style>
 </head>
@@ -591,23 +595,28 @@ function compute() {
     }
   }
 
-  /* ================== RÉSUMÉ COMMANDEMENT ================== */
-  const updateResume = (vTapisPreventif = 0) => {
-    const vExt = Math.round(Vemul);
-    const vTempo = Math.round(VtempoAff);
-    const vEntretien = Math.round(VemulEntretien);
-    const vTapis = Math.round(vTapisPreventif);
+/* ================== RÉSUMÉ COMMANDEMENT ================== */
+const updateResume = (vTapisPreventif = 0) => {
+  const vExt = Math.round(Vemul);
+  const vTempo = Math.round(VtempoAff);
+  const vEntretien = Math.round(VemulEntretien);
+  const vTapis = Math.round(vTapisPreventif);
 
-    const vTotal = vExt + vTempo + vEntretien + vTapis;
+  const vTotal = vExt + vTempo + vEntretien + vTapis;
 
-    $("resumeCmd").textContent =
-`Surface estimée : ${Math.round(S)} m²
-Tex retenu : ${Tex.toFixed(1)} L/min/m²
-Concentration retenue : ${Number.isFinite(concPct) ? concPct : 3} %
-Débit extinction : ${Math.round(Qext)} L/min
-Volume émulseur total : ${vTotal} L
-Détail volume émulseur : Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L`;
-  };
+  $("resumeCmd").innerHTML = `
+    <div><span class="resume-label">Surface estimée :</span> ${Math.round(S)} m²</div>
+    <div><span class="resume-label">Tex retenu :</span> ${Tex.toFixed(1)} L/min/m²</div>
+    <div><span class="resume-label">Concentration retenue :</span> ${Number.isFinite(concPct) ? concPct : 3} %</div>
+    <div><span class="resume-label">Débit extinction :</span> ${Math.round(Qext)} L/min</div>
+    <div><span class="resume-label">Volume émulseur total :</span> ${vTotal} L</div>
+    <div style="margin-top:6px;font-size:0.9em;color:#444;">
+      <span class="resume-label">Détail volume émulseur :</span>
+      Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L
+    </div>
+  `;
+};
+
 
   // ✅ résumé dispo immédiatement (sans tapis préventif)
   updateResume(0);
@@ -744,6 +753,7 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 
 

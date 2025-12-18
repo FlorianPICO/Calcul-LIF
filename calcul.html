@@ -613,16 +613,20 @@ const updateResume = (vTapisPreventif = 0) => {
 
   const vTotal = vExt + vTempo + vEntretien + vTapis;
 
-  const line = (label, value) => `<b>${label} :</b> ${value}`;
+  const line = (label, value) =>
+    `<div><strong>${label} :</strong> ${value}</div>`;
 
   $("resumeCmd").innerHTML =
-    `${line("Surface estimée", `${Math.round(S)} m²`)}<br>` +
-    `${line("Tex retenu", `${Tex.toFixed(1)} L/min/m²`)}<br>` +
-    `${line("Concentration retenue", `${Number.isFinite(concPct) ? concPct : 3} %`)}<br>` +
-    `${line("Débit extinction", `${Math.round(Qext)} L/min`)}<br>` +
-    `${line("Volume émulseur total", `${vTotal} L`)}<br><br>` +
-    `<span style="font-size:0.9em;color:#475569">${line("Détail volume émulseur", `Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L`)}</span>`;
+    line("Surface estimée", `${Math.round(S)} m²`) +
+    line("Tex retenu", `${Tex.toFixed(1)} L/min/m²`) +
+    line("Concentration retenue", `${Number.isFinite(concPct) ? concPct : 3} %`) +
+    line("Débit extinction", `${Math.round(Qext)} L/min`) +
+    line(
+      "Volume émulseur total",
+      `${vTotal} L <span style="font-size:0.9em;color:#475569">(Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L)</span>`
+    );
 };
+
 
 
 
@@ -762,6 +766,7 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 
 

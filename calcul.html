@@ -27,14 +27,6 @@
       justify-content: center;
       gap: 14px;
     }
-header img {
-  display: block;
-  height: auto;
-  width: min(150px, 45vw);
-  max-height: 80px;
-  object-fit: contain;
-  margin: 0;
-}
 
     header h1 {
       margin: 0;
@@ -84,22 +76,23 @@ header img {
       .lif-signature { font-size: 11px; padding-left: 10px; padding-right: 10px; }
     }
 
-    /* ===== LOGO RESPONSIVE ===== */
-    .logo {
-      display: block;
-      height: auto;
-      width: min(150px, 45vw);
-      max-height: 80px;
-      object-fit: contain;
-      margin: 0;
-    }
+/* ===== LOGO (plus grand, uniforme partout) ===== */
+.logo{
+  display:block;
+  height:auto;
+  width:min(220px, 55vw);   /* ⬅️ plus large qu’avant */
+  max-height:120px;         /* ⬅️ plus haut qu’avant (avant 80px) */
+  object-fit:contain;
+  margin:0;
+}
 
-    /* ===== AJUSTEMENTS MOBILE ===== */
-    @media (max-width: 420px) {
-      header { padding: 34px 14px; }
-      header h1 { max-width: 20ch; }
-      .logo { width: min(135px, 42vw); }
-    }
+/* Mobile */
+@media (max-width: 420px){
+  .logo{
+    width:min(200px, 70vw);
+    max-height:110px;
+  }
+}
 
     .hero-title {
       display: flex;
@@ -197,15 +190,6 @@ header img {
       margin: 0 0 10px 0;
     }
     @media (max-width: 520px) { .lif-resume { font-size: 0.9rem; } }
-    .logo { width: min(150px, 45vw) !important; max-height: 80px !important; height: auto !important; }
-/* ✅ Force le logo comme sur l’index (au cas où une règle l’écrase) */
-header img.logo{
-  width: min(150px, 45vw) !important;
-  max-height: 80px !important;
-  height: auto !important;
-  object-fit: contain !important;
-  margin: 0 !important;
-}
 
   </style>
 </head>
@@ -746,6 +730,7 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 
 

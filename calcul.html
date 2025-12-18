@@ -429,7 +429,7 @@ header img.Logo {
       <section class="lif-card" id="blocResumeCmd">
         <div class="lif-card-title">4) Résumé </div>
 
-<div id="resumeCmd" class="lif-resume lif-resume-pre"></div>
+<div id="resumeCmd" class="lif-resume"></div>
 Surface estimée : —
 Tex retenu : —
 Concentration retenue : —
@@ -616,13 +616,14 @@ const updateResume = (vTapisPreventif = 0) => {
   const line = (label, value) => `<b>${label} :</b> ${value}`;
 
   $("resumeCmd").innerHTML =
-    `${line("Surface estimée", `${Math.round(S)} m²`)}\n` +
-    `${line("Tex retenu", `${Tex.toFixed(1)} L/min/m²`)}\n` +
-    `${line("Concentration retenue", `${Number.isFinite(concPct) ? concPct : 3} %`)}\n` +
-    `${line("Débit extinction", `${Math.round(Qext)} L/min`)}\n` +
-    `${line("Volume émulseur total", `${vTotal} L`)}\n\n` +
-    `${line("Détail volume émulseur", `Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L`)}`;
+    `${line("Surface estimée", `${Math.round(S)} m²`)}<br>` +
+    `${line("Tex retenu", `${Tex.toFixed(1)} L/min/m²`)}<br>` +
+    `${line("Concentration retenue", `${Number.isFinite(concPct) ? concPct : 3} %`)}<br>` +
+    `${line("Débit extinction", `${Math.round(Qext)} L/min`)}<br>` +
+    `${line("Volume émulseur total", `${vTotal} L`)}<br><br>` +
+    `<span style="font-size:0.9em;color:#475569">${line("Détail volume émulseur", `Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L`)}</span>`;
 };
+
 
 
 
@@ -761,6 +762,7 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 
 

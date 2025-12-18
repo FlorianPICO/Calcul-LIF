@@ -204,10 +204,18 @@ header img.Logo {
     border-radius: 14px;
   }
 }
-/* Résumé commandement : libellés en gras */
-.resume-label {
-  font-weight: 700;
+/* Résumé : garder l'aspect "texte compact" */
+.lif-resume-pre{
+  white-space: pre-wrap;
+  font-family: system-ui, Arial, sans-serif;
+  line-height: 1.45;
 }
+
+/* Gras uniquement sur les libellés */
+.lif-resume-pre b{
+  font-weight: 800;
+}
+
 
   </style>
 </head>
@@ -421,7 +429,8 @@ header img.Logo {
       <section class="lif-card" id="blocResumeCmd">
         <div class="lif-card-title">4) Résumé </div>
 
-        <pre id="resumeCmd" class="lif-resume">Surface estimée : —
+<div id="resumeCmd" class="lif-resume lif-resume-pre"></div>
+Surface estimée : —
 Tex retenu : —
 Concentration retenue : —
 Débit extinction : —
@@ -604,18 +613,17 @@ const updateResume = (vTapisPreventif = 0) => {
 
   const vTotal = vExt + vTempo + vEntretien + vTapis;
 
-  $("resumeCmd").innerHTML = `
-    <div><span class="resume-label">Surface estimée :</span> ${Math.round(S)} m²</div>
-    <div><span class="resume-label">Tex retenu :</span> ${Tex.toFixed(1)} L/min/m²</div>
-    <div><span class="resume-label">Concentration retenue :</span> ${Number.isFinite(concPct) ? concPct : 3} %</div>
-    <div><span class="resume-label">Débit extinction :</span> ${Math.round(Qext)} L/min</div>
-    <div><span class="resume-label">Volume émulseur total :</span> ${vTotal} L</div>
-    <div style="margin-top:6px;font-size:0.9em;color:#444;">
-      <span class="resume-label">Détail volume émulseur :</span>
-      Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L
-    </div>
-  `;
+  const line = (label, value) => `<b>${label} :</b> ${value}`;
+
+  $("resumeCmd").innerHTML =
+    `${line("Surface estimée", `${Math.round(S)} m²`)}\n` +
+    `${line("Tex retenu", `${Tex.toFixed(1)} L/min/m²`)}\n` +
+    `${line("Concentration retenue", `${Number.isFinite(concPct) ? concPct : 3} %`)}\n` +
+    `${line("Débit extinction", `${Math.round(Qext)} L/min`)}\n` +
+    `${line("Volume émulseur total", `${vTotal} L`)}\n\n` +
+    `${line("Détail volume émulseur", `Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L`)}`;
 };
+
 
 
   // ✅ résumé dispo immédiatement (sans tapis préventif)
@@ -753,6 +761,7 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 
 

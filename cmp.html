@@ -365,16 +365,21 @@ function simulate() {
 // Fin extinction = début extinction + durée extinction
 const tExtEnd = (tExtStart !== null) ? (tExtStart + tExt) : null;
 
-  return {
-    Qext, Qtempo, tExt, concPct: params.concPct,
-    needExtTotal,
-    t0Abs,
-    labels,
-    tStockOK,
-    tExtStart,
-    flowAvailSerie,
-    emulSerie
-  };
+return {
+  Qext,
+  Qtempo,
+  tExt,
+  concPct: params.concPct,
+  needExtTotal,
+  t0Abs,
+  labels,
+  tStockOK,
+  tExtStart,
+  tExtEnd,
+  flowAvailSerie,
+  emulSerie
+};
+
 }
 
   // ===== Dessin canvas (escaliers) =====

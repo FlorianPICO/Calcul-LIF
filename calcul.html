@@ -836,6 +836,51 @@ Volume émulseur total : —`;
     navigator.clipboard.writeText(text);
     alert("Résumé commandement copié");
   });
+// ================== PASSERELLE VERS CMP (stockage local) ==================
+const btnCmp = $("btnCmp");
+if (btnCmp) {
+  btnCmp.addEventListener("click", (e) => {
+    // Bloque le lien le temps de vérifier + stocker
+    e.preventDefault();
+
+    // CMP dispo uniquement en mode SDIS 27 verrouillé
+    if ($("modeSdis").value !== "lock") {
+      alert("Courbe de montée en puissance disponible uniquement en mode SDIS 27.");
+      return;
+    }
+
+    // On récupère les valeurs calculées (issues du compute)
+    const Qext = n($("oQext").textContent);
+    const Qtempo = n($("oQtempo").textContent);
+    const tExt = n($("oT").textContent);
+    const concPct = n($("oConc").textContent); // ex "3 %" -> n() sort 3
+
+    // Sécurité : si pas encore calculé
+    if (![Qext, Qtempo, tExt, concPct].every(Number.isFinite) || Qext <= 0 || Qtempo <= 0 || tExt <= 0) {
+      alert("Fais un calcul d’abord (surface, type, attaque, etc.) pour générer Q ext / Q tempo / durée.");
+      return;
+    }
+
+    // Besoin émulseur extinction complet (à 3%)
+    const conc = concPct / 100;
+    const besoinExt = Qext * tExt * conc;
+
+    // Stockage local
+    const payload = {
+      mode: "lock",
+      Qext,
+      Qtempo,
+      tExt,
+      concPct,
+      besoinExt,
+      savedAt: Date.now()
+    };
+    localStorage.setItem("LIF_CMP_INPUTS", JSON.stringify(payload));
+
+    // Go CMP
+    window.location.href = btnCmp.getAttribute("href") || "cmp.html";
+  });
+}
 
   resetAll();
 })();
@@ -843,6 +888,7 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 
 

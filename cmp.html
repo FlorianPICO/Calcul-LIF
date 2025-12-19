@@ -212,12 +212,13 @@
   </div>
 
   <div class="card" id="blocCourbe" style="display:none;">
-    <h2>Courbe (0 → 3h, pas 20 min)</h2>
+    <h2>Courbe (T0 → T0+5h, pas 20 min)</h2>
     <div class="row" style="align-items:center;">
       <span class="pill" id="pillQext">Q ext : —</span>
       <span class="pill" id="pillQtempo">Q tempo : —</span>
       <span class="pill" id="pilltExt">Durée ext. : —</span>
       <span class="pill" id="pillBesoin">Besoin extinction : —</span>
+      <span class="pill" id="pillT0">T0 : —</span>
     </div>
 
     <div class="canvas-wrap" style="margin-top:10px;">
@@ -225,7 +226,7 @@
     </div>
 
     <div class="small">
-      Axe gauche : débit solution (kL/min). Axe droit : stock émulseur (L). Pointillés : Q ext (cible).
+      Axe gauche : débit solution (L/min). Axe droit : stock émulseur (L). Pointillés : Q ext (cible).
     </div>
   </div>
 
@@ -235,7 +236,61 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
-  // Table SDIS 27 : débit solution (L/min) et stock émulseur (L)
+  // =========================
+  // Étape A — Temps (T0 + pas)
+  // =========================
+  const STEP_MIN = 20;      // pas de 20 minutes
+  const HORIZON_H = 5;      // jusqu'à T0 + 5h
+  const HORIZON_MIN = HORIZON_H * 60;
+
+  const pad2 = (n) => String(n).padStart(2, "0");
+
+  // "hh:mm" -> minutes dans la journée (0..1439)
+  function hhmmToMin(hhmm) {
+    if (!hhmm || !/^\d{2}:\d{2}$/.test(hhmm)) return NaN;
+    const [h, m] = hhmm.split(":").map(Number);
+    if (h < 0 || h > 23 || m < 0 || m > 59) return NaN;
+    return h * 60 + m;
+  }
+
+  // minutes -> "hh:mm" (boucle sur 24h)
+  function minToHHMM(min) {
+    const mm = ((min % 1440) + 1440) % 1440;
+    const h = Math.floor(mm / 60);
+    const m = mm % 60;
+    return `${pad2(h)}:${pad2(m)}`;
+  }
+
+  // Trouve l'heure d'arrivée la + tôt
+  function getFirstArrivalMin(engins) {
+    const mins = engins
+      .map(e => hhmmToMin(e.atStr))
+      .filter(Number.isFinite);
+    return mins.length ? Math.min(...mins) : NaN;
+  }
+
+  // "arrivée hh:mm" -> minutes relatives depuis T0 (gestion simple passage minuit)
+  function arrivalRelMin(arriveeHHMM, t0Min) {
+    const a = hhmmToMin(arriveeHHMM);
+    if (!Number.isFinite(a)) return NaN;
+    let rel = a - t0Min;
+    if (rel < 0) rel += 1440;
+    return rel;
+  }
+
+  // Labels X : de T0 à T0+5h par pas de 20 min
+  function buildTimeLabels(t0Min) {
+    const totalSteps = Math.round(HORIZON_MIN / STEP_MIN); // 300/20=15
+    const labels = [];
+    for (let i = 0; i <= totalSteps; i++) {
+      labels.push(minToHHMM(t0Min + i * STEP_MIN));
+    }
+    return labels;
+  }
+
+  // =========================
+  // Données SDIS 27
+  // =========================
   const ENGINS = {
     FPT:   { flow: 2000, emul: 200 },
     CCRM:  { flow: 1500, emul: 200 },
@@ -256,14 +311,9 @@
     return Number.isFinite(x) ? x : NaN;
   };
 
-  const timeToMin = (hhmm) => {
-    if (!hhmm) return NaN;
-    const [h, m] = hhmm.split(":").map(Number);
-    if (![h,m].every(Number.isFinite)) return NaN;
-    return h*60 + m;
-  };
-
+  // =========================
   // Charge paramètres calcul
+  // =========================
   let params = null;
   try {
     params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null");
@@ -278,7 +328,6 @@
     return;
   }
 
-  // OK
   status.innerHTML =
     `✅ Paramètres reçus :<br>
      - Q ext = <b>${Math.round(params.Qext)}</b> L/min<br>
@@ -288,8 +337,10 @@
      - Besoin extinction = <b>${Math.round(params.besoinExt)}</b> L émulseur`;
   blocSaisie.style.display = "block";
 
-  // Liste d'engins (lignes ajoutées)
-  const rows = []; // {type, atMin, atStr, qty}
+  // =========================
+  // Liste d'engins
+  // =========================
+  const rows = []; // {type, atStr, qty}
   const tbody = $("liste");
 
   const render = () => {
@@ -323,17 +374,18 @@
   $("btnAdd").addEventListener("click", () => {
     const type = $("enginType").value;
     const atStr = $("arrivee").value || "00:00";
-    const atMin = timeToMin(atStr);
     const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
 
     if (!ENGINS[type]) return;
-    if (!Number.isFinite(atMin) || atMin < 0) {
+    if (!Number.isFinite(hhmmToMin(atStr))) {
       alert("Heure d’arrivée invalide.");
       return;
     }
 
-    rows.push({ type, atMin, atStr, qty });
-    rows.sort((a,b) => a.atMin - b.atMin);
+    rows.push({ type, atStr, qty });
+
+    // tri simple par heure dans la journée (utile visuellement)
+    rows.sort((a,b) => hhmmToMin(a.atStr) - hhmmToMin(b.atStr));
     render();
   });
 
@@ -343,7 +395,9 @@
     blocCourbe.style.display = "none";
   });
 
-  // Simulation minute par minute (0 → 180)
+  // =========================
+  // Simulation minute par minute (T0 → T0+5h)
+  // =========================
   function simulate() {
     const Qext = params.Qext;
     const Qtempo = params.Qtempo;
@@ -352,13 +406,22 @@
 
     const needExtTotal = Qext * tExt * conc;
 
-    // Arrivées minute -> ajout flow/emul
-    const addFlow = Array(181).fill(0);
-    const addEmul = Array(181).fill(0);
+    // T0 = arrivée la + tôt
+    const t0 = getFirstArrivalMin(rows);
+    if (!Number.isFinite(t0)) {
+      throw new Error("Impossible de déterminer T0 (aucune arrivée valide).");
+    }
+
+    // Arrivées minute relative -> ajout flow/emul
+    const addFlow = Array(HORIZON_MIN + 1).fill(0);
+    const addEmul = Array(HORIZON_MIN + 1).fill(0);
 
     rows.forEach(r => {
       const def = ENGINS[r.type];
-      const m = Math.min(180, Math.max(0, Math.round(r.atMin)));
+      const rel = arrivalRelMin(r.atStr, t0); // minutes depuis T0
+      if (!Number.isFinite(rel)) return;
+
+      const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
       addFlow[m] += def.flow * r.qty;
       addEmul[m] += def.emul * r.qty;
     });
@@ -371,14 +434,13 @@
     let startedExt = false;
 
     // Séries minute
-    const usedFlow = Array(181).fill(0);    // débit utilisé (L/min)
-    const emulSerie = Array(181).fill(0);   // stock émulseur (L)
+    const usedFlow = Array(HORIZON_MIN + 1).fill(0);  // L/min
+    const emulSerie = Array(HORIZON_MIN + 1).fill(0); // L
 
-    for (let t=0; t<=180; t++) {
+    for (let t=0; t<=HORIZON_MIN; t++) {
       flowAvail += addFlow[t];
       emulStock += addEmul[t];
 
-      // Conditions pour basculer extinction
       const canFlow = flowAvail >= Qext;
       const canEmul = emulStock >= needExtTotal;
 
@@ -398,11 +460,9 @@
       let emulCons = 0;
 
       if (phase === "TEMPORISATION") {
-        // Débit utilisé = min(flow dispo, Qtempo)
         flowUse = Math.min(flowAvail, Qtempo);
-        emulCons = flowUse * conc; // 3%
+        emulCons = flowUse * conc;
       } else if (phase === "EXTINCTION") {
-        // Débit utilisé = Qext (puisqu'on a validé flowAvail >= Qext)
         flowUse = Qext;
         emulCons = flowUse * conc;
         extRemaining -= 1;
@@ -411,29 +471,32 @@
         emulCons = 0;
       }
 
-      // On ne peut pas consommer plus d’émulseur que stock
       if (emulCons > emulStock) emulCons = emulStock;
-
       emulStock -= emulCons;
 
       usedFlow[t] = flowUse;
       emulSerie[t] = emulStock;
     }
 
-    // Échantillonnage toutes les 20 minutes (0..180)
+    // Échantillonnage toutes les 20 minutes (0..300)
     const ticks = [];
     const flow20 = [];
     const emul20 = [];
-    for (let t=0; t<=180; t+=20) {
-      ticks.push(t);
+    for (let t=0; t<=HORIZON_MIN; t+=STEP_MIN) {
+      ticks.push(t);           // minutes relatives
       flow20.push(usedFlow[t]);
       emul20.push(emulSerie[t]);
     }
 
-    return { ticks, flow20, emul20, Qext, Qtempo, tExt, needExtTotal };
+    // labels X en hh:mm (T0→T0+5h)
+    const labels = buildTimeLabels(t0);
+
+    return { t0, labels, ticks, flow20, emul20, Qext, Qtempo, tExt, needExtTotal };
   }
 
-  // Dessin canvas (axe gauche débit kL/min, axe droit stock L)
+  // =========================
+  // Dessin canvas (débit L/min + stock L)
+  // =========================
   function drawChart(data) {
     const c = $("chart");
     const ctx = c.getContext("2d");
@@ -442,13 +505,13 @@
     ctx.clearRect(0,0,W,H);
 
     // Marges
-    const mL = 70, mR = 70, mT = 40, mB = 60;
+    const mL = 85, mR = 85, mT = 40, mB = 70;
     const plotW = W - mL - mR;
     const plotH = H - mT - mB;
 
     // Domaines
-    const xMax = 180;
-    const yFlowMax = Math.max(data.Qext, ...data.flow20) * 1.2 || 1000;
+    const xMax = HORIZON_MIN;
+    const yFlowMax = Math.max(data.Qext, ...data.flow20) * 1.2 || 1000; // L/min
     const yEmulMax = Math.max(...data.emul20, 1) * 1.2;
 
     const x = (t) => mL + (t / xMax) * plotW;
@@ -462,42 +525,42 @@
 
     // Grille verticale (tous les 20 min)
     ctx.strokeStyle = "#e5e7eb";
-    for (let t=0; t<=180; t+=20){
+    for (let t=0; t<=HORIZON_MIN; t+=STEP_MIN){
       ctx.beginPath();
       ctx.moveTo(x(t), mT);
       ctx.lineTo(x(t), mT+plotH);
       ctx.stroke();
     }
 
-    // Axe X labels (0..3h)
+    // Axe X labels (hh:mm)
     ctx.fillStyle = "#111";
     ctx.font = "12px system-ui, Arial";
-    for (let t=0; t<=180; t+=20){
-      const hh = Math.floor(t/60);
-      const mm = t%60;
-      const label = `${hh}h${String(mm).padStart(2,"0")}`;
-      ctx.fillText(label, x(t)-14, mT+plotH+22);
+    for (let t=0; t<=HORIZON_MIN; t+=STEP_MIN){
+      const idx = Math.round(t / STEP_MIN);
+      const label = data.labels[idx] || "";
+      ctx.fillText(label, x(t)-16, mT+plotH+22);
     }
-    ctx.fillText("Temps (0 → 3h, pas 20 min)", mL, H-18);
+    ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H-18);
 
-    // Axe Y gauche (débit kL/min)
-    ctx.fillText("Débit solution (kL/min)", 10, 18);
+    // Axe Y gauche (débit L/min)
+    ctx.fillStyle = "#111";
+    ctx.fillText("Débit solution (L/min)", 10, 18);
     for (let i=0;i<=5;i++){
       const v = (yFlowMax * i/5);
       const yy = yFlow(v);
       ctx.strokeStyle = "#e5e7eb";
       ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL+plotW, yy); ctx.stroke();
       ctx.fillStyle = "#111";
-      ctx.fillText((v/1000).toFixed(1), 18, yy+4);
+      ctx.fillText(Math.round(v).toString(), 10, yy+4);
     }
 
     // Axe Y droit (stock émulseur)
     ctx.fillStyle = "#111";
-    ctx.fillText("Stock émulseur (L)", W-150, 18);
+    ctx.fillText("Stock émulseur (L)", W-180, 18);
     for (let i=0;i<=5;i++){
       const v = (yEmulMax * i/5);
       const yy = yEmul(v);
-      ctx.fillText(Math.round(v).toString(), W-68, yy+4);
+      ctx.fillText(Math.round(v).toString(), W-78, yy+4);
     }
 
     // Courbe débit (noir)
@@ -549,17 +612,23 @@
       return;
     }
 
-    const data = simulate();
+    let data;
+    try {
+      data = simulate();
+    } catch (e) {
+      alert(e.message || "Erreur simulation.");
+      return;
+    }
 
     $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
     $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
     $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
     $("pillBesoin").textContent = `Besoin extinction : ${Math.round(data.needExtTotal)} L`;
+    $("pillT0").textContent = `T0 : ${minToHHMM(data.t0)}`;
 
     blocCourbe.style.display = "block";
     drawChart(data);
 
-    // Scroll vers la courbe
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
@@ -569,4 +638,3 @@
 
 </body>
 </html>
-

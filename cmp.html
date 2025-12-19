@@ -112,15 +112,16 @@
 
   <div class="card" id="blocCourbe" style="display:none;">
     <h2>Courbe (T0 → T0+5h, pas 20 min)</h2>
-    <div class="row" style="align-items:center;">
-      <span class="pill" id="pillQext">Q ext : —</span>
-      <span class="pill" id="pillQtempo">Q tempo : —</span>
-      <span class="pill" id="pilltExt">Durée ext. : —</span>
-      <span class="pill" id="pillBesoin">Besoin extinction : —</span>
-      <span class="pill" id="pillT0">T0 : —</span>
-      <span class="pill" id="pillStockOK">Stock OK : —</span>
-      <span class="pill" id="pillExtStart">Début ext. : —</span>
-    </div>
+ <div class="row" style="align-items:center;">
+  <span class="pill" id="pillQext">Q ext : —</span>
+  <span class="pill" id="pillQtempo">Q tempo : —</span>
+  <span class="pill" id="pilltExt">Durée ext. : —</span>
+  <span class="pill" id="pillBesoin">Besoin en émulseur pour extinction : —</span>
+  <span class="pill" id="pillT0">T0 : —</span>
+  <span class="pill" id="pillExtStart">Début extinction : —</span>
+  <span class="pill" id="pillExtEnd">Fin extinction : —</span>
+</div>
+
 
     <div class="canvas-wrap" style="margin-top:10px;">
       <canvas id="chart" width="1100" height="520"></canvas>
@@ -380,7 +381,8 @@ function drawChart(data) {
   const W = c.width, H = c.height;
   ctx.clearRect(0, 0, W, H);
 
-  const mL = 95, mR = 95, mT = 42, mB = 75;
+  // Marges (plus de place sous l’axe X => plus de superposition)
+  const mL = 95, mR = 105, mT = 42, mB = 100;
   const plotW = W - mL - mR;
   const plotH = H - mT - mB;
 
@@ -421,6 +423,7 @@ function drawChart(data) {
   ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H - 18);
 
   // Axe Y gauche
+  ctx.fillStyle = "#111";
   ctx.fillText("Débit solution (L/min)", 10, 18);
   for (let i = 0; i <= 5; i++) {
     const v = (yFlowMax * i / 5);
@@ -433,11 +436,19 @@ function drawChart(data) {
 
   // Axe Y droit
   ctx.fillStyle = "#111";
-  ctx.fillText("Stock émulseur (L)", W - 195, 18);
+  ctx.fillText("Stock émulseur (L)", W - 230, 18);
   for (let i = 0; i <= 5; i++) {
     const v = (yEmulMax * i / 5);
     const yy = yEmul(v);
-    ctx.fillText(Math.round(v).toString(), W - 85, yy + 4);
+    ctx.fillText(Math.round(v).toString(), W - 90, yy + 4);
+  }
+
+  // ✅ Bande "phase extinction" (si on a un début)
+  if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
+    const x1 = x(data.tExtStart);
+    const x2 = x(Math.min(data.tExtEnd, HORIZON_MIN));
+    ctx.fillStyle = "rgba(34,197,94,0.10)"; // vert léger
+    ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
   }
 
   // ✅ NOIR = débit dispo (escaliers)
@@ -478,7 +489,7 @@ function drawChart(data) {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // ✅ OBJECTIF STOCK (vert pointillés) = Besoin extinction
+  // ✅ Besoin émulseur extinction (vert pointillés)
   ctx.strokeStyle = "#16a34a";
   ctx.setLineDash([6, 6]);
   ctx.lineWidth = 2;
@@ -488,41 +499,73 @@ function drawChart(data) {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Marqueurs verticaux (stock OK / début extinction)
-  const labelAt = (tMin) => {
-    const t0 = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
-    return addMinToHHMM(t0, tMin);
-  };
+  // Helpers temps
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
+  const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
 
-  const drawMarker = (tMin, text) => {
-    if (tMin === null || !Number.isFinite(tMin)) return;
-    ctx.strokeStyle = "#0f172a";
-    ctx.setLineDash([4,4]);
+  // ✅ Marqueurs verticaux (on met les libellés EN HAUT dans le graphe => plus de superposition)
+  function drawMarkerTop(tMin, text, color) {
+    if (!Number.isFinite(tMin)) return;
+
+    const xx = x(tMin);
+
+    // ligne verticale
+    ctx.strokeStyle = color;
+    ctx.setLineDash([4, 4]);
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(x(tMin), mT);
-    ctx.lineTo(x(tMin), mT + plotH);
+    ctx.moveTo(xx, mT);
+    ctx.lineTo(xx, mT + plotH);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = "#0f172a";
-    ctx.font = "12px system-ui, Arial";
-    ctx.fillText(text, x(tMin) + 6, mT + plotH + 44);
-  };
 
-  if (data.tStockOK !== null) drawMarker(data.tStockOK, `Stock OK : ${labelAt(data.tStockOK)}`);
-  if (data.tExtStart !== null) drawMarker(data.tExtStart, `Début ext. : ${labelAt(data.tExtStart)}`);
+    // petit cartouche en haut
+    ctx.font = "12px system-ui, Arial";
+    const pad = 6;
+    const w = ctx.measureText(text).width + pad * 2;
+    const boxX = Math.min(W - mR - w - 4, Math.max(mL + 4, xx + 6));
+    const boxY = mT + 6;
+
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, w, 22, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = color;
+    ctx.fillText(text, boxX + pad, boxY + 15);
+  }
+
+  // Stock OK (vert)
+  if (data.tStockOK !== null) {
+    drawMarkerTop(data.tStockOK, `Stock OK : ${labelAt(data.tStockOK)}`, "#16a34a");
+  }
+
+  // Début extinction (bleu foncé)
+  if (data.tExtStart !== null) {
+    drawMarkerTop(data.tExtStart, `Début ext. : ${labelAt(data.tExtStart)}`, "#0f172a");
+  }
+
+  // Fin extinction (bleu foncé)
+  if (data.tExtEnd !== null) {
+    drawMarkerTop(data.tExtEnd, `Fin ext. : ${labelAt(data.tExtEnd)}`, "#0f172a");
+  }
 
   // Légende
   ctx.fillStyle = "#111";
   ctx.font = "12px system-ui, Arial";
   ctx.fillText("— Débit dispo (somme engins)", mL + 10, mT + 16);
   ctx.fillStyle = "#ef4444";
-  ctx.fillText("— Stock émulseur dispo", mL + 220, mT + 16);
+  ctx.fillText("— Stock émulseur dispo", mL + 230, mT + 16);
   ctx.fillStyle = "#2563eb";
   ctx.fillText("— Q ext (cible)", mL + 390, mT + 16);
   ctx.fillStyle = "#16a34a";
-  ctx.fillText("— Objectif besoin extinction", mL + 510, mT + 16);
+  ctx.fillText("— Besoin en émulseur pour extinction", mL + 510, mT + 16);
 }
+
 
 
   // ===== Action tracer =====

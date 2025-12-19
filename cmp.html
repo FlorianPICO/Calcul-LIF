@@ -581,8 +581,26 @@ function drawChart(data) {
     $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
     $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
     $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
-    $("pillBesoin").textContent = `Besoin extinction : ${Math.round(data.needExtTotal)} L`;
-    $("pillT0").textContent = `T0 : ${t0HHMM}`;
+   $("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${Math.round(data.needExtTotal)} L`;
+$("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
+
+// Début / fin extinction (si atteinte)
+if (Number.isFinite(data.tExtStart)) {
+  const t0Str = `${String(Math.floor(data.t0Abs/60)).padStart(2,"0")}:${String(data.t0Abs%60).padStart(2,"0")}`;
+  const startHHMM = addMinToHHMM(t0Str, data.tExtStart);
+  $("pillExtStart").textContent = `Début extinction : ${startHHMM}`;
+} else {
+  $("pillExtStart").textContent = "Début extinction : —";
+}
+
+if (Number.isFinite(data.tExtEnd)) {
+  const t0Str = `${String(Math.floor(data.t0Abs/60)).padStart(2,"0")}:${String(data.t0Abs%60).padStart(2,"0")}`;
+  const endHHMM = addMinToHHMM(t0Str, data.tExtEnd);
+  $("pillExtEnd").textContent = `Fin extinction : ${endHHMM}`;
+} else {
+  $("pillExtEnd").textContent = "Fin extinction : —";
+}
+
 
     const stockOK = (data.tStockOK === null) ? "—" : addMinToHHMM(t0HHMM, data.tStockOK);
     const extStart = (data.tExtStart === null) ? "—" : addMinToHHMM(t0HHMM, data.tExtStart);

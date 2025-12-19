@@ -6,132 +6,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    body{
-      margin:0;
-      font-family:system-ui, Arial, sans-serif;
-      background:#f5f7fa;
-      color:#111;
-      line-height:1.5;
-    }
-    header{
-      background:#0b1220;
-      color:#fff;
-      padding:18px 14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-    header .title{
-      font-weight:900;
-      font-size:1.1rem;
-    }
-    header a{
-      color:#fff;
-      text-decoration:none;
-      font-weight:800;
-      padding:10px 12px;
-      border-radius:10px;
-      background:rgba(255,255,255,0.12);
-      white-space:nowrap;
-    }
-    main{
-      max-width:980px;
-      margin:auto;
-      padding:16px 12px 26px;
-    }
-    .card{
-      background:#fff;
-      border:1px solid #ddd;
-      border-radius:14px;
-      padding:14px;
-      margin-top:12px;
-    }
-    .card h2{
-      margin:0 0 10px 0;
-      font-size:1.1rem;
-      font-weight:900;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap:10px;
-      align-items:end;
-    }
-    @media (max-width:720px){
-      .grid{ grid-template-columns: 1fr 1fr; }
-    }
+    body{ margin:0; font-family:system-ui, Arial, sans-serif; background:#f5f7fa; color:#111; line-height:1.5; }
+    header{ background:#0b1220; color:#fff; padding:18px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    header .title{ font-weight:900; font-size:1.1rem; }
+    header a{ color:#fff; text-decoration:none; font-weight:800; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.12); white-space:nowrap; }
+    main{ max-width:980px; margin:auto; padding:16px 12px 26px; }
+    .card{ background:#fff; border:1px solid #ddd; border-radius:14px; padding:14px; margin-top:12px; }
+    .card h2{ margin:0 0 10px 0; font-size:1.1rem; font-weight:900; }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:end; }
+    @media (max-width:720px){ .grid{ grid-template-columns: 1fr 1fr; } }
     label{ font-weight:800; font-size:0.95rem; }
-    input, select, button{
-      width:100%;
-      padding:10px;
-      border-radius:10px;
-      border:1px solid #ccc;
-      box-sizing:border-box;
-      font-family:inherit;
-      font-size:1rem;
-    }
-    .row{
-      display:flex;
-      gap:10px;
-      margin-top:10px;
-      flex-wrap:wrap;
-    }
-    .btn{
-      cursor:pointer;
-      font-weight:900;
-      border:0;
-      border-radius:12px;
-      padding:12px 14px;
-    }
+    input, select, button{ width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; box-sizing:border-box; font-family:inherit; font-size:1rem; }
+    .row{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+    .btn{ cursor:pointer; font-weight:900; border:0; border-radius:12px; padding:12px 14px; }
     .btn-primary{ background:#2563eb; color:#fff; }
     .btn-ghost{ background:#fff; border:1px solid #ccc; }
     .small{ font-size:12px; color:#555; margin-top:6px; }
-    .warn{
-      background:#fff3cd;
-      border:1px solid #ffeeba;
-      padding:10px 12px;
-      border-radius:12px;
-      font-size:0.95rem;
-    }
+    .warn{ background:#fff3cd; border:1px solid #ffeeba; padding:10px 12px; border-radius:12px; font-size:0.95rem; }
 
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      overflow:hidden;
-      border:1px solid #e5e7eb;
-      border-radius:12px;
-      margin-top:10px;
-    }
-    th, td{
-      padding:10px;
-      border-bottom:1px solid #e5e7eb;
-      text-align:left;
-      font-size:0.95rem;
-      vertical-align:middle;
-    }
+    table{ width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border:1px solid #e5e7eb; border-radius:12px; margin-top:10px; }
+    th, td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; font-size:0.95rem; vertical-align:middle; }
     th{ background:#f8fafc; font-weight:900; }
     tr:last-child td{ border-bottom:none; }
 
-    .pill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:0.85rem;
-      border:1px solid #ddd;
-      background:#f8fafc;
-    }
+    .pill{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:0.85rem; border:1px solid #ddd; background:#f8fafc; }
 
-    .canvas-wrap{
-      width:100%;
-      overflow:auto;
-      border:1px dashed #cbd5e1;
-      border-radius:12px;
-      padding:10px;
-      background:#fff;
-    }
+    .canvas-wrap{ width:100%; overflow:auto; border:1px dashed #cbd5e1; border-radius:12px; padding:10px; background:#fff; }
     canvas{ width:100%; height:auto; }
   </style>
 </head>
@@ -143,7 +43,6 @@
 </header>
 
 <main>
-
   <div class="card" id="blocStatus">
     <h2>Paramètres importés depuis le calcul</h2>
     <div id="status" class="warn">Chargement…</div>
@@ -207,7 +106,7 @@
 
     <div class="small">
       Logique : TEMPORISATION tant que débit dispo &lt; Q ext OU stock émulseur &lt; besoin extinction.
-      Consommation émulseur = 3% du débit utilisé (Q tempo / Q ext).
+      Temporisation : conso = Q tempo × 3%. Extinction : conso = Q ext × 3% pendant Durée ext.
     </div>
   </div>
 
@@ -219,6 +118,8 @@
       <span class="pill" id="pilltExt">Durée ext. : —</span>
       <span class="pill" id="pillBesoin">Besoin extinction : —</span>
       <span class="pill" id="pillT0">T0 : —</span>
+      <span class="pill" id="pillStockOK">Stock OK : —</span>
+      <span class="pill" id="pillExtStart">Début ext. : —</span>
     </div>
 
     <div class="canvas-wrap" style="margin-top:10px;">
@@ -226,123 +127,73 @@
     </div>
 
     <div class="small">
-      Axe gauche : débit solution (L/min). Axe droit : stock émulseur (L). Temporisation = Q tempo x 3%. Extinction = Q ext x 3%.
+      Axe gauche : débit solution (L/min). Axe droit : stock émulseur (L). Courbes en escaliers.
+      Marqueurs : Stock OK (≥ besoin extinction) et Début extinction (débit ≥ Q ext ET stock ≥ besoin).
     </div>
   </div>
-
 </main>
 
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
-// ===== CMP : constantes =====
-const STEP_MIN = 20;
-const HORIZON_H = 5;
-const HORIZON_MIN = HORIZON_H * 60;
 
-const pad2 = (x) => String(x).padStart(2, "0");
-
-const timeToMin = (hhmm) => {
-  if (!hhmm) return NaN;
-  const [h, m] = hhmm.split(":").map(Number);
-  if (![h, m].every(Number.isFinite)) return NaN;
-  return h * 60 + m;
-};
-
-// T0 = arrivée la plus tôt (en minutes "horloge")
-const getFirstArrivalMin = (rows) => {
-  let best = Infinity;
-  rows.forEach(r => {
-    const m = timeToMin(r.atStr);
-    if (Number.isFinite(m)) best = Math.min(best, m);
-  });
-  return best === Infinity ? NaN : best;
-};
-
-// minutes relatives depuis T0 (gère passage minuit)
-const arrivalRelMin = (hhmm, t0) => {
-  const m = timeToMin(hhmm);
-  if (!Number.isFinite(m) || !Number.isFinite(t0)) return NaN;
-  let rel = m - t0;
-  if (rel < 0) rel += 24 * 60;
-  return rel;
-};
-
-const addMinToHHMM = (hhmm, add) => {
-  const base = timeToMin(hhmm);
-  if (!Number.isFinite(base)) return "??:??";
-  let total = (base + add) % (24 * 60);
-  if (total < 0) total += 24 * 60;
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  return `${pad2(h)}:${pad2(m)}`;
-};
-
-// labels X : toutes les 20 minutes de T0 à T0+5h
-const buildTimeLabels = (t0MinAbs) => {
-  const t0 = `${pad2(Math.floor(t0MinAbs / 60))}:${pad2(t0MinAbs % 60)}`;
-  const labels = [];
-  for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
-    labels.push(addMinToHHMM(t0, t));
-  }
-  return labels;
-};
-
-  // =========================
-  // Étape A — Temps (T0 + pas)
-  // =========================
-  const STEP_MIN = 20;      // pas de 20 minutes
-  const HORIZON_H = 5;      // jusqu'à T0 + 5h
+  // ===== Paramètres CMP =====
+  const STEP_MIN = 20;
+  const HORIZON_H = 5;
   const HORIZON_MIN = HORIZON_H * 60;
 
-  const pad2 = (n) => String(n).padStart(2, "0");
+  const pad2 = (x) => String(x).padStart(2, "0");
 
-  // "hh:mm" -> minutes dans la journée (0..1439)
-  function hhmmToMin(hhmm) {
+  const n = (v) => {
+    if (v === null || v === undefined) return NaN;
+    const s = String(v).replace(",", ".").trim();
+    if (!s) return NaN;
+    const x = Number(s);
+    return Number.isFinite(x) ? x : NaN;
+  };
+
+  const timeToMin = (hhmm) => {
     if (!hhmm || !/^\d{2}:\d{2}$/.test(hhmm)) return NaN;
     const [h, m] = hhmm.split(":").map(Number);
     if (h < 0 || h > 23 || m < 0 || m > 59) return NaN;
     return h * 60 + m;
-  }
+  };
 
-  // minutes -> "hh:mm" (boucle sur 24h)
-  function minToHHMM(min) {
-    const mm = ((min % 1440) + 1440) % 1440;
-    const h = Math.floor(mm / 60);
-    const m = mm % 60;
+  const addMinToHHMM = (hhmm, add) => {
+    const base = timeToMin(hhmm);
+    if (!Number.isFinite(base)) return "??:??";
+    let total = (base + add) % (24 * 60);
+    if (total < 0) total += 24 * 60;
+    const h = Math.floor(total / 60);
+    const m = total % 60;
     return `${pad2(h)}:${pad2(m)}`;
-  }
+  };
 
-  // Trouve l'heure d'arrivée la + tôt
-  function getFirstArrivalMin(engins) {
-    const mins = engins
-      .map(e => hhmmToMin(e.atStr))
-      .filter(Number.isFinite);
-    return mins.length ? Math.min(...mins) : NaN;
-  }
+  const getFirstArrivalMin = (rows) => {
+    let best = Infinity;
+    rows.forEach(r => {
+      const m = timeToMin(r.atStr);
+      if (Number.isFinite(m)) best = Math.min(best, m);
+    });
+    return best === Infinity ? NaN : best;
+  };
 
-  // "arrivée hh:mm" -> minutes relatives depuis T0 (gestion simple passage minuit)
-  function arrivalRelMin(arriveeHHMM, t0Min) {
-    const a = hhmmToMin(arriveeHHMM);
-    if (!Number.isFinite(a)) return NaN;
-    let rel = a - t0Min;
-    if (rel < 0) rel += 1440;
+  const arrivalRelMin = (hhmm, t0) => {
+    const m = timeToMin(hhmm);
+    if (!Number.isFinite(m) || !Number.isFinite(t0)) return NaN;
+    let rel = m - t0;
+    if (rel < 0) rel += 24 * 60; // passage minuit
     return rel;
-  }
+  };
 
-  // Labels X : de T0 à T0+5h par pas de 20 min
-  function buildTimeLabels(t0Min) {
-    const totalSteps = Math.round(HORIZON_MIN / STEP_MIN); // 300/20=15
+  const buildTimeLabels = (t0MinAbs) => {
+    const t0 = `${pad2(Math.floor(t0MinAbs / 60))}:${pad2(t0MinAbs % 60)}`;
     const labels = [];
-    for (let i = 0; i <= totalSteps; i++) {
-      labels.push(minToHHMM(t0Min + i * STEP_MIN));
-    }
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) labels.push(addMinToHHMM(t0, t));
     return labels;
-  }
+  };
 
-  // =========================
-  // Données SDIS 27
-  // =========================
+  // ===== Table SDIS 27 : débit solution (L/min) et stock émulseur (L) =====
   const ENGINS = {
     FPT:   { flow: 2000, emul: 200 },
     CCRM:  { flow: 1500, emul: 200 },
@@ -355,17 +206,7 @@ const buildTimeLabels = (t0MinAbs) => {
     CEEM:  { flow: 0,    emul: 6000 }
   };
 
-  const n = (v) => {
-    if (v === null || v === undefined) return NaN;
-    const s = String(v).replace(",", ".").trim();
-    if (!s) return NaN;
-    const x = Number(s);
-    return Number.isFinite(x) ? x : NaN;
-  };
-
-  // =========================
-  // Charge paramètres calcul
-  // =========================
+  // ===== Charge paramètres calcul =====
   let params = null;
   try {
     params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null");
@@ -389,9 +230,7 @@ const buildTimeLabels = (t0MinAbs) => {
      - Besoin extinction = <b>${Math.round(params.besoinExt)}</b> L émulseur`;
   blocSaisie.style.display = "block";
 
-  // =========================
-  // Liste d'engins
-  // =========================
+  // ===== Liste d'engins =====
   const rows = []; // {type, atStr, qty}
   const tbody = $("liste");
 
@@ -429,15 +268,10 @@ const buildTimeLabels = (t0MinAbs) => {
     const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
 
     if (!ENGINS[type]) return;
-    if (!Number.isFinite(hhmmToMin(atStr))) {
-      alert("Heure d’arrivée invalide.");
-      return;
-    }
+    if (!Number.isFinite(timeToMin(atStr))) { alert("Heure d’arrivée invalide."); return; }
 
     rows.push({ type, atStr, qty });
-
-    // tri simple par heure dans la journée (utile visuellement)
-    rows.sort((a,b) => hhmmToMin(a.atStr) - hhmmToMin(b.atStr));
+    rows.sort((a,b) => timeToMin(a.atStr) - timeToMin(b.atStr));
     render();
   });
 
@@ -447,123 +281,96 @@ const buildTimeLabels = (t0MinAbs) => {
     blocCourbe.style.display = "none";
   });
 
-  // =========================
-  // Simulation minute par minute (T0 → T0+5h)
-  // =========================
-function simulate() {
-  const Qext = params.Qext;          // L/min
-  const Qtempo = params.Qtempo;      // L/min
-  const tExt = params.tExt;          // min
-  const conc = (params.concPct / 100);
+  // ===== Simulation minute par minute (T0 → T0+5h) =====
+  function simulate() {
+    const Qext = params.Qext;          // L/min
+    const Qtempo = params.Qtempo;      // L/min
+    const tExt = params.tExt;          // min
+    const conc = (params.concPct / 100);
 
-  const needExtTotal = Qext * tExt * conc; // L d’émulseur nécessaires
+    const needExtTotal = Qext * tExt * conc; // L d’émulseur nécessaires
 
-  // T0 = arrivée la + tôt
-  const t0Abs = getFirstArrivalMin(rows);
-  if (!Number.isFinite(t0Abs)) {
-    throw new Error("Impossible : aucune arrivée valide.");
-  }
+    const t0Abs = getFirstArrivalMin(rows);
+    if (!Number.isFinite(t0Abs)) throw new Error("Impossible : aucune arrivée valide.");
 
-  // Ajouts minute (0..HORIZON_MIN)
-  const addFlow = Array(HORIZON_MIN + 1).fill(0); // débit dispo ajouté
-  const addEmul = Array(HORIZON_MIN + 1).fill(0); // stock ajouté
+    const addFlow = Array(HORIZON_MIN + 1).fill(0);
+    const addEmul = Array(HORIZON_MIN + 1).fill(0);
 
-  rows.forEach(r => {
-    const def = ENGINS[r.type];
-    const rel = arrivalRelMin(r.atStr, t0Abs); // minute relative depuis T0
-    if (!Number.isFinite(rel)) return;
+    rows.forEach(r => {
+      const def = ENGINS[r.type];
+      const rel = arrivalRelMin(r.atStr, t0Abs);
+      if (!Number.isFinite(rel)) return;
+      const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
+      addFlow[m] += def.flow * r.qty;
+      addEmul[m] += def.emul * r.qty;
+    });
 
-    const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
-    addFlow[m] += def.flow * r.qty;
-    addEmul[m] += def.emul * r.qty;
-  });
+    let flowAvail = 0;
+    let emulStock = 0;
 
-  let flowAvail = 0;   // débit dispo cumulé
-  let emulStock = 0;   // stock dispo cumulé
+    let startedExt = false;
+    let extRemaining = 0;
 
-  let startedExt = false;
-  let extRemaining = 0;
+    let tStockOK = null;
+    let tExtStart = null;
 
-  let tStockOK = null;    // 1ère minute où stock >= besoin extinction
-  let tExtStart = null;   // 1ère minute où (débit>=Qext && stock>=besoin)
+    const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0);
+    const emulSerie = Array(HORIZON_MIN + 1).fill(0);
 
-  // séries minute
-  const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0); // NOIR = débit dispo (escaliers)
-  const emulSerie = Array(HORIZON_MIN + 1).fill(0);      // ROUGE = stock dispo (escaliers)
+    for (let t = 0; t <= HORIZON_MIN; t++) {
+      flowAvail += addFlow[t];
+      emulStock += addEmul[t];
 
-  for (let t = 0; t <= HORIZON_MIN; t++) {
-    // Arrivées => marches immédiates
-    flowAvail += addFlow[t];
-    emulStock += addEmul[t];
+      if (tStockOK === null && emulStock >= needExtTotal) tStockOK = t;
 
-    // repère "stock OK"
-    if (tStockOK === null && emulStock >= needExtTotal) tStockOK = t;
+      const canFlow = flowAvail >= Qext;
+      const canEmul = emulStock >= needExtTotal;
 
-    // Conditions de bascule extinction
-    const canFlow = flowAvail >= Qext;
-    const canEmul = emulStock >= needExtTotal;
+      if (!startedExt && canFlow && canEmul) {
+        startedExt = true;
+        extRemaining = tExt;
+        tExtStart = t;
+      }
 
-    if (!startedExt && canFlow && canEmul) {
-      startedExt = true;
-      extRemaining = tExt;
-      tExtStart = t;
+      let emulCons = 0;
+      if (!startedExt) {
+        emulCons = Qtempo * conc;
+      } else if (extRemaining > 0) {
+        emulCons = Qext * conc;
+        extRemaining -= 1;
+      } else {
+        emulCons = 0;
+      }
+
+      if (emulCons > emulStock) emulCons = emulStock;
+      emulStock -= emulCons;
+
+      flowAvailSerie[t] = flowAvail;
+      emulSerie[t] = emulStock;
     }
 
-    // ===== consommation d’émulseur =====
-    // TEMPORISATION tant que pas en extinction : conso = Qtempo * 3%
-    // EXTINCTION : conso = Qext * 3% pendant tExt
-    let emulCons = 0;
+    const labels = buildTimeLabels(t0Abs);
 
-    if (!startedExt) {
-      emulCons = Qtempo * conc; // L/min d'émulseur
-    } else if (extRemaining > 0) {
-      emulCons = Qext * conc;
-      extRemaining -= 1;
-    } else {
-      emulCons = 0;
-    }
-
-    // on ne consomme pas au-delà du stock
-    if (emulCons > emulStock) emulCons = emulStock;
-    emulStock -= emulCons;
-
-    flowAvailSerie[t] = flowAvail;
-    emulSerie[t] = emulStock;
+    return { Qext, Qtempo, tExt, concPct: params.concPct, needExtTotal, t0Abs, labels, tStockOK, tExtStart, flowAvailSerie, emulSerie };
   }
 
-  const labels = buildTimeLabels(t0Abs);
-
-  return {
-    Qext, Qtempo, tExt, concPct: params.concPct,
-    needExtTotal,
-    t0Abs,
-    labels,
-    tStockOK,
-    tExtStart,
-    flowAvailSerie,
-    emulSerie
-  };
-}
-
-  // =========================
-  // Dessin canvas (débit L/min + stock L)
-  // =========================
+  // ===== Dessin canvas (escaliers) =====
   function drawChart(data) {
     const c = $("chart");
     const ctx = c.getContext("2d");
-
     const W = c.width, H = c.height;
-    ctx.clearRect(0,0,W,H);
+    ctx.clearRect(0, 0, W, H);
 
-    // Marges
-    const mL = 85, mR = 85, mT = 40, mB = 70;
+    const mL = 95, mR = 95, mT = 42, mB = 75;
     const plotW = W - mL - mR;
     const plotH = H - mT - mB;
 
-    // Domaines
     const xMax = HORIZON_MIN;
-    const yFlowMax = Math.max(data.Qext, ...data.flow20) * 1.2 || 1000; // L/min
-    const yEmulMax = Math.max(...data.emul20, 1) * 1.2;
+    const maxFlow = Math.max(data.Qext, ...data.flowAvailSerie) || 1000;
+    const yFlowMax = maxFlow * 1.15;
+
+    const maxEmul = Math.max(...data.emulSerie, 1);
+    const yEmulMax = maxEmul * 1.15;
 
     const x = (t) => mL + (t / xMax) * plotW;
     const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
@@ -574,112 +381,141 @@ function simulate() {
     ctx.strokeStyle = "#cbd5e1";
     ctx.strokeRect(mL, mT, plotW, plotH);
 
-    // Grille verticale (tous les 20 min)
+    // Grille verticale (20 min)
     ctx.strokeStyle = "#e5e7eb";
-    for (let t=0; t<=HORIZON_MIN; t+=STEP_MIN){
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
       ctx.beginPath();
       ctx.moveTo(x(t), mT);
-      ctx.lineTo(x(t), mT+plotH);
+      ctx.lineTo(x(t), mT + plotH);
       ctx.stroke();
     }
 
     // Axe X labels (hh:mm)
     ctx.fillStyle = "#111";
     ctx.font = "12px system-ui, Arial";
-    for (let t=0; t<=HORIZON_MIN; t+=STEP_MIN){
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
       const idx = Math.round(t / STEP_MIN);
       const label = data.labels[idx] || "";
-      ctx.fillText(label, x(t)-16, mT+plotH+22);
+      ctx.fillText(label, x(t) - 18, mT + plotH + 22);
     }
-    ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H-18);
+    ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H - 18);
 
-    // Axe Y gauche (débit L/min)
-    ctx.fillStyle = "#111";
+    // Axe Y gauche
     ctx.fillText("Débit solution (L/min)", 10, 18);
-    for (let i=0;i<=5;i++){
-      const v = (yFlowMax * i/5);
+    for (let i = 0; i <= 5; i++) {
+      const v = (yFlowMax * i / 5);
       const yy = yFlow(v);
       ctx.strokeStyle = "#e5e7eb";
-      ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL+plotW, yy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL + plotW, yy); ctx.stroke();
       ctx.fillStyle = "#111";
-      ctx.fillText(Math.round(v).toString(), 10, yy+4);
+      ctx.fillText(Math.round(v).toString(), 10, yy + 4);
     }
 
-    // Axe Y droit (stock émulseur)
+    // Axe Y droit
     ctx.fillStyle = "#111";
-    ctx.fillText("Stock émulseur (L)", W-180, 18);
-    for (let i=0;i<=5;i++){
-      const v = (yEmulMax * i/5);
+    ctx.fillText("Stock émulseur (L)", W - 195, 18);
+    for (let i = 0; i <= 5; i++) {
+      const v = (yEmulMax * i / 5);
       const yy = yEmul(v);
-      ctx.fillText(Math.round(v).toString(), W-78, yy+4);
+      ctx.fillText(Math.round(v).toString(), W - 85, yy + 4);
     }
 
-    // Courbe débit (noir)
+    // NOIR = débit dispo (escaliers)
     ctx.strokeStyle = "#111";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    data.ticks.forEach((t, i) => {
+    ctx.moveTo(x(0), yFlow(data.flowAvailSerie[0] || 0));
+    for (let t = 1; t <= HORIZON_MIN; t++) {
+      const prev = data.flowAvailSerie[t - 1] || 0;
+      const cur = data.flowAvailSerie[t] || 0;
       const xx = x(t);
-      const yy = yFlow(data.flow20[i]);
-      if (i===0) ctx.moveTo(xx, yy);
-      else ctx.lineTo(xx, yy);
-    });
+      ctx.lineTo(xx, yFlow(prev));
+      if (cur !== prev) ctx.lineTo(xx, yFlow(cur));
+    }
     ctx.stroke();
 
-    // Courbe stock émulseur (rouge)
+    // ROUGE = stock (escaliers)
     ctx.strokeStyle = "#ef4444";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    data.ticks.forEach((t, i) => {
+    ctx.moveTo(x(0), yEmul(data.emulSerie[0] || 0));
+    for (let t = 1; t <= HORIZON_MIN; t++) {
+      const prev = data.emulSerie[t - 1] || 0;
+      const cur = data.emulSerie[t] || 0;
       const xx = x(t);
-      const yy = yEmul(data.emul20[i]);
-      if (i===0) ctx.moveTo(xx, yy);
-      else ctx.lineTo(xx, yy);
-    });
+      ctx.lineTo(xx, yEmul(prev));
+      if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
+    }
     ctx.stroke();
 
     // Ligne cible Qext (pointillés)
     ctx.strokeStyle = "#2563eb";
-    ctx.setLineDash([6,6]);
+    ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(mL, yFlow(data.Qext));
-    ctx.lineTo(mL+plotW, yFlow(data.Qext));
+    ctx.lineTo(mL + plotW, yFlow(data.Qext));
     ctx.stroke();
     ctx.setLineDash([]);
 
+    // Marqueurs verticaux
+    const labelAt = (tMin) => {
+      const t0 = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
+      return addMinToHHMM(t0, tMin);
+    };
+
+    const drawMarker = (tMin, text) => {
+      if (tMin === null || !Number.isFinite(tMin)) return;
+      ctx.strokeStyle = "#0f172a";
+      ctx.setLineDash([4,4]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x(tMin), mT);
+      ctx.lineTo(x(tMin), mT + plotH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "12px system-ui, Arial";
+      ctx.fillText(text, x(tMin) + 6, mT + plotH + 44);
+    };
+
+    if (data.tStockOK !== null) drawMarker(data.tStockOK, `Stock OK : ${labelAt(data.tStockOK)}`);
+    if (data.tExtStart !== null) drawMarker(data.tExtStart, `Début ext. : ${labelAt(data.tExtStart)}`);
+
     // Légende
     ctx.fillStyle = "#111";
-    ctx.fillText("— Débit utilisé", mL+10, mT+16);
+    ctx.font = "12px system-ui, Arial";
+    ctx.fillText("— Débit dispo (somme engins)", mL + 10, mT + 16);
     ctx.fillStyle = "#ef4444";
-    ctx.fillText("— Stock émulseur", mL+120, mT+16);
+    ctx.fillText("— Stock émulseur dispo", mL + 220, mT + 16);
     ctx.fillStyle = "#2563eb";
-    ctx.fillText("— Q ext (cible)", mL+260, mT+16);
+    ctx.fillText("— Q ext (cible)", mL + 390, mT + 16);
   }
 
+  // ===== Action tracer =====
   $("btnTracer").addEventListener("click", () => {
-    if (rows.length === 0) {
-      alert("Ajoute au moins un engin (ex : 1 FPT à 00:00).");
-      return;
-    }
+    if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
 
     let data;
-    try {
-      data = simulate();
-    } catch (e) {
-      alert(e.message || "Erreur simulation.");
-      return;
-    }
+    try { data = simulate(); }
+    catch (e) { alert(e.message || "Erreur simulation."); return; }
+
+    const t0HHMM = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
 
     $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
     $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
     $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
     $("pillBesoin").textContent = `Besoin extinction : ${Math.round(data.needExtTotal)} L`;
-    $("pillT0").textContent = `T0 : ${minToHHMM(data.t0)}`;
+    $("pillT0").textContent = `T0 : ${t0HHMM}`;
+
+    const stockOK = (data.tStockOK === null) ? "—" : addMinToHHMM(t0HHMM, data.tStockOK);
+    const extStart = (data.tExtStart === null) ? "—" : addMinToHHMM(t0HHMM, data.tExtStart);
+
+    $("pillStockOK").textContent = `Stock OK : ${stockOK}`;
+    $("pillExtStart").textContent = `Début ext. : ${extStart}`;
 
     blocCourbe.style.display = "block";
     drawChart(data);
-
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 

@@ -838,9 +838,20 @@ Volume émulseur total : —`;
   });
 // ================== PASSERELLE VERS CMP (stockage local) ==================
 const btnCmp = $("btnCmp");
+
+// Convertit un texte type "3 %" / "1 000" / "1000 L/min" en nombre
+const numFromText = (txt) => {
+  if (txt == null) return NaN;
+  const s = String(txt)
+    .replace(/\s/g, "")      // enlève espaces
+    .replace(",", ".")       // virgule -> point
+    .replace(/[^0-9.\-]/g, ""); // garde chiffres + . + -
+  const x = Number(s);
+  return Number.isFinite(x) ? x : NaN;
+};
+
 if (btnCmp) {
   btnCmp.addEventListener("click", (e) => {
-    // Bloque le lien le temps de vérifier + stocker
     e.preventDefault();
 
     // CMP dispo uniquement en mode SDIS 27 verrouillé
@@ -849,19 +860,19 @@ if (btnCmp) {
       return;
     }
 
-    // On récupère les valeurs calculées (issues du compute)
-    const Qext = n($("oQext").textContent);
-    const Qtempo = n($("oQtempo").textContent);
-    const tExt = n($("oT").textContent);
-    const concPct = n($("oConc").textContent); // ex "3 %" -> n() sort 3
+    // Valeurs calculées
+    const Qext   = numFromText($("oQext").textContent);   // L/min
+    const Qtempo = numFromText($("oQtempo").textContent); // L/min
+    const tExt   = numFromText($("oT").textContent);      // min
+    const concPct = numFromText($("oConc").textContent);  // ex "3 %"
 
     // Sécurité : si pas encore calculé
-    if (![Qext, Qtempo, tExt, concPct].every(Number.isFinite) || Qext <= 0 || Qtempo <= 0 || tExt <= 0) {
-      alert("Fais un calcul d’abord (surface, type, attaque, etc.) pour générer Q ext / Q tempo / durée.");
+    if (![Qext, Qtempo, tExt, concPct].every(Number.isFinite) || Qext <= 0 || Qtempo <= 0 || tExt <= 0 || concPct <= 0) {
+      alert("Fais un calcul d’abord pour générer Q ext / Q tempo / durée.");
       return;
     }
 
-    // Besoin émulseur extinction complet (à 3%)
+    // Besoin émulseur extinction complet
     const conc = concPct / 100;
     const besoinExt = Qext * tExt * conc;
 
@@ -877,10 +888,11 @@ if (btnCmp) {
     };
     localStorage.setItem("LIF_CMP_INPUTS", JSON.stringify(payload));
 
-    // Go CMP
+    // Navigation
     window.location.href = btnCmp.getAttribute("href") || "cmp.html";
   });
 }
+
 
   resetAll();
 })();
@@ -888,6 +900,7 @@ if (btnCmp) {
 
 </body>
 </html>
+
 
 
 

@@ -468,12 +468,12 @@ function drawChart(data) {
   for (let i = 0; i <= 5; i++) {
     const v = (yEmulMax * i / 5);
     const yy = yEmul(v);
-    ctx.fillStyle = "#111";
+    ctx.fillStyle = "#ef4444";
     ctx.fillText(Math.round(v).toString(), W - 90, yy + 4);
   }
 
   // === Libellé "Stock émulseur (L)" AU-DESSUS DE L'AXE droit ===
-  ctx.fillStyle = "#111";
+  ctx.fillStyle = "#ef4444";
   ctx.font = "12px system-ui, Arial";
   ctx.fillText("Stock émulseur (L)", mL + plotW - 120, mT - 12);
 

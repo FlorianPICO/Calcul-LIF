@@ -449,29 +449,37 @@ function drawChart(data) {
     ctx.fillText(label, x(t) - 18, mT + plotH + 22);
   }
 
-  // === Axe Y gauche ===
+// === Axe Y gauche ===
+ctx.fillStyle = "#111";
+ctx.font = "12px system-ui, Arial";
+ctx.textAlign = "left";
+ctx.textBaseline = "alphabetic";
+ctx.fillText("Débit solution (L/min)", 10, 18);
+
+ctx.textAlign = "right";
+ctx.textBaseline = "middle";
+for (let i = 0; i <= 5; i++) {
+  const v = (yFlowMax * i / 5);
+  const yy = yFlow(v);
+
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL + plotW, yy); ctx.stroke();
+
   ctx.fillStyle = "#111";
-  ctx.fillText("Débit solution (L/min)", 10, 18);
-  for (let i = 0; i <= 5; i++) {
-    const v = (yFlowMax * i / 5);
-    const yy = yFlow(v);
-    ctx.strokeStyle = "#e5e7eb";
-    ctx.beginPath();
-    ctx.moveTo(mL, yy);
-    ctx.lineTo(mL + plotW, yy);
-    ctx.stroke();
-    ctx.fillStyle = "#111";
-    ctx.fillText(Math.round(v).toString(), 10, yy + 4);
-  }
+  ctx.fillText(Math.round(v).toString(), mL - 8, yy);
+}
+
 
   // === Axe Y droit (valeurs) ===
   for (let i = 0; i <= 5; i++) {
     const v = (yEmulMax * i / 5);
     const yy = yEmul(v);
     ctx.fillStyle = "#ef4444";
-    ctx.fillText(Math.round(v).toString(), W - 90, yy + 4);
+    ctx.fillText(Math.round(v).toString(), mL + plotW + 8, yy);
   }
-
+ctx.textAlign = "left";
+ctx.textBaseline = "alphabetic";
+  
   // === Libellé "Stock émulseur (L)" AU-DESSUS DE L'AXE droit ===
   ctx.fillStyle = "#ef4444";
   ctx.font = "12px system-ui, Arial";
@@ -499,6 +507,16 @@ function drawChart(data) {
   }
   ctx.stroke();
 
+  // === Qext cible (bleu pointillés) ===
+  ctx.strokeStyle = "#2563eb";
+  ctx.setLineDash([6, 6]);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(mL, yFlow(data.Qext));
+  ctx.lineTo(mL + plotW, yFlow(data.Qext));
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
   // === ROUGE : stock émulseur (escaliers) ===
   ctx.strokeStyle = "#ef4444";
   ctx.lineWidth = 2;
@@ -512,16 +530,6 @@ function drawChart(data) {
     if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
   }
   ctx.stroke();
-
-  // === Qext cible (bleu pointillés) ===
-  ctx.strokeStyle = "#2563eb";
-  ctx.setLineDash([6, 6]);
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(mL, yFlow(data.Qext));
-  ctx.lineTo(mL + plotW, yFlow(data.Qext));
-  ctx.stroke();
-  ctx.setLineDash([]);
 
   // === Besoin émulseur extinction (vert pointillés) ===
   ctx.strokeStyle = "#16a34a";

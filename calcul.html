@@ -255,6 +255,30 @@ header img.Logo {
     font-size: 0.92rem;
   }
 }
+/* ===== Actions résumé (copie + CMP) ===== */
+.resume-actions{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  gap: 10px;
+}
+
+/* Bouton CMP plus discret mais visible */
+#btnCmp{
+  text-align: center;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* Mobile : boutons bien alignés */
+@media (max-width: 520px){
+  .resume-actions{
+    flex-direction: row;
+  }
+}
 
   </style>
 </head>
@@ -477,9 +501,16 @@ header img.Logo {
 </div>
 
 
-        <button id="btnCopyResume" class="lif-btn lif-btn-ghost" type="button">
-          Copier le résumé
-        </button>
+<div class="resume-actions">
+  <button id="btnCopyResume" class="lif-btn lif-btn-ghost" type="button">
+    Copier le résumé
+  </button>
+
+  <a href="cmp.html" id="btnCmp" class="lif-btn lif-btn-primary">
+    Courbe de montée<br>en puissance
+  </a>
+</div>
+
 
         <small class="lif-help">Résumé prêt à transmettre (radio / PC / main courante).</small>
       </section>
@@ -812,6 +843,7 @@ Volume émulseur total : —`;
 
 </body>
 </html>
+
 
 
 

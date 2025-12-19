@@ -235,6 +235,58 @@
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
+// ===== CMP : constantes =====
+const STEP_MIN = 20;
+const HORIZON_H = 5;
+const HORIZON_MIN = HORIZON_H * 60;
+
+const pad2 = (x) => String(x).padStart(2, "0");
+
+const timeToMin = (hhmm) => {
+  if (!hhmm) return NaN;
+  const [h, m] = hhmm.split(":").map(Number);
+  if (![h, m].every(Number.isFinite)) return NaN;
+  return h * 60 + m;
+};
+
+// T0 = arrivée la plus tôt (en minutes "horloge")
+const getFirstArrivalMin = (rows) => {
+  let best = Infinity;
+  rows.forEach(r => {
+    const m = timeToMin(r.atStr);
+    if (Number.isFinite(m)) best = Math.min(best, m);
+  });
+  return best === Infinity ? NaN : best;
+};
+
+// minutes relatives depuis T0 (gère passage minuit)
+const arrivalRelMin = (hhmm, t0) => {
+  const m = timeToMin(hhmm);
+  if (!Number.isFinite(m) || !Number.isFinite(t0)) return NaN;
+  let rel = m - t0;
+  if (rel < 0) rel += 24 * 60;
+  return rel;
+};
+
+const addMinToHHMM = (hhmm, add) => {
+  const base = timeToMin(hhmm);
+  if (!Number.isFinite(base)) return "??:??";
+  let total = (base + add) % (24 * 60);
+  if (total < 0) total += 24 * 60;
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  return `${pad2(h)}:${pad2(m)}`;
+};
+
+// labels X : toutes les 20 minutes de T0 à T0+5h
+const buildTimeLabels = (t0MinAbs) => {
+  const t0 = `${pad2(Math.floor(t0MinAbs / 60))}:${pad2(t0MinAbs % 60)}`;
+  const labels = [];
+  for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
+    labels.push(addMinToHHMM(t0, t));
+  }
+  return labels;
+};
 
   // =========================
   // Étape A — Temps (T0 + pas)
@@ -398,101 +450,100 @@
   // =========================
   // Simulation minute par minute (T0 → T0+5h)
   // =========================
-  function simulate() {
-    const Qext = params.Qext;
-    const Qtempo = params.Qtempo;
-    const tExt = params.tExt;
-    const conc = (params.concPct / 100);
+function simulate() {
+  const Qext = params.Qext;          // L/min
+  const Qtempo = params.Qtempo;      // L/min
+  const tExt = params.tExt;          // min
+  const conc = (params.concPct / 100);
 
-    const needExtTotal = Qext * tExt * conc;
+  const needExtTotal = Qext * tExt * conc; // L d’émulseur nécessaires
 
-    // T0 = arrivée la + tôt
-    const t0 = getFirstArrivalMin(rows);
-    if (!Number.isFinite(t0)) {
-      throw new Error("Impossible de déterminer T0 (aucune arrivée valide).");
-    }
-
-    // Arrivées minute relative -> ajout flow/emul
-    const addFlow = Array(HORIZON_MIN + 1).fill(0);
-    const addEmul = Array(HORIZON_MIN + 1).fill(0);
-
-    rows.forEach(r => {
-      const def = ENGINS[r.type];
-      const rel = arrivalRelMin(r.atStr, t0); // minutes depuis T0
-      if (!Number.isFinite(rel)) return;
-
-      const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
-      addFlow[m] += def.flow * r.qty;
-      addEmul[m] += def.emul * r.qty;
-    });
-
-    let flowAvail = 0;
-    let emulStock = 0;
-
-    let phase = "TEMPORISATION";
-    let extRemaining = 0; // minutes restantes extinction
-    let startedExt = false;
-
-    // Séries minute
-    const usedFlow = Array(HORIZON_MIN + 1).fill(0);  // L/min
-    const emulSerie = Array(HORIZON_MIN + 1).fill(0); // L
-
-    for (let t=0; t<=HORIZON_MIN; t++) {
-      flowAvail += addFlow[t];
-      emulStock += addEmul[t];
-
-      const canFlow = flowAvail >= Qext;
-      const canEmul = emulStock >= needExtTotal;
-
-      if (!startedExt) {
-        if (canFlow && canEmul) {
-          phase = "EXTINCTION";
-          startedExt = true;
-          extRemaining = tExt;
-        } else {
-          phase = "TEMPORISATION";
-        }
-      } else if (extRemaining <= 0) {
-        phase = "FIN";
-      }
-
-      let flowUse = 0;
-      let emulCons = 0;
-
-      if (phase === "TEMPORISATION") {
-        flowUse = Math.min(flowAvail, Qtempo);
-        emulCons = flowUse * conc;
-      } else if (phase === "EXTINCTION") {
-        flowUse = Qext;
-        emulCons = flowUse * conc;
-        extRemaining -= 1;
-      } else {
-        flowUse = 0;
-        emulCons = 0;
-      }
-
-      if (emulCons > emulStock) emulCons = emulStock;
-      emulStock -= emulCons;
-
-      usedFlow[t] = flowUse;
-      emulSerie[t] = emulStock;
-    }
-
-    // Échantillonnage toutes les 20 minutes (0..300)
-    const ticks = [];
-    const flow20 = [];
-    const emul20 = [];
-    for (let t=0; t<=HORIZON_MIN; t+=STEP_MIN) {
-      ticks.push(t);           // minutes relatives
-      flow20.push(usedFlow[t]);
-      emul20.push(emulSerie[t]);
-    }
-
-    // labels X en hh:mm (T0→T0+5h)
-    const labels = buildTimeLabels(t0);
-
-    return { t0, labels, ticks, flow20, emul20, Qext, Qtempo, tExt, needExtTotal };
+  // T0 = arrivée la + tôt
+  const t0Abs = getFirstArrivalMin(rows);
+  if (!Number.isFinite(t0Abs)) {
+    throw new Error("Impossible : aucune arrivée valide.");
   }
+
+  // Ajouts minute (0..HORIZON_MIN)
+  const addFlow = Array(HORIZON_MIN + 1).fill(0); // débit dispo ajouté
+  const addEmul = Array(HORIZON_MIN + 1).fill(0); // stock ajouté
+
+  rows.forEach(r => {
+    const def = ENGINS[r.type];
+    const rel = arrivalRelMin(r.atStr, t0Abs); // minute relative depuis T0
+    if (!Number.isFinite(rel)) return;
+
+    const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
+    addFlow[m] += def.flow * r.qty;
+    addEmul[m] += def.emul * r.qty;
+  });
+
+  let flowAvail = 0;   // débit dispo cumulé
+  let emulStock = 0;   // stock dispo cumulé
+
+  let startedExt = false;
+  let extRemaining = 0;
+
+  let tStockOK = null;    // 1ère minute où stock >= besoin extinction
+  let tExtStart = null;   // 1ère minute où (débit>=Qext && stock>=besoin)
+
+  // séries minute
+  const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0); // NOIR = débit dispo (escaliers)
+  const emulSerie = Array(HORIZON_MIN + 1).fill(0);      // ROUGE = stock dispo (escaliers)
+
+  for (let t = 0; t <= HORIZON_MIN; t++) {
+    // Arrivées => marches immédiates
+    flowAvail += addFlow[t];
+    emulStock += addEmul[t];
+
+    // repère "stock OK"
+    if (tStockOK === null && emulStock >= needExtTotal) tStockOK = t;
+
+    // Conditions de bascule extinction
+    const canFlow = flowAvail >= Qext;
+    const canEmul = emulStock >= needExtTotal;
+
+    if (!startedExt && canFlow && canEmul) {
+      startedExt = true;
+      extRemaining = tExt;
+      tExtStart = t;
+    }
+
+    // ===== consommation d’émulseur =====
+    // TEMPORISATION tant que pas en extinction : conso = Qtempo * 3%
+    // EXTINCTION : conso = Qext * 3% pendant tExt
+    let emulCons = 0;
+
+    if (!startedExt) {
+      emulCons = Qtempo * conc; // L/min d'émulseur
+    } else if (extRemaining > 0) {
+      emulCons = Qext * conc;
+      extRemaining -= 1;
+    } else {
+      emulCons = 0;
+    }
+
+    // on ne consomme pas au-delà du stock
+    if (emulCons > emulStock) emulCons = emulStock;
+    emulStock -= emulCons;
+
+    flowAvailSerie[t] = flowAvail;
+    emulSerie[t] = emulStock;
+  }
+
+  const labels = buildTimeLabels(t0Abs);
+
+  return {
+    Qext, Qtempo, tExt, concPct: params.concPct,
+    needExtTotal,
+    t0Abs,
+    labels,
+    tStockOK,
+    tExtStart,
+    flowAvailSerie,
+    emulSerie
+  };
+}
 
   // =========================
   // Dessin canvas (débit L/min + stock L)

@@ -1,1 +1,572 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>CMP – Courbe de montée en puissance (SDIS 27)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body{
+      margin:0;
+      font-family:system-ui, Arial, sans-serif;
+      background:#f5f7fa;
+      color:#111;
+      line-height:1.5;
+    }
+    header{
+      background:#0b1220;
+      color:#fff;
+      padding:18px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    header .title{
+      font-weight:900;
+      font-size:1.1rem;
+    }
+    header a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+      padding:10px 12px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.12);
+      white-space:nowrap;
+    }
+    main{
+      max-width:980px;
+      margin:auto;
+      padding:16px 12px 26px;
+    }
+    .card{
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:14px;
+      padding:14px;
+      margin-top:12px;
+    }
+    .card h2{
+      margin:0 0 10px 0;
+      font-size:1.1rem;
+      font-weight:900;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap:10px;
+      align-items:end;
+    }
+    @media (max-width:720px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+    }
+    label{ font-weight:800; font-size:0.95rem; }
+    input, select, button{
+      width:100%;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      box-sizing:border-box;
+      font-family:inherit;
+      font-size:1rem;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      cursor:pointer;
+      font-weight:900;
+      border:0;
+      border-radius:12px;
+      padding:12px 14px;
+    }
+    .btn-primary{ background:#2563eb; color:#fff; }
+    .btn-ghost{ background:#fff; border:1px solid #ccc; }
+    .small{ font-size:12px; color:#555; margin-top:6px; }
+    .warn{
+      background:#fff3cd;
+      border:1px solid #ffeeba;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:0.95rem;
+    }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      margin-top:10px;
+    }
+    th, td{
+      padding:10px;
+      border-bottom:1px solid #e5e7eb;
+      text-align:left;
+      font-size:0.95rem;
+      vertical-align:middle;
+    }
+    th{ background:#f8fafc; font-weight:900; }
+    tr:last-child td{ border-bottom:none; }
+
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:0.85rem;
+      border:1px solid #ddd;
+      background:#f8fafc;
+    }
+
+    .canvas-wrap{
+      width:100%;
+      overflow:auto;
+      border:1px dashed #cbd5e1;
+      border-radius:12px;
+      padding:10px;
+      background:#fff;
+    }
+    canvas{ width:100%; height:auto; }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="title">CMP – Courbe de montée en puissance (SDIS 27)</div>
+  <a href="calcul.html">← Retour calcul</a>
+</header>
+
+<main>
+
+  <div class="card" id="blocStatus">
+    <h2>Paramètres importés depuis le calcul</h2>
+    <div id="status" class="warn">Chargement…</div>
+    <div class="small">La CMP est disponible uniquement si tu viens depuis le calcul en mode SDIS 27.</div>
+  </div>
+
+  <div class="card" id="blocSaisie" style="display:none;">
+    <h2>Saisie des engins (arrivée échelonnée)</h2>
+
+    <div class="grid">
+      <div>
+        <label>Type d’engin</label>
+        <select id="enginType">
+          <option value="FPT">FPT</option>
+          <option value="CCRM">CCRM</option>
+          <option value="CCR">CCR</option>
+          <option value="CCGC">CCGC</option>
+          <option value="CCGCM">CCGCM</option>
+          <option value="CED">CED</option>
+          <option value="CEDEM">CEDEM</option>
+          <option value="CDHR">CDHR</option>
+          <option value="CEEM">CEEM (émulseur)</option>
+        </select>
+        <div class="small">Débit solution + stock émulseur selon table SDIS 27.</div>
+      </div>
+
+      <div>
+        <label>Heure d’arrivée (hh:mm)</label>
+        <input id="arrivee" type="time" value="00:00">
+        <div class="small">00:00 = sur place immédiat.</div>
+      </div>
+
+      <div>
+        <label>Quantité</label>
+        <input id="qty" type="number" min="1" step="1" value="1">
+      </div>
+
+      <div>
+        <button id="btnAdd" class="btn btn-primary" type="button">Ajouter</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Arrivée</th>
+          <th>Qté</th>
+          <th>Débit (L/min)</th>
+          <th>Émulseur (L)</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="liste"></tbody>
+    </table>
+
+    <div class="row">
+      <button id="btnTracer" class="btn btn-primary" type="button">Tracer la courbe</button>
+      <button id="btnReset" class="btn btn-ghost" type="button">Tout effacer</button>
+    </div>
+
+    <div class="small">
+      Logique : TEMPORISATION tant que débit dispo &lt; Q ext OU stock émulseur &lt; besoin extinction.
+      Consommation émulseur = 3% du débit utilisé (Q tempo / Q ext).
+    </div>
+  </div>
+
+  <div class="card" id="blocCourbe" style="display:none;">
+    <h2>Courbe (0 → 3h, pas 20 min)</h2>
+    <div class="row" style="align-items:center;">
+      <span class="pill" id="pillQext">Q ext : —</span>
+      <span class="pill" id="pillQtempo">Q tempo : —</span>
+      <span class="pill" id="pilltExt">Durée ext. : —</span>
+      <span class="pill" id="pillBesoin">Besoin extinction : —</span>
+    </div>
+
+    <div class="canvas-wrap" style="margin-top:10px;">
+      <canvas id="chart" width="1100" height="520"></canvas>
+    </div>
+
+    <div class="small">
+      Axe gauche : débit solution (kL/min). Axe droit : stock émulseur (L). Pointillés : Q ext (cible).
+    </div>
+  </div>
+
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  // Table SDIS 27 : débit solution (L/min) et stock émulseur (L)
+  const ENGINS = {
+    FPT:   { flow: 2000, emul: 200 },
+    CCRM:  { flow: 1500, emul: 200 },
+    CCR:   { flow: 1000, emul: 40  },
+    CCGC:  { flow: 1000, emul: 0   },
+    CCGCM: { flow: 3000, emul: 1200 },
+    CED:   { flow: 4000, emul: 0   },
+    CEDEM: { flow: 4000, emul: 2000 },
+    CDHR:  { flow: 4000, emul: 0   },
+    CEEM:  { flow: 0,    emul: 6000 }
+  };
+
+  const n = (v) => {
+    if (v === null || v === undefined) return NaN;
+    const s = String(v).replace(",", ".").trim();
+    if (!s) return NaN;
+    const x = Number(s);
+    return Number.isFinite(x) ? x : NaN;
+  };
+
+  const timeToMin = (hhmm) => {
+    if (!hhmm) return NaN;
+    const [h, m] = hhmm.split(":").map(Number);
+    if (![h,m].every(Number.isFinite)) return NaN;
+    return h*60 + m;
+  };
+
+  // Charge paramètres calcul
+  let params = null;
+  try {
+    params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null");
+  } catch (e) { params = null; }
+
+  const status = $("status");
+  const blocSaisie = $("blocSaisie");
+  const blocCourbe = $("blocCourbe");
+
+  if (!params || params.mode !== "lock") {
+    status.textContent = "Impossible : aucun calcul SDIS 27 n’a été transmis. Retourne sur la page calcul, fais un calcul en mode SDIS 27, puis clique sur “Courbe de montée en puissance”.";
+    return;
+  }
+
+  // OK
+  status.innerHTML =
+    `✅ Paramètres reçus :<br>
+     - Q ext = <b>${Math.round(params.Qext)}</b> L/min<br>
+     - Q tempo = <b>${Math.round(params.Qtempo)}</b> L/min<br>
+     - Durée ext. = <b>${Math.round(params.tExt)}</b> min<br>
+     - Concentration = <b>${params.concPct}%</b><br>
+     - Besoin extinction = <b>${Math.round(params.besoinExt)}</b> L émulseur`;
+  blocSaisie.style.display = "block";
+
+  // Liste d'engins (lignes ajoutées)
+  const rows = []; // {type, atMin, atStr, qty}
+  const tbody = $("liste");
+
+  const render = () => {
+    tbody.innerHTML = "";
+    rows.forEach((r, idx) => {
+      const def = ENGINS[r.type];
+      const flow = def.flow * r.qty;
+      const emul = def.emul * r.qty;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${r.type}</b></td>
+        <td>${r.atStr}</td>
+        <td>${r.qty}</td>
+        <td>${flow}</td>
+        <td>${emul}</td>
+        <td><button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll("button[data-i]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.getAttribute("data-i"));
+        rows.splice(i, 1);
+        render();
+      });
+    });
+  };
+
+  $("btnAdd").addEventListener("click", () => {
+    const type = $("enginType").value;
+    const atStr = $("arrivee").value || "00:00";
+    const atMin = timeToMin(atStr);
+    const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
+
+    if (!ENGINS[type]) return;
+    if (!Number.isFinite(atMin) || atMin < 0) {
+      alert("Heure d’arrivée invalide.");
+      return;
+    }
+
+    rows.push({ type, atMin, atStr, qty });
+    rows.sort((a,b) => a.atMin - b.atMin);
+    render();
+  });
+
+  $("btnReset").addEventListener("click", () => {
+    rows.length = 0;
+    render();
+    blocCourbe.style.display = "none";
+  });
+
+  // Simulation minute par minute (0 → 180)
+  function simulate() {
+    const Qext = params.Qext;
+    const Qtempo = params.Qtempo;
+    const tExt = params.tExt;
+    const conc = (params.concPct / 100);
+
+    const needExtTotal = Qext * tExt * conc;
+
+    // Arrivées minute -> ajout flow/emul
+    const addFlow = Array(181).fill(0);
+    const addEmul = Array(181).fill(0);
+
+    rows.forEach(r => {
+      const def = ENGINS[r.type];
+      const m = Math.min(180, Math.max(0, Math.round(r.atMin)));
+      addFlow[m] += def.flow * r.qty;
+      addEmul[m] += def.emul * r.qty;
+    });
+
+    let flowAvail = 0;
+    let emulStock = 0;
+
+    let phase = "TEMPORISATION";
+    let extRemaining = 0; // minutes restantes extinction
+    let startedExt = false;
+
+    // Séries minute
+    const usedFlow = Array(181).fill(0);    // débit utilisé (L/min)
+    const emulSerie = Array(181).fill(0);   // stock émulseur (L)
+
+    for (let t=0; t<=180; t++) {
+      flowAvail += addFlow[t];
+      emulStock += addEmul[t];
+
+      // Conditions pour basculer extinction
+      const canFlow = flowAvail >= Qext;
+      const canEmul = emulStock >= needExtTotal;
+
+      if (!startedExt) {
+        if (canFlow && canEmul) {
+          phase = "EXTINCTION";
+          startedExt = true;
+          extRemaining = tExt;
+        } else {
+          phase = "TEMPORISATION";
+        }
+      } else if (extRemaining <= 0) {
+        phase = "FIN";
+      }
+
+      let flowUse = 0;
+      let emulCons = 0;
+
+      if (phase === "TEMPORISATION") {
+        // Débit utilisé = min(flow dispo, Qtempo)
+        flowUse = Math.min(flowAvail, Qtempo);
+        emulCons = flowUse * conc; // 3%
+      } else if (phase === "EXTINCTION") {
+        // Débit utilisé = Qext (puisqu'on a validé flowAvail >= Qext)
+        flowUse = Qext;
+        emulCons = flowUse * conc;
+        extRemaining -= 1;
+      } else {
+        flowUse = 0;
+        emulCons = 0;
+      }
+
+      // On ne peut pas consommer plus d’émulseur que stock
+      if (emulCons > emulStock) emulCons = emulStock;
+
+      emulStock -= emulCons;
+
+      usedFlow[t] = flowUse;
+      emulSerie[t] = emulStock;
+    }
+
+    // Échantillonnage toutes les 20 minutes (0..180)
+    const ticks = [];
+    const flow20 = [];
+    const emul20 = [];
+    for (let t=0; t<=180; t+=20) {
+      ticks.push(t);
+      flow20.push(usedFlow[t]);
+      emul20.push(emulSerie[t]);
+    }
+
+    return { ticks, flow20, emul20, Qext, Qtempo, tExt, needExtTotal };
+  }
+
+  // Dessin canvas (axe gauche débit kL/min, axe droit stock L)
+  function drawChart(data) {
+    const c = $("chart");
+    const ctx = c.getContext("2d");
+
+    const W = c.width, H = c.height;
+    ctx.clearRect(0,0,W,H);
+
+    // Marges
+    const mL = 70, mR = 70, mT = 40, mB = 60;
+    const plotW = W - mL - mR;
+    const plotH = H - mT - mB;
+
+    // Domaines
+    const xMax = 180;
+    const yFlowMax = Math.max(data.Qext, ...data.flow20) * 1.2 || 1000;
+    const yEmulMax = Math.max(...data.emul20, 1) * 1.2;
+
+    const x = (t) => mL + (t / xMax) * plotW;
+    const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
+    const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
+
+    // Cadre
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.strokeRect(mL, mT, plotW, plotH);
+
+    // Grille verticale (tous les 20 min)
+    ctx.strokeStyle = "#e5e7eb";
+    for (let t=0; t<=180; t+=20){
+      ctx.beginPath();
+      ctx.moveTo(x(t), mT);
+      ctx.lineTo(x(t), mT+plotH);
+      ctx.stroke();
+    }
+
+    // Axe X labels (0..3h)
+    ctx.fillStyle = "#111";
+    ctx.font = "12px system-ui, Arial";
+    for (let t=0; t<=180; t+=20){
+      const hh = Math.floor(t/60);
+      const mm = t%60;
+      const label = `${hh}h${String(mm).padStart(2,"0")}`;
+      ctx.fillText(label, x(t)-14, mT+plotH+22);
+    }
+    ctx.fillText("Temps (0 → 3h, pas 20 min)", mL, H-18);
+
+    // Axe Y gauche (débit kL/min)
+    ctx.fillText("Débit solution (kL/min)", 10, 18);
+    for (let i=0;i<=5;i++){
+      const v = (yFlowMax * i/5);
+      const yy = yFlow(v);
+      ctx.strokeStyle = "#e5e7eb";
+      ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL+plotW, yy); ctx.stroke();
+      ctx.fillStyle = "#111";
+      ctx.fillText((v/1000).toFixed(1), 18, yy+4);
+    }
+
+    // Axe Y droit (stock émulseur)
+    ctx.fillStyle = "#111";
+    ctx.fillText("Stock émulseur (L)", W-150, 18);
+    for (let i=0;i<=5;i++){
+      const v = (yEmulMax * i/5);
+      const yy = yEmul(v);
+      ctx.fillText(Math.round(v).toString(), W-68, yy+4);
+    }
+
+    // Courbe débit (noir)
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    data.ticks.forEach((t, i) => {
+      const xx = x(t);
+      const yy = yFlow(data.flow20[i]);
+      if (i===0) ctx.moveTo(xx, yy);
+      else ctx.lineTo(xx, yy);
+    });
+    ctx.stroke();
+
+    // Courbe stock émulseur (rouge)
+    ctx.strokeStyle = "#ef4444";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    data.ticks.forEach((t, i) => {
+      const xx = x(t);
+      const yy = yEmul(data.emul20[i]);
+      if (i===0) ctx.moveTo(xx, yy);
+      else ctx.lineTo(xx, yy);
+    });
+    ctx.stroke();
+
+    // Ligne cible Qext (pointillés)
+    ctx.strokeStyle = "#2563eb";
+    ctx.setLineDash([6,6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(mL, yFlow(data.Qext));
+    ctx.lineTo(mL+plotW, yFlow(data.Qext));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Légende
+    ctx.fillStyle = "#111";
+    ctx.fillText("— Débit utilisé", mL+10, mT+16);
+    ctx.fillStyle = "#ef4444";
+    ctx.fillText("— Stock émulseur", mL+120, mT+16);
+    ctx.fillStyle = "#2563eb";
+    ctx.fillText("— Q ext (cible)", mL+260, mT+16);
+  }
+
+  $("btnTracer").addEventListener("click", () => {
+    if (rows.length === 0) {
+      alert("Ajoute au moins un engin (ex : 1 FPT à 00:00).");
+      return;
+    }
+
+    const data = simulate();
+
+    $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
+    $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
+    $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
+    $("pillBesoin").textContent = `Besoin extinction : ${Math.round(data.needExtTotal)} L`;
+
+    blocCourbe.style.display = "block";
+    drawChart(data);
+
+    // Scroll vers la courbe
+    blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
 

@@ -383,7 +383,7 @@ function drawChart(data) {
   ctx.clearRect(0, 0, W, H);
 
   // Marges
-  const mL = 95, mR = 105, mT = 48, mB = 115; // + de place en haut/bas
+  const mL = 95, mR = 115, mT = 58, mB = 120;
   const plotW = W - mL - mR;
   const plotH = H - mT - mB;
 
@@ -399,7 +399,7 @@ function drawChart(data) {
   const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
   const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
 
-  // === Helpers ===
+  // Helpers temps
   const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
   const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
 
@@ -454,14 +454,18 @@ function drawChart(data) {
     ctx.fillText(Math.round(v).toString(), 10, yy + 4);
   }
 
-  // === Axe Y droit (libellé AU-DESSUS de l’axe) ===
-  ctx.fillStyle = "#111";
-  ctx.fillText("Stock émulseur (L)", W - mR - 160, mT - 10); // au-dessus de l'axe droit
+  // === Axe Y droit (valeurs) ===
   for (let i = 0; i <= 5; i++) {
     const v = (yEmulMax * i / 5);
     const yy = yEmul(v);
+    ctx.fillStyle = "#111";
     ctx.fillText(Math.round(v).toString(), W - 90, yy + 4);
   }
+
+  // === Libellé "Stock émulseur (L)" AU-DESSUS DE L'AXE (sans toucher la légende) ===
+  ctx.fillStyle = "#111";
+  ctx.font = "12px system-ui, Arial";
+  ctx.fillText("Stock émulseur (L)", mL + plotW - 120, mT - 12);
 
   // === Bande extinction (vert clair) ===
   if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
@@ -519,7 +523,42 @@ function drawChart(data) {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // === Marqueurs verts "Début/Fin extinction" à la place des points ===
+  // ========= Marqueurs bas (anti-chevauchement) =========
+  const usedBoxes = []; // {x,y,w,h}
+
+  function intersects(a, b) {
+    return !(a.x + a.w < b.x || b.x + b.w < a.x || a.y + a.h < b.y || b.y + b.h < a.y);
+  }
+
+  function placeBox(initialBox) {
+    // on tente 6 positions : même x, puis décalage vertical, puis décalage horizontal
+    const candidates = [
+      { ...initialBox },
+      { ...initialBox, y: initialBox.y + 26 },
+      { ...initialBox, y: initialBox.y + 52 },
+      { ...initialBox, x: initialBox.x - 80 },
+      { ...initialBox, x: initialBox.x + 80 },
+      { ...initialBox, x: initialBox.x - 160 },
+    ];
+
+    for (const box of candidates) {
+      // clamp dans la zone canvas
+      box.x = Math.max(mL + 4, Math.min(W - mR - box.w - 4, box.x));
+      box.y = Math.max(mT + plotH + 34, Math.min(H - 30, box.y));
+
+      let ok = true;
+      for (const u of usedBoxes) {
+        if (intersects(box, u)) { ok = false; break; }
+      }
+      if (ok) return box;
+    }
+
+    // sinon on garde la position clamped
+    initialBox.x = Math.max(mL + 4, Math.min(W - mR - initialBox.w - 4, initialBox.x));
+    initialBox.y = Math.max(mT + plotH + 34, Math.min(H - 30, initialBox.y));
+    return initialBox;
+  }
+
   function drawGreenMarkerBottom(tMin, text) {
     if (!Number.isFinite(tMin)) return;
     const xx = x(tMin);
@@ -534,25 +573,30 @@ function drawChart(data) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // cartouche en bas (au niveau des anciens points)
+    // cartouche bas
     ctx.font = "12px system-ui, Arial";
     const pad = 6;
     const w = ctx.measureText(text).width + pad * 2;
-    const boxX = Math.min(W - mR - w - 4, Math.max(mL + 4, xx - (w / 2)));
-    const boxY = mT + plotH + 40;
+    const h = 24;
+
+    const baseY = mT + plotH + 40;
+    let box = { x: xx - w / 2, y: baseY, w, h };
+    box = placeBox(box);
 
     ctx.fillStyle = "rgba(22,163,74,0.12)";
     ctx.strokeStyle = "#16a34a";
     ctx.lineWidth = 1.5;
-    ctx.roundRect(boxX, boxY, w, 24, 10);
+    ctx.roundRect(box.x, box.y, box.w, box.h, 10);
     ctx.fill();
     ctx.stroke();
 
     ctx.fillStyle = "#166534";
-    ctx.fillText(text, boxX + pad, boxY + 16);
+    ctx.fillText(text, box.x + pad, box.y + 16);
+
+    usedBoxes.push(box);
   }
 
-  // Début extinction / Fin extinction (verts)
+  // Début / Fin extinction (verts)
   if (Number.isFinite(data.tExtStart)) {
     drawGreenMarkerBottom(data.tExtStart, `Début ext. ${labelAt(data.tExtStart)}`);
   }
@@ -560,29 +604,40 @@ function drawChart(data) {
     drawGreenMarkerBottom(data.tExtEnd, `Fin ext. ${labelAt(data.tExtEnd)}`);
   }
 
-  // === LÉGENDE (réapparait en haut, propre) ===
-  const legendY = mT - 18;
+  // ========= LÉGENDE (déplacée DANS le graphe, en haut à gauche, donc plus de chevauchement) =========
+  const legendX = mL + 8;
+  const legendY = mT + 14;
 
-  function legendItem(x0, color, label, dash = null) {
+  function legendItem(x0, y0, color, label, dash = null) {
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
     if (dash) ctx.setLineDash(dash);
     ctx.beginPath();
-    ctx.moveTo(x0, legendY);
-    ctx.lineTo(x0 + 26, legendY);
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x0 + 26, y0);
     ctx.stroke();
     ctx.setLineDash([]);
 
     ctx.fillStyle = "#111";
     ctx.font = "12px system-ui, Arial";
-    ctx.fillText(label, x0 + 32, legendY + 4);
+    ctx.fillText(label, x0 + 32, y0 + 4);
   }
 
-  legendItem(mL, "#111", "Débit dispo (somme engins)");
-  legendItem(mL + 250, "#ef4444", "Stock émulseur dispo");
-  legendItem(mL + 460, "#2563eb", "Q ext (cible)", [6, 6]);
-  legendItem(mL + 620, "#16a34a", "Besoin émulseur extinction", [6, 6]);
+  // fond légende (lisible)
+  const boxW = 690, boxH = 24;
+  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.lineWidth = 1;
+  ctx.roundRect(legendX - 6, legendY - 14, boxW, boxH, 10);
+  ctx.fill();
+  ctx.stroke();
+
+  legendItem(legendX, legendY, "#111", "Débit dispo (somme engins)");
+  legendItem(legendX + 235, legendY, "#ef4444", "Stock émulseur dispo");
+  legendItem(legendX + 415, legendY, "#2563eb", "Q ext (cible)", [6, 6]);
+  legendItem(legendX + 555, legendY, "#16a34a", "Besoin émulseur extinction", [6, 6]);
 }
+
 
   // ===== Tracer =====
   $("btnTracer").addEventListener("click", () => {

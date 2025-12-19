@@ -448,7 +448,6 @@ function drawChart(data) {
     const label = data.labels[idx] || "";
     ctx.fillText(label, x(t) - 18, mT + plotH + 22);
   }
-  ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H - 18);
 
   // === Axe Y gauche ===
   ctx.fillStyle = "#111";

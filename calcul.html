@@ -216,6 +216,45 @@ header img.Logo {
   font-weight: 800;
 }
 
+/* ===== Bouton flottant CMP (bas droite) ===== */
+.cmp-fab{
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9999;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.15);
+
+  background: #0f172a;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 800;
+  line-height: 1.1;
+
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+}
+
+.cmp-fab:active{
+  transform: translateY(1px);
+}
+
+/* Mobile : un peu plus compact */
+@media (max-width: 520px){
+  .cmp-fab{
+    right: 12px;
+    bottom: 12px;
+    padding: 11px 12px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+  }
+}
 
   </style>
 </head>
@@ -766,9 +805,14 @@ Volume émulseur total : —`;
   resetAll();
 })();
 </script>
+<!-- ===== Bouton flottant : Courbe de montée en puissance ===== -->
+<a href="cmp.html" class="cmp-fab" title="Ouvrir la courbe de montée en puissance">
+  Courbe de montée<br>en puissance
+</a>
 
 </body>
 </html>
+
 
 
 

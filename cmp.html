@@ -457,7 +457,10 @@ function drawChart(data) {
     const v = (yFlowMax * i / 5);
     const yy = yFlow(v);
     ctx.strokeStyle = "#e5e7eb";
-    ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL + plotW, yy); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(mL, yy);
+    ctx.lineTo(mL + plotW, yy);
+    ctx.stroke();
     ctx.fillStyle = "#111";
     ctx.fillText(Math.round(v).toString(), 10, yy + 4);
   }
@@ -470,7 +473,7 @@ function drawChart(data) {
     ctx.fillText(Math.round(v).toString(), W - 90, yy + 4);
   }
 
-  // === Libellé "Stock émulseur (L)" AU-DESSUS DE L'AXE (sans toucher la légende) ===
+  // === Libellé "Stock émulseur (L)" AU-DESSUS DE L'AXE droit ===
   ctx.fillStyle = "#111";
   ctx.font = "12px system-ui, Arial";
   ctx.fillText("Stock émulseur (L)", mL + plotW - 120, mT - 12);
@@ -531,66 +534,23 @@ function drawChart(data) {
   ctx.stroke();
   ctx.setLineDash([]);
 
-function drawVLine(tMin, color){
-  if (!Number.isFinite(tMin)) return;
-  const xx = x(tMin);
-  ctx.strokeStyle = color;
-  ctx.setLineDash([4,4]);
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(xx, mT);
-  ctx.lineTo(xx, mT + plotH);
-  ctx.stroke();
-  ctx.setLineDash([]);
-}
-
-drawVLine(data.tExtStart, "#16a34a");
-drawVLine(data.tExtEnd, "#16a34a");
-
- 
-
-    // ligne verticale verte
-    ctx.strokeStyle = "#16a34a";
-    ctx.setLineDash([4, 4]);
+  // === Lignes verticales vertes (début/fin extinction) ===
+  function drawVLine(tMin, color){
+    if (!Number.isFinite(tMin)) return;
+    const xx = x(tMin);
+    ctx.strokeStyle = color;
+    ctx.setLineDash([4,4]);
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(xx, mT);
     ctx.lineTo(xx, mT + plotH);
     ctx.stroke();
     ctx.setLineDash([]);
-
-    // cartouche bas
-    ctx.font = "12px system-ui, Arial";
-    const pad = 6;
-    const w = ctx.measureText(text).width + pad * 2;
-    const h = 24;
-
-    const baseY = mT + plotH + 40;
-    let box = { x: xx - w / 2, y: baseY, w, h };
-    box = placeBox(box);
-
-    ctx.fillStyle = "rgba(22,163,74,0.12)";
-    ctx.strokeStyle = "#16a34a";
-    ctx.lineWidth = 1.5;
-    ctx.roundRect(box.x, box.y, box.w, box.h, 10);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = "#166534";
-    ctx.fillText(text, box.x + pad, box.y + 16);
-
-    usedBoxes.push(box);
   }
+  drawVLine(data.tExtStart, "#16a34a");
+  drawVLine(data.tExtEnd, "#16a34a");
 
-  // Début / Fin extinction (verts)
-  if (Number.isFinite(data.tExtStart)) {
-    drawGreenMarkerBottom(data.tExtStart, `Début ext. ${labelAt(data.tExtStart)}`);
-  }
-  if (Number.isFinite(data.tExtEnd)) {
-    drawGreenMarkerBottom(data.tExtEnd, `Fin ext. ${labelAt(data.tExtEnd)}`);
-  }
-
-  // ========= LÉGENDE (déplacée DANS le graphe, en haut à gauche, donc plus de chevauchement) =========
+  // ========= LÉGENDE (dans le graphe) =========
   const legendX = mL + 8;
   const legendY = mT + 14;
 
@@ -609,7 +569,7 @@ drawVLine(data.tExtEnd, "#16a34a");
     ctx.fillText(label, x0 + 32, y0 + 4);
   }
 
-  // fond légende (lisible)
+  // fond légende
   const boxW = 690, boxH = 24;
   ctx.fillStyle = "rgba(255,255,255,0.85)";
   ctx.strokeStyle = "#e5e7eb";
@@ -650,6 +610,16 @@ drawVLine(data.tExtEnd, "#16a34a");
     $("pillExtEnd").textContent =
       (data.tExtEnd === null) ? "Fin extinction : —" : `Fin extinction : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
 
+    // ✅ Indicateurs FIXES sous l’axe du temps (jamais de superposition)
+    const extIndStart = $("extIndStart");
+    const extIndEnd = $("extIndEnd");
+    if (extIndStart && extIndEnd) {
+      extIndStart.textContent =
+        (data.tExtStart === null) ? "Début ext. : —" : `Début ext. : ${addMinToHHMM(t0Str, data.tExtStart)}`;
+      extIndEnd.textContent =
+        (data.tExtEnd === null) ? "Fin ext. : —" : `Fin ext. : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
+    }
+
     blocCourbe.style.display = "block";
     drawChart(data);
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -658,6 +628,7 @@ drawVLine(data.tExtEnd, "#16a34a");
   render();
 })();
 </script>
+
 
 </body>
 </html>

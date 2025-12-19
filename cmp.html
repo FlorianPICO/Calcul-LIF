@@ -282,215 +282,248 @@
   });
 
   // ===== Simulation minute par minute (T0 → T0+5h) =====
-  function simulate() {
-    const Qext = params.Qext;          // L/min
-    const Qtempo = params.Qtempo;      // L/min
-    const tExt = params.tExt;          // min
-    const conc = (params.concPct / 100);
+function simulate() {
+  const Qext = params.Qext;          // L/min
+  const Qtempo = params.Qtempo;      // L/min
+  const tExt = params.tExt;          // min
+  const conc = (params.concPct / 100);
 
-    const needExtTotal = Qext * tExt * conc; // L d’émulseur nécessaires
+  const needExtTotal = Qext * tExt * conc; // L d’émulseur nécessaires
 
-    const t0Abs = getFirstArrivalMin(rows);
-    if (!Number.isFinite(t0Abs)) throw new Error("Impossible : aucune arrivée valide.");
+  const t0Abs = getFirstArrivalMin(rows);
+  if (!Number.isFinite(t0Abs)) throw new Error("Impossible : aucune arrivée valide.");
 
-    const addFlow = Array(HORIZON_MIN + 1).fill(0);
-    const addEmul = Array(HORIZON_MIN + 1).fill(0);
+  const addFlow = Array(HORIZON_MIN + 1).fill(0);
+  const addEmul = Array(HORIZON_MIN + 1).fill(0);
 
-    rows.forEach(r => {
-      const def = ENGINS[r.type];
-      const rel = arrivalRelMin(r.atStr, t0Abs);
-      if (!Number.isFinite(rel)) return;
-      const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
-      addFlow[m] += def.flow * r.qty;
-      addEmul[m] += def.emul * r.qty;
-    });
+  rows.forEach(r => {
+    const def = ENGINS[r.type];
+    const rel = arrivalRelMin(r.atStr, t0Abs);
+    if (!Number.isFinite(rel)) return;
 
-    let flowAvail = 0;
-    let emulStock = 0;
+    const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
+    addFlow[m] += def.flow * r.qty;
+    addEmul[m] += def.emul * r.qty;
+  });
 
-    let startedExt = false;
-    let extRemaining = 0;
+  let flowAvail = 0;
+  let emulStock = 0;
 
-    let tStockOK = null;
-    let tExtStart = null;
+  let startedExt = false;
+  let extRemaining = 0;
 
-    const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0);
-    const emulSerie = Array(HORIZON_MIN + 1).fill(0);
+  let tStockOK = null;
+  let tExtStart = null;
 
-    for (let t = 0; t <= HORIZON_MIN; t++) {
-      flowAvail += addFlow[t];
-      emulStock += addEmul[t];
+  const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0); // NOIR (escaliers)
+  const emulSerie = Array(HORIZON_MIN + 1).fill(0);      // ROUGE (escaliers)
 
-      if (tStockOK === null && emulStock >= needExtTotal) tStockOK = t;
+  for (let t = 0; t <= HORIZON_MIN; t++) {
+    // Arrivées => marches immédiates
+    flowAvail += addFlow[t];
+    emulStock += addEmul[t];
 
-      const canFlow = flowAvail >= Qext;
-      const canEmul = emulStock >= needExtTotal;
+    // repère "stock OK"
+    if (tStockOK === null && emulStock >= needExtTotal) tStockOK = t;
 
-      if (!startedExt && canFlow && canEmul) {
-        startedExt = true;
-        extRemaining = tExt;
-        tExtStart = t;
-      }
+    // Conditions extinction
+    const canFlow = flowAvail >= Qext;
+    const canEmul = emulStock >= needExtTotal;
 
-      let emulCons = 0;
-      if (!startedExt) {
-        emulCons = Qtempo * conc;
-      } else if (extRemaining > 0) {
-        emulCons = Qext * conc;
-        extRemaining -= 1;
-      } else {
-        emulCons = 0;
-      }
-
-      if (emulCons > emulStock) emulCons = emulStock;
-      emulStock -= emulCons;
-
-      flowAvailSerie[t] = flowAvail;
-      emulSerie[t] = emulStock;
+    if (!startedExt && canFlow && canEmul) {
+      startedExt = true;
+      extRemaining = tExt;
+      tExtStart = t;
     }
 
-    const labels = buildTimeLabels(t0Abs);
+    // ===== consommation d’émulseur =====
+    let emulCons = 0;
 
-    return { Qext, Qtempo, tExt, concPct: params.concPct, needExtTotal, t0Abs, labels, tStockOK, tExtStart, flowAvailSerie, emulSerie };
+    if (!startedExt) {
+      // ✅ TEMPORISATION : on ne peut pas "consommer dans le vide"
+      const flowUsedTempo = Math.min(flowAvail, Qtempo);
+      emulCons = flowUsedTempo * conc;
+    } else if (extRemaining > 0) {
+      // EXTINCTION : conso = Qext × 3% pendant tExt
+      emulCons = Qext * conc;
+      extRemaining -= 1;
+    } else {
+      emulCons = 0;
+    }
+
+    // on ne consomme pas au-delà du stock
+    if (emulCons > emulStock) emulCons = emulStock;
+    emulStock -= emulCons;
+
+    flowAvailSerie[t] = flowAvail;
+    emulSerie[t] = emulStock;
   }
+
+  const labels = buildTimeLabels(t0Abs);
+
+  return {
+    Qext, Qtempo, tExt, concPct: params.concPct,
+    needExtTotal,
+    t0Abs,
+    labels,
+    tStockOK,
+    tExtStart,
+    flowAvailSerie,
+    emulSerie
+  };
+}
 
   // ===== Dessin canvas (escaliers) =====
-  function drawChart(data) {
-    const c = $("chart");
-    const ctx = c.getContext("2d");
-    const W = c.width, H = c.height;
-    ctx.clearRect(0, 0, W, H);
+function drawChart(data) {
+  const c = $("chart");
+  const ctx = c.getContext("2d");
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
 
-    const mL = 95, mR = 95, mT = 42, mB = 75;
-    const plotW = W - mL - mR;
-    const plotH = H - mT - mB;
+  const mL = 95, mR = 95, mT = 42, mB = 75;
+  const plotW = W - mL - mR;
+  const plotH = H - mT - mB;
 
-    const xMax = HORIZON_MIN;
-    const maxFlow = Math.max(data.Qext, ...data.flowAvailSerie) || 1000;
-    const yFlowMax = maxFlow * 1.15;
+  const xMax = HORIZON_MIN;
 
-    const maxEmul = Math.max(...data.emulSerie, 1);
-    const yEmulMax = maxEmul * 1.15;
+  const maxFlow = Math.max(data.Qext, ...data.flowAvailSerie) || 1000;
+  const yFlowMax = maxFlow * 1.15;
 
-    const x = (t) => mL + (t / xMax) * plotW;
-    const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
-    const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
+  const maxEmul = Math.max(...data.emulSerie, data.needExtTotal, 1);
+  const yEmulMax = maxEmul * 1.15;
 
-    // Cadre
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "#cbd5e1";
-    ctx.strokeRect(mL, mT, plotW, plotH);
+  const x = (t) => mL + (t / xMax) * plotW;
+  const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
+  const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
 
-    // Grille verticale (20 min)
+  // Cadre
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "#cbd5e1";
+  ctx.strokeRect(mL, mT, plotW, plotH);
+
+  // Grille verticale (20 min)
+  ctx.strokeStyle = "#e5e7eb";
+  for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
+    ctx.beginPath();
+    ctx.moveTo(x(t), mT);
+    ctx.lineTo(x(t), mT + plotH);
+    ctx.stroke();
+  }
+
+  // Axe X labels (hh:mm)
+  ctx.fillStyle = "#111";
+  ctx.font = "12px system-ui, Arial";
+  for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
+    const idx = Math.round(t / STEP_MIN);
+    const label = data.labels[idx] || "";
+    ctx.fillText(label, x(t) - 18, mT + plotH + 22);
+  }
+  ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H - 18);
+
+  // Axe Y gauche
+  ctx.fillText("Débit solution (L/min)", 10, 18);
+  for (let i = 0; i <= 5; i++) {
+    const v = (yFlowMax * i / 5);
+    const yy = yFlow(v);
     ctx.strokeStyle = "#e5e7eb";
-    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
-      ctx.beginPath();
-      ctx.moveTo(x(t), mT);
-      ctx.lineTo(x(t), mT + plotH);
-      ctx.stroke();
-    }
-
-    // Axe X labels (hh:mm)
+    ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL + plotW, yy); ctx.stroke();
     ctx.fillStyle = "#111";
-    ctx.font = "12px system-ui, Arial";
-    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
-      const idx = Math.round(t / STEP_MIN);
-      const label = data.labels[idx] || "";
-      ctx.fillText(label, x(t) - 18, mT + plotH + 22);
-    }
-    ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H - 18);
+    ctx.fillText(Math.round(v).toString(), 10, yy + 4);
+  }
 
-    // Axe Y gauche
-    ctx.fillText("Débit solution (L/min)", 10, 18);
-    for (let i = 0; i <= 5; i++) {
-      const v = (yFlowMax * i / 5);
-      const yy = yFlow(v);
-      ctx.strokeStyle = "#e5e7eb";
-      ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL + plotW, yy); ctx.stroke();
-      ctx.fillStyle = "#111";
-      ctx.fillText(Math.round(v).toString(), 10, yy + 4);
-    }
+  // Axe Y droit
+  ctx.fillStyle = "#111";
+  ctx.fillText("Stock émulseur (L)", W - 195, 18);
+  for (let i = 0; i <= 5; i++) {
+    const v = (yEmulMax * i / 5);
+    const yy = yEmul(v);
+    ctx.fillText(Math.round(v).toString(), W - 85, yy + 4);
+  }
 
-    // Axe Y droit
-    ctx.fillStyle = "#111";
-    ctx.fillText("Stock émulseur (L)", W - 195, 18);
-    for (let i = 0; i <= 5; i++) {
-      const v = (yEmulMax * i / 5);
-      const yy = yEmul(v);
-      ctx.fillText(Math.round(v).toString(), W - 85, yy + 4);
-    }
+  // ✅ NOIR = débit dispo (escaliers)
+  ctx.strokeStyle = "#111";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x(0), yFlow(data.flowAvailSerie[0] || 0));
+  for (let t = 1; t <= HORIZON_MIN; t++) {
+    const prev = data.flowAvailSerie[t - 1] || 0;
+    const cur = data.flowAvailSerie[t] || 0;
+    const xx = x(t);
+    ctx.lineTo(xx, yFlow(prev));
+    if (cur !== prev) ctx.lineTo(xx, yFlow(cur));
+  }
+  ctx.stroke();
 
-    // NOIR = débit dispo (escaliers)
-    ctx.strokeStyle = "#111";
-    ctx.lineWidth = 2;
+  // ✅ ROUGE = stock émulseur (escaliers)
+  ctx.strokeStyle = "#ef4444";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x(0), yEmul(data.emulSerie[0] || 0));
+  for (let t = 1; t <= HORIZON_MIN; t++) {
+    const prev = data.emulSerie[t - 1] || 0;
+    const cur = data.emulSerie[t] || 0;
+    const xx = x(t);
+    ctx.lineTo(xx, yEmul(prev));
+    if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
+  }
+  ctx.stroke();
+
+  // ✅ Ligne cible Qext (bleu pointillés)
+  ctx.strokeStyle = "#2563eb";
+  ctx.setLineDash([6, 6]);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(mL, yFlow(data.Qext));
+  ctx.lineTo(mL + plotW, yFlow(data.Qext));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ✅ OBJECTIF STOCK (vert pointillés) = Besoin extinction
+  ctx.strokeStyle = "#16a34a";
+  ctx.setLineDash([6, 6]);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(mL, yEmul(data.needExtTotal));
+  ctx.lineTo(mL + plotW, yEmul(data.needExtTotal));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Marqueurs verticaux (stock OK / début extinction)
+  const labelAt = (tMin) => {
+    const t0 = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
+    return addMinToHHMM(t0, tMin);
+  };
+
+  const drawMarker = (tMin, text) => {
+    if (tMin === null || !Number.isFinite(tMin)) return;
+    ctx.strokeStyle = "#0f172a";
+    ctx.setLineDash([4,4]);
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(x(0), yFlow(data.flowAvailSerie[0] || 0));
-    for (let t = 1; t <= HORIZON_MIN; t++) {
-      const prev = data.flowAvailSerie[t - 1] || 0;
-      const cur = data.flowAvailSerie[t] || 0;
-      const xx = x(t);
-      ctx.lineTo(xx, yFlow(prev));
-      if (cur !== prev) ctx.lineTo(xx, yFlow(cur));
-    }
-    ctx.stroke();
-
-    // ROUGE = stock (escaliers)
-    ctx.strokeStyle = "#ef4444";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x(0), yEmul(data.emulSerie[0] || 0));
-    for (let t = 1; t <= HORIZON_MIN; t++) {
-      const prev = data.emulSerie[t - 1] || 0;
-      const cur = data.emulSerie[t] || 0;
-      const xx = x(t);
-      ctx.lineTo(xx, yEmul(prev));
-      if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
-    }
-    ctx.stroke();
-
-    // Ligne cible Qext (pointillés)
-    ctx.strokeStyle = "#2563eb";
-    ctx.setLineDash([6, 6]);
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(mL, yFlow(data.Qext));
-    ctx.lineTo(mL + plotW, yFlow(data.Qext));
+    ctx.moveTo(x(tMin), mT);
+    ctx.lineTo(x(tMin), mT + plotH);
     ctx.stroke();
     ctx.setLineDash([]);
-
-    // Marqueurs verticaux
-    const labelAt = (tMin) => {
-      const t0 = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
-      return addMinToHHMM(t0, tMin);
-    };
-
-    const drawMarker = (tMin, text) => {
-      if (tMin === null || !Number.isFinite(tMin)) return;
-      ctx.strokeStyle = "#0f172a";
-      ctx.setLineDash([4,4]);
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(x(tMin), mT);
-      ctx.lineTo(x(tMin), mT + plotH);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#0f172a";
-      ctx.font = "12px system-ui, Arial";
-      ctx.fillText(text, x(tMin) + 6, mT + plotH + 44);
-    };
-
-    if (data.tStockOK !== null) drawMarker(data.tStockOK, `Stock OK : ${labelAt(data.tStockOK)}`);
-    if (data.tExtStart !== null) drawMarker(data.tExtStart, `Début ext. : ${labelAt(data.tExtStart)}`);
-
-    // Légende
-    ctx.fillStyle = "#111";
+    ctx.fillStyle = "#0f172a";
     ctx.font = "12px system-ui, Arial";
-    ctx.fillText("— Débit dispo (somme engins)", mL + 10, mT + 16);
-    ctx.fillStyle = "#ef4444";
-    ctx.fillText("— Stock émulseur dispo", mL + 220, mT + 16);
-    ctx.fillStyle = "#2563eb";
-    ctx.fillText("— Q ext (cible)", mL + 390, mT + 16);
-  }
+    ctx.fillText(text, x(tMin) + 6, mT + plotH + 44);
+  };
+
+  if (data.tStockOK !== null) drawMarker(data.tStockOK, `Stock OK : ${labelAt(data.tStockOK)}`);
+  if (data.tExtStart !== null) drawMarker(data.tExtStart, `Début ext. : ${labelAt(data.tExtStart)}`);
+
+  // Légende
+  ctx.fillStyle = "#111";
+  ctx.font = "12px system-ui, Arial";
+  ctx.fillText("— Débit dispo (somme engins)", mL + 10, mT + 16);
+  ctx.fillStyle = "#ef4444";
+  ctx.fillText("— Stock émulseur dispo", mL + 220, mT + 16);
+  ctx.fillStyle = "#2563eb";
+  ctx.fillText("— Q ext (cible)", mL + 390, mT + 16);
+  ctx.fillStyle = "#16a34a";
+  ctx.fillText("— Objectif besoin extinction", mL + 510, mT + 16);
+}
+
 
   // ===== Action tracer =====
   $("btnTracer").addEventListener("click", () => {

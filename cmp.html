@@ -112,16 +112,17 @@
 
   <div class="card" id="blocCourbe" style="display:none;">
     <h2>Courbe (T0 → T0+5h, pas 20 min)</h2>
- <div class="row" style="align-items:center;">
-  <span class="pill" id="pillQext">Q ext : —</span>
-  <span class="pill" id="pillQtempo">Q tempo : —</span>
-  <span class="pill" id="pilltExt">Durée ext. : —</span>
-  <span class="pill" id="pillBesoin">Besoin en émulseur pour extinction : —</span>
-  <span class="pill" id="pillT0">T0 : —</span>
-  <span class="pill" id="pillExtStart">Début extinction : —</span>
-  <span class="pill" id="pillExtEnd">Fin extinction : —</span>
-</div>
 
+    <div class="row" style="align-items:center;">
+      <span class="pill" id="pillQext">Q ext : —</span>
+      <span class="pill" id="pillQtempo">Q tempo : —</span>
+      <span class="pill" id="pilltExt">Durée ext. : —</span>
+      <span class="pill" id="pillBesoin">Besoin en émulseur pour extinction : —</span>
+      <span class="pill" id="pillT0">T0 : —</span>
+      <span class="pill" id="pillStockOK">Stock OK : —</span>
+      <span class="pill" id="pillExtStart">Début extinction : —</span>
+      <span class="pill" id="pillExtEnd">Fin extinction : —</span>
+    </div>
 
     <div class="canvas-wrap" style="margin-top:10px;">
       <canvas id="chart" width="1100" height="520"></canvas>
@@ -144,6 +145,14 @@
   const HORIZON_MIN = HORIZON_H * 60;
 
   const pad2 = (x) => String(x).padStart(2, "0");
+
+  // minutes -> "hh:mm" (boucle 24h)
+  const minToHHMM = (min) => {
+    const mm = ((min % 1440) + 1440) % 1440;
+    const h = Math.floor(mm / 60);
+    const m = mm % 60;
+    return `${pad2(h)}:${pad2(m)}`;
+  };
 
   const n = (v) => {
     if (v === null || v === undefined) return NaN;
@@ -183,7 +192,7 @@
     const m = timeToMin(hhmm);
     if (!Number.isFinite(m) || !Number.isFinite(t0)) return NaN;
     let rel = m - t0;
-    if (rel < 0) rel += 24 * 60; // passage minuit
+    if (rel < 0) rel += 24 * 60;
     return rel;
   };
 
@@ -194,7 +203,7 @@
     return labels;
   };
 
-  // ===== Table SDIS 27 : débit solution (L/min) et stock émulseur (L) =====
+  // ===== Engins =====
   const ENGINS = {
     FPT:   { flow: 2000, emul: 200 },
     CCRM:  { flow: 1500, emul: 200 },
@@ -207,11 +216,10 @@
     CEEM:  { flow: 0,    emul: 6000 }
   };
 
-  // ===== Charge paramètres calcul =====
+  // ===== Charge params =====
   let params = null;
-  try {
-    params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null");
-  } catch (e) { params = null; }
+  try { params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null"); }
+  catch (e) { params = null; }
 
   const status = $("status");
   const blocSaisie = $("blocSaisie");
@@ -231,8 +239,8 @@
      - Besoin extinction = <b>${Math.round(params.besoinExt)}</b> L émulseur`;
   blocSaisie.style.display = "block";
 
-  // ===== Liste d'engins =====
-  const rows = []; // {type, atStr, qty}
+  // ===== Liste engins =====
+  const rows = [];
   const tbody = $("liste");
 
   const render = () => {
@@ -282,301 +290,217 @@
     blocCourbe.style.display = "none";
   });
 
-  // ===== Simulation minute par minute (T0 → T0+5h) =====
-function simulate() {
-  const Qext = params.Qext;          // L/min
-  const Qtempo = params.Qtempo;      // L/min
-  const tExt = params.tExt;          // min
-  const conc = (params.concPct / 100);
+  // ===== Simulation =====
+  function simulate() {
+    const Qext = params.Qext;
+    const Qtempo = params.Qtempo;
+    const tExt = params.tExt;
+    const conc = (params.concPct / 100);
 
-  const needExtTotal = Qext * tExt * conc; // L d’émulseur nécessaires
+    const needExtTotal = Qext * tExt * conc;
 
-  const t0Abs = getFirstArrivalMin(rows);
-  if (!Number.isFinite(t0Abs)) throw new Error("Impossible : aucune arrivée valide.");
+    const t0Abs = getFirstArrivalMin(rows);
+    if (!Number.isFinite(t0Abs)) throw new Error("Impossible : aucune arrivée valide.");
 
-  const addFlow = Array(HORIZON_MIN + 1).fill(0);
-  const addEmul = Array(HORIZON_MIN + 1).fill(0);
+    const addFlow = Array(HORIZON_MIN + 1).fill(0);
+    const addEmul = Array(HORIZON_MIN + 1).fill(0);
 
-  rows.forEach(r => {
-    const def = ENGINS[r.type];
-    const rel = arrivalRelMin(r.atStr, t0Abs);
-    if (!Number.isFinite(rel)) return;
+    rows.forEach(r => {
+      const def = ENGINS[r.type];
+      const rel = arrivalRelMin(r.atStr, t0Abs);
+      if (!Number.isFinite(rel)) return;
+      const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
+      addFlow[m] += def.flow * r.qty;
+      addEmul[m] += def.emul * r.qty;
+    });
 
-    const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
-    addFlow[m] += def.flow * r.qty;
-    addEmul[m] += def.emul * r.qty;
-  });
+    let flowAvail = 0;
+    let emulStock = 0;
 
-  let flowAvail = 0;
-  let emulStock = 0;
+    let startedExt = false;
+    let extRemaining = 0;
 
-  let startedExt = false;
-  let extRemaining = 0;
+    let tStockOK = null;
+    let tExtStart = null;
 
-  let tStockOK = null;
-  let tExtStart = null;
+    const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0);
+    const emulSerie = Array(HORIZON_MIN + 1).fill(0);
 
-  const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0); // NOIR (escaliers)
-  const emulSerie = Array(HORIZON_MIN + 1).fill(0);      // ROUGE (escaliers)
+    for (let t = 0; t <= HORIZON_MIN; t++) {
+      flowAvail += addFlow[t];
+      emulStock += addEmul[t];
 
-  for (let t = 0; t <= HORIZON_MIN; t++) {
-    // Arrivées => marches immédiates
-    flowAvail += addFlow[t];
-    emulStock += addEmul[t];
+      if (tStockOK === null && emulStock >= needExtTotal) tStockOK = t;
 
-    // repère "stock OK"
-    if (tStockOK === null && emulStock >= needExtTotal) tStockOK = t;
+      const canFlow = flowAvail >= Qext;
+      const canEmul = emulStock >= needExtTotal;
 
-    // Conditions extinction
-    const canFlow = flowAvail >= Qext;
-    const canEmul = emulStock >= needExtTotal;
+      if (!startedExt && canFlow && canEmul) {
+        startedExt = true;
+        extRemaining = tExt;
+        tExtStart = t;
+      }
 
-    if (!startedExt && canFlow && canEmul) {
-      startedExt = true;
-      extRemaining = tExt;
-      tExtStart = t;
+      let emulCons = 0;
+
+      if (!startedExt) {
+        const flowUsedTempo = Math.min(flowAvail, Qtempo);
+        emulCons = flowUsedTempo * conc;
+      } else if (extRemaining > 0) {
+        emulCons = Qext * conc;
+        extRemaining -= 1;
+      }
+
+      if (emulCons > emulStock) emulCons = emulStock;
+      emulStock -= emulCons;
+
+      flowAvailSerie[t] = flowAvail;
+      emulSerie[t] = emulStock;
     }
 
-    // ===== consommation d’émulseur =====
-    let emulCons = 0;
+    const labels = buildTimeLabels(t0Abs);
+    const tExtEnd = (tExtStart !== null) ? (tExtStart + tExt) : null;
 
-    if (!startedExt) {
-      // ✅ TEMPORISATION : on ne peut pas "consommer dans le vide"
-      const flowUsedTempo = Math.min(flowAvail, Qtempo);
-      emulCons = flowUsedTempo * conc;
-    } else if (extRemaining > 0) {
-      // EXTINCTION : conso = Qext × 3% pendant tExt
-      emulCons = Qext * conc;
-      extRemaining -= 1;
-    } else {
-      emulCons = 0;
-    }
-
-    // on ne consomme pas au-delà du stock
-    if (emulCons > emulStock) emulCons = emulStock;
-    emulStock -= emulCons;
-
-    flowAvailSerie[t] = flowAvail;
-    emulSerie[t] = emulStock;
+    return {
+      Qext, Qtempo, tExt,
+      concPct: params.concPct,
+      needExtTotal,
+      t0Abs,
+      labels,
+      tStockOK,
+      tExtStart,
+      tExtEnd,
+      flowAvailSerie,
+      emulSerie
+    };
   }
 
-  const labels = buildTimeLabels(t0Abs);
-  
-// Fin extinction = début extinction + durée extinction
-const tExtEnd = (tExtStart !== null) ? (tExtStart + tExt) : null;
+  // ===== Dessin =====
+  function drawChart(data) {
+    const c = $("chart");
+    const ctx = c.getContext("2d");
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
 
-return {
-  Qext,
-  Qtempo,
-  tExt,
-  concPct: params.concPct,
-  needExtTotal,
-  t0Abs,
-  labels,
-  tStockOK,
-  tExtStart,
-  tExtEnd,
-  flowAvailSerie,
-  emulSerie
-};
+    const mL = 95, mR = 105, mT = 42, mB = 100;
+    const plotW = W - mL - mR;
+    const plotH = H - mT - mB;
 
-}
+    const xMax = HORIZON_MIN;
 
-  // ===== Dessin canvas (escaliers) =====
-function drawChart(data) {
-  const c = $("chart");
-  const ctx = c.getContext("2d");
-  const W = c.width, H = c.height;
-  ctx.clearRect(0, 0, W, H);
+    const maxFlow = Math.max(data.Qext, ...data.flowAvailSerie) || 1000;
+    const yFlowMax = maxFlow * 1.15;
 
-  // Marges (plus de place sous l’axe X => plus de superposition)
-  const mL = 95, mR = 105, mT = 42, mB = 100;
-  const plotW = W - mL - mR;
-  const plotH = H - mT - mB;
+    const maxEmul = Math.max(...data.emulSerie, data.needExtTotal, 1);
+    const yEmulMax = maxEmul * 1.15;
 
-  const xMax = HORIZON_MIN;
+    const x = (t) => mL + (t / xMax) * plotW;
+    const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
+    const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
 
-  const maxFlow = Math.max(data.Qext, ...data.flowAvailSerie) || 1000;
-  const yFlowMax = maxFlow * 1.15;
+    // Cadre
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.strokeRect(mL, mT, plotW, plotH);
 
-  const maxEmul = Math.max(...data.emulSerie, data.needExtTotal, 1);
-  const yEmulMax = maxEmul * 1.15;
-
-  const x = (t) => mL + (t / xMax) * plotW;
-  const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
-  const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
-
-  // Cadre
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = "#cbd5e1";
-  ctx.strokeRect(mL, mT, plotW, plotH);
-
-  // Grille verticale (20 min)
-  ctx.strokeStyle = "#e5e7eb";
-  for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
-    ctx.beginPath();
-    ctx.moveTo(x(t), mT);
-    ctx.lineTo(x(t), mT + plotH);
-    ctx.stroke();
-  }
-
-  // Axe X labels (hh:mm)
-  ctx.fillStyle = "#111";
-  ctx.font = "12px system-ui, Arial";
-  for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
-    const idx = Math.round(t / STEP_MIN);
-    const label = data.labels[idx] || "";
-    ctx.fillText(label, x(t) - 18, mT + plotH + 22);
-  }
-  ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H - 18);
-
-  // Axe Y gauche
-  ctx.fillStyle = "#111";
-  ctx.fillText("Débit solution (L/min)", 10, 18);
-  for (let i = 0; i <= 5; i++) {
-    const v = (yFlowMax * i / 5);
-    const yy = yFlow(v);
+    // Grille verticale
     ctx.strokeStyle = "#e5e7eb";
-    ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL + plotW, yy); ctx.stroke();
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
+      ctx.beginPath();
+      ctx.moveTo(x(t), mT);
+      ctx.lineTo(x(t), mT + plotH);
+      ctx.stroke();
+    }
+
+    // Axe X
     ctx.fillStyle = "#111";
-    ctx.fillText(Math.round(v).toString(), 10, yy + 4);
-  }
+    ctx.font = "12px system-ui, Arial";
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
+      const idx = Math.round(t / STEP_MIN);
+      const label = data.labels[idx] || "";
+      ctx.fillText(label, x(t) - 18, mT + plotH + 22);
+    }
+    ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H - 18);
 
-  // Axe Y droit
-  ctx.fillStyle = "#111";
-  ctx.fillText("Stock émulseur (L)", W - 230, 18);
-  for (let i = 0; i <= 5; i++) {
-    const v = (yEmulMax * i / 5);
-    const yy = yEmul(v);
-    ctx.fillText(Math.round(v).toString(), W - 90, yy + 4);
-  }
+    // Axe Y gauche
+    ctx.fillStyle = "#111";
+    ctx.fillText("Débit solution (L/min)", 10, 18);
+    for (let i = 0; i <= 5; i++) {
+      const v = (yFlowMax * i / 5);
+      const yy = yFlow(v);
+      ctx.strokeStyle = "#e5e7eb";
+      ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL + plotW, yy); ctx.stroke();
+      ctx.fillStyle = "#111";
+      ctx.fillText(Math.round(v).toString(), 10, yy + 4);
+    }
 
-  // ✅ Bande "phase extinction" (si on a un début)
-  if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
-    const x1 = x(data.tExtStart);
-    const x2 = x(Math.min(data.tExtEnd, HORIZON_MIN));
-    ctx.fillStyle = "rgba(34,197,94,0.10)"; // vert léger
-    ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
-  }
+    // Axe Y droit
+    ctx.fillStyle = "#111";
+    ctx.fillText("Stock émulseur (L)", W - 230, 18);
+    for (let i = 0; i <= 5; i++) {
+      const v = (yEmulMax * i / 5);
+      const yy = yEmul(v);
+      ctx.fillText(Math.round(v).toString(), W - 90, yy + 4);
+    }
 
-  // ✅ NOIR = débit dispo (escaliers)
-  ctx.strokeStyle = "#111";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(x(0), yFlow(data.flowAvailSerie[0] || 0));
-  for (let t = 1; t <= HORIZON_MIN; t++) {
-    const prev = data.flowAvailSerie[t - 1] || 0;
-    const cur = data.flowAvailSerie[t] || 0;
-    const xx = x(t);
-    ctx.lineTo(xx, yFlow(prev));
-    if (cur !== prev) ctx.lineTo(xx, yFlow(cur));
-  }
-  ctx.stroke();
+    // Bande extinction
+    if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
+      const x1 = x(data.tExtStart);
+      const x2 = x(Math.min(data.tExtEnd, HORIZON_MIN));
+      ctx.fillStyle = "rgba(34,197,94,0.10)";
+      ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
+    }
 
-  // ✅ ROUGE = stock émulseur (escaliers)
-  ctx.strokeStyle = "#ef4444";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(x(0), yEmul(data.emulSerie[0] || 0));
-  for (let t = 1; t <= HORIZON_MIN; t++) {
-    const prev = data.emulSerie[t - 1] || 0;
-    const cur = data.emulSerie[t] || 0;
-    const xx = x(t);
-    ctx.lineTo(xx, yEmul(prev));
-    if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
-  }
-  ctx.stroke();
-
-  // ✅ Ligne cible Qext (bleu pointillés)
-  ctx.strokeStyle = "#2563eb";
-  ctx.setLineDash([6, 6]);
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(mL, yFlow(data.Qext));
-  ctx.lineTo(mL + plotW, yFlow(data.Qext));
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // ✅ Besoin émulseur extinction (vert pointillés)
-  ctx.strokeStyle = "#16a34a";
-  ctx.setLineDash([6, 6]);
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(mL, yEmul(data.needExtTotal));
-  ctx.lineTo(mL + plotW, yEmul(data.needExtTotal));
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Helpers temps
-  const pad2 = (n) => String(n).padStart(2, "0");
-  const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
-  const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
-
-  // ✅ Marqueurs verticaux (on met les libellés EN HAUT dans le graphe => plus de superposition)
-  function drawMarkerTop(tMin, text, color) {
-    if (!Number.isFinite(tMin)) return;
-
-    const xx = x(tMin);
-
-    // ligne verticale
-    ctx.strokeStyle = color;
-    ctx.setLineDash([4, 4]);
-    ctx.lineWidth = 1.5;
+    // NOIR : débit dispo (escaliers)
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(xx, mT);
-    ctx.lineTo(xx, mT + plotH);
+    ctx.moveTo(x(0), yFlow(data.flowAvailSerie[0] || 0));
+    for (let t = 1; t <= HORIZON_MIN; t++) {
+      const prev = data.flowAvailSerie[t - 1] || 0;
+      const cur = data.flowAvailSerie[t] || 0;
+      const xx = x(t);
+      ctx.lineTo(xx, yFlow(prev));
+      if (cur !== prev) ctx.lineTo(xx, yFlow(cur));
+    }
+    ctx.stroke();
+
+    // ROUGE : stock émulseur (escaliers)
+    ctx.strokeStyle = "#ef4444";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x(0), yEmul(data.emulSerie[0] || 0));
+    for (let t = 1; t <= HORIZON_MIN; t++) {
+      const prev = data.emulSerie[t - 1] || 0;
+      const cur = data.emulSerie[t] || 0;
+      const xx = x(t);
+      ctx.lineTo(xx, yEmul(prev));
+      if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
+    }
+    ctx.stroke();
+
+    // Qext cible
+    ctx.strokeStyle = "#2563eb";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(mL, yFlow(data.Qext));
+    ctx.lineTo(mL + plotW, yFlow(data.Qext));
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // petit cartouche en haut
-    ctx.font = "12px system-ui, Arial";
-    const pad = 6;
-    const w = ctx.measureText(text).width + pad * 2;
-    const boxX = Math.min(W - mR - w - 4, Math.max(mL + 4, xx + 6));
-    const boxY = mT + 6;
-
-    ctx.fillStyle = "rgba(255,255,255,0.92)";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
+    // Besoin émulseur extinction
+    ctx.strokeStyle = "#16a34a";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(boxX, boxY, w, 22, 8);
-    ctx.fill();
+    ctx.moveTo(mL, yEmul(data.needExtTotal));
+    ctx.lineTo(mL + plotW, yEmul(data.needExtTotal));
     ctx.stroke();
-
-    ctx.fillStyle = color;
-    ctx.fillText(text, boxX + pad, boxY + 15);
+    ctx.setLineDash([]);
   }
 
-  // Stock OK (vert)
-  if (data.tStockOK !== null) {
-    drawMarkerTop(data.tStockOK, `Stock OK : ${labelAt(data.tStockOK)}`, "#16a34a");
-  }
-
-  // Début extinction (bleu foncé)
-  if (data.tExtStart !== null) {
-    drawMarkerTop(data.tExtStart, `Début ext. : ${labelAt(data.tExtStart)}`, "#0f172a");
-  }
-
-  // Fin extinction (bleu foncé)
-  if (data.tExtEnd !== null) {
-    drawMarkerTop(data.tExtEnd, `Fin ext. : ${labelAt(data.tExtEnd)}`, "#0f172a");
-  }
-
-  // Légende
-  ctx.fillStyle = "#111";
-  ctx.font = "12px system-ui, Arial";
-  ctx.fillText("— Débit dispo (somme engins)", mL + 10, mT + 16);
-  ctx.fillStyle = "#ef4444";
-  ctx.fillText("— Stock émulseur dispo", mL + 230, mT + 16);
-  ctx.fillStyle = "#2563eb";
-  ctx.fillText("— Q ext (cible)", mL + 390, mT + 16);
-  ctx.fillStyle = "#16a34a";
-  ctx.fillText("— Besoin en émulseur pour extinction", mL + 510, mT + 16);
-}
-
-
-
-  // ===== Action tracer =====
+  // ===== Tracer =====
   $("btnTracer").addEventListener("click", () => {
     if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
 
@@ -584,37 +508,22 @@ function drawChart(data) {
     try { data = simulate(); }
     catch (e) { alert(e.message || "Erreur simulation."); return; }
 
-    const t0HHMM = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
-
     $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
     $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
     $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
-   $("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${Math.round(data.needExtTotal)} L`;
-$("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
+    $("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${Math.round(data.needExtTotal)} L`;
+    $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
 
-// Début / fin extinction (si atteinte)
-if (Number.isFinite(data.tExtStart)) {
-  const t0Str = `${String(Math.floor(data.t0Abs/60)).padStart(2,"0")}:${String(data.t0Abs%60).padStart(2,"0")}`;
-  const startHHMM = addMinToHHMM(t0Str, data.tExtStart);
-  $("pillExtStart").textContent = `Début extinction : ${startHHMM}`;
-} else {
-  $("pillExtStart").textContent = "Début extinction : —";
-}
+    const t0Str = minToHHMM(data.t0Abs);
 
-if (Number.isFinite(data.tExtEnd)) {
-  const t0Str = `${String(Math.floor(data.t0Abs/60)).padStart(2,"0")}:${String(data.t0Abs%60).padStart(2,"0")}`;
-  const endHHMM = addMinToHHMM(t0Str, data.tExtEnd);
-  $("pillExtEnd").textContent = `Fin extinction : ${endHHMM}`;
-} else {
-  $("pillExtEnd").textContent = "Fin extinction : —";
-}
+    $("pillStockOK").textContent =
+      (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
+    $("pillExtStart").textContent =
+      (data.tExtStart === null) ? "Début extinction : —" : `Début extinction : ${addMinToHHMM(t0Str, data.tExtStart)}`;
 
-    const stockOK = (data.tStockOK === null) ? "—" : addMinToHHMM(t0HHMM, data.tStockOK);
-    const extStart = (data.tExtStart === null) ? "—" : addMinToHHMM(t0HHMM, data.tExtStart);
-
-    $("pillStockOK").textContent = `Stock OK : ${stockOK}`;
-    $("pillExtStart").textContent = `Début ext. : ${extStart}`;
+    $("pillExtEnd").textContent =
+      (data.tExtEnd === null) ? "Fin extinction : —" : `Fin extinction : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
 
     blocCourbe.style.display = "block";
     drawChart(data);

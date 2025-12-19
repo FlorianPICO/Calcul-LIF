@@ -361,6 +361,9 @@ function simulate() {
   }
 
   const labels = buildTimeLabels(t0Abs);
+  
+// Fin extinction = début extinction + durée extinction
+const tExtEnd = (tExtStart !== null) ? (tExtStart + tExt) : null;
 
   return {
     Qext, Qtempo, tExt, concPct: params.concPct,

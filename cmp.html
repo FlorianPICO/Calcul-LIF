@@ -113,8 +113,9 @@
     </div>
 
     <div class="small">
-      Logique : TEMPORISATION tant que débit dispo &lt; Q ext OU stock émulseur &lt; besoin extinction.
-      Temporisation : conso = Q tempo × 3%. Extinction : conso = Q ext × 3% pendant Durée ext.
+      Logique : TEMPORISATION tant que débit dispo &lt; Q ext OU stock émulseur &lt; besoin extinction.<br>
+      Temporisation : conso = Q tempo × 3%.<br>
+      Extinction : conso = Q ext × 3% pendant Durée ext.
     </div>
   </div>
 
@@ -137,8 +138,10 @@
     </div>
 
     <div class="small">
-      Axe gauche : débit solution (L/min). Axe droit : stock émulseur (L). Courbes en escaliers.
-      Marqueurs : Stock OK (≥ besoin extinction) et Extinction (débit ≥ Q ext ET stock ≥ besoin).
+      Axe gauche : Débit solution (L/min).<br>
+      Axe droit : Volume émulseur (L). Courbes en escaliers rouge.<br>
+      Marqueurs : Stock OK (volume émulseur ≥ besoin extinction)<br>
+      Extinction (débit ≥ Q ext ET volume émulseur ≥ besoin).
     </div>
   </div>
 </main>
@@ -522,8 +525,8 @@
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Volume émulseur extinction (vert)
-    ctx.strokeStyle = "#16a34a";
+    // Volume émulseur extinction (orange)
+    ctx.strokeStyle = "#ff8800";
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -578,7 +581,7 @@
 
     legendItem(legendX + 0,   legendY, "#111",    "Débit dispo (somme engins)");
     legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
-    legendItem(legendX + 440, legendY, "#ef4444", "Stock émulseur dispo");
+    legendItem(legendX + 440, legendY, "#ef4444", "Volume émulseur dispo");
     legendItem(legendX + 620, legendY, "#16a34a", "Volume émulseur extinction (cible)", [6, 6]);
 
     // IMPORTANT : les “pastilles” visuelles sont gérées en HTML (extIndStart/extIndEnd),

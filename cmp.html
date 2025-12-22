@@ -34,6 +34,13 @@
 
     .canvas-wrap{ width:100%; overflow:auto; border:1px dashed #cbd5e1; border-radius:12px; padding:10px; background:#fff; }
     canvas{ width:100%; height:auto; }
+    
+.pill-ext {
+  border-color:#16a34a !important;
+  background:rgba(22,163,74,0.10) !important;
+  color:#166534 !important;
+}
+    
   </style>
 </head>
 
@@ -121,27 +128,13 @@
       <span class="pill" id="pillBesoin">Besoin en émulseur pour extinction : —</span>
       <span class="pill" id="pillT0">T0 : —</span>
       <span class="pill" id="pillStockOK">Stock OK : —</span>
-      <span class="pill" id="pillExtStart">Début extinction : —</span>
-      <span class="pill" id="pillExtEnd">Fin extinction : —</span>
+<span class="pill pill-ext" id="pillExtStart">Début extinction : —</span>
+<span class="pill pill-ext" id="pillExtEnd">Fin extinction : —</span>
     </div>
-
+    
     <div class="canvas-wrap" style="margin-top:10px;">
       <canvas id="chart" width="1100" height="520"></canvas>
     </div>
-
-    <!-- Indicateurs VISUELS sous l’axe X (fixes, pas de superposition) -->
-<div id="extIndicators"
-     style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
-            margin-top:6px; padding-top:8px; padding-bottom:8px;
-            border-top:1.2px dashed #cbd5e1;">
-  <span id="extIndStart" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
-    Début ext. : —
-  </span>
-  <span id="extIndEnd" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
-    Fin ext. : —
-  </span>
-</div>
-
 
     <div class="small">
       Axe gauche : débit solution (L/min). Axe droit : stock émulseur (L). Courbes en escaliers.
@@ -225,7 +218,7 @@
     CCGC:  { flow: 1000, emul: 0   },
     CCGCM: { flow: 3000, emul: 1200 },
     CED:   { flow: 4000, emul: 0   },
-    CEDEM: { flow: 4000, emul: 2000 },
+    CEDEM: { flow: 2000, emul: 2000 },
     CDHR:  { flow: 4000, emul: 0   },
     CEEM:  { flow: 0,    emul: 6000 }
   };
@@ -302,11 +295,6 @@
     rows.length = 0;
     render();
     blocCourbe.style.display = "none";
-    // remet les pastilles du haut si tu veux
-    const elStart = $("pillExtStart");
-    const elEnd = $("pillExtEnd");
-    if (elStart) elStart.style.display = "";
-    if (elEnd) elEnd.style.display = "";
   });
 
   // ===== Simulation =====

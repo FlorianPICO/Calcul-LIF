@@ -223,68 +223,40 @@ th, td {
 
 @media (max-width: 720px){
 
-  /* grille 2 colonnes */
-  .grid{
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px;
-    align-items: start; /* on gère l'alignement via les champs */
+  /* Chaque cellule de la grille devient une colonne flex */
+  .grid > div{
+    display: flex;
+    flex-direction: column;
   }
 
-  /* Hauteur unique pour les champs "Type" et "Heure" */
-  :root{
-    --fieldH: 58px;
-  }
-
-  /* Force la même box */
+  /* On pousse le champ vers le bas */
   .grid select,
   .grid input[type="time"]{
-    width:100%;
-    box-sizing:border-box;
-    height: var(--fieldH);
-    padding: 0 14px;          /* pas de padding vertical -> hauteur fixe */
-    font-size: 18px;
-    border-radius: 16px;
-    line-height: var(--fieldH); /* centre le texte */
-    background:#eee;          /* si tu veux garder ton style gris */
+    margin-top: auto;
   }
 
-  /* iOS: neutraliser l'apparence native pour que height/line-height marchent */
-  .grid select{
-    -webkit-appearance: none;
-    appearance: none;
-    background-image: none; /* évite certains décalages iOS */
+  /* Hauteur identique des deux cases */
+  .grid select,
+  .grid input[type="time"]{
+    height: 58px;
+    padding: 0 14px;
+    font-size: 18px;
+    border-radius: 16px;
+    box-sizing: border-box;
   }
+
+  /* iOS : neutraliser l’apparence native */
+  .grid select,
   .grid input[type="time"]{
     -webkit-appearance: none;
     appearance: none;
   }
 
-  /* iOS time: le texte n'est pas toujours centré -> on le force */
+  /* Centrage visuel */
   .grid input[type="time"]{
     text-align: center;
   }
-
-  /* Même hauteur pour Quantité + Ajouter */
-  .grid input[type="number"],
-  .grid button{
-    height: var(--fieldH);
-    padding: 0 14px;
-    line-height: var(--fieldH);
-    border-radius: 16px;
-    font-size: 18px;
-    box-sizing:border-box;
-  }
-
-  .grid button{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:900;
-    line-height: normal; /* on laisse flex centrer */
-  }
 }
-
-
 
   </style>
 </head>

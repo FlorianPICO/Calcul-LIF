@@ -117,10 +117,25 @@ header img.Logo {
     .small{ font-size:12px; color:#555; margin-top:6px; }
     .warn{ background:#fff3cd; border:1px solid #ffeeba; padding:10px 12px; border-radius:12px; font-size:0.95rem; }
 
-    table{ width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border:1px solid #e5e7eb; border-radius:12px; margin-top:10px; }
-    th, td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; font-size:0.95rem; vertical-align:middle; }
-    th{ background:#f8fafc; font-weight:900; }
-    tr:last-child td{ border-bottom:none; }
+   /* Empêche le débordement du tableau sur mobile */
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  margin-top:10px;
+  display:block;              /* clé */
+  overflow-x:auto;            /* clé */
+  -webkit-overflow-scrolling: touch;
+}
+
+thead, tbody, tr{
+  display:table;
+  width:100%;
+  table-layout:fixed;
+}
+
 
     .pill{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:0.85rem; border:1px solid #ddd; background:#f8fafc; }
 
@@ -213,9 +228,9 @@ header img.Logo {
     </div>
 
     <div class="small">
-      Logique : TEMPORISATION tant que débit dispo &lt; Q ext OU stock émulseur &lt; besoin extinction.<br>
-      Temporisation : conso = Q tempo × 3%.<br>
-      Extinction : conso = Q ext × 3% pendant Durée ext.
+      <u>Logique :</u> TEMPORISATION tant que débit dispo &lt; Q ext OU stock émulseur &lt; besoin extinction.<br>
+      <u>Temporisation :</u> conso = Q tempo × 3%.<br>
+      <u>Extinction :</u> conso = Q ext × 3% pendant Durée ext.
     </div>
   </div>
 
@@ -238,10 +253,10 @@ header img.Logo {
     </div>
 
     <div class="small">
-      Axe gauche : Débit solution (L/min).<br>
-      Axe droit : Volume émulseur (L). Courbes en escaliers rouge.<br>
-      Marqueurs : Stock émulseur OK (volume émulseur ≥ besoin extinction)<br>
-      Extinction (débit ≥ Q ext ET volume émulseur ≥ besoin).
+      <u>Axe gauche :</u> Débit solution (L/min).<br>
+      <u>Axe droit :</u> Volume émulseur (L). Courbes en escaliers rouge.<br>
+      <u>Marqueur :</u> Stock émulseur OK (volume émulseur ≥ besoin extinction)<br>
+      <u>Extinction :</u> Possible si débit ≥ Q ext ET volume émulseur ≥ besoin.
     </div>
   </div>
 </main>

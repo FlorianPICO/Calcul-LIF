@@ -127,18 +127,20 @@
     <div class="canvas-wrap" style="margin-top:10px;">
       <canvas id="chart" width="1100" height="520"></canvas>
     </div>
-<div id="extIndicators" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:-10px;">
-  <span id="extIndStart" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
-    Début ext. : —
-  </span>
-  <span id="extIndEnd" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
-    Fin ext. : —
-  </span>
-</div>
+
+    <!-- Indicateurs VISUELS sous l’axe X (fixes, pas de superposition) -->
+    <div id="extIndicators" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:-8px;">
+      <span id="extIndStart" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
+        Début ext. : —
+      </span>
+      <span id="extIndEnd" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
+        Fin ext. : —
+      </span>
+    </div>
 
     <div class="small">
       Axe gauche : débit solution (L/min). Axe droit : stock émulseur (L). Courbes en escaliers.
-      Marqueurs : Stock OK (≥ besoin extinction) et Début extinction (débit ≥ Q ext ET stock ≥ besoin).
+      Marqueurs : Stock OK (≥ besoin extinction) et Extinction (débit ≥ Q ext ET stock ≥ besoin).
     </div>
   </div>
 </main>
@@ -154,7 +156,6 @@
 
   const pad2 = (x) => String(x).padStart(2, "0");
 
-  // minutes -> "hh:mm" (boucle 24h)
   const minToHHMM = (min) => {
     const mm = ((min % 1440) + 1440) % 1440;
     const h = Math.floor(mm / 60);
@@ -296,6 +297,11 @@
     rows.length = 0;
     render();
     blocCourbe.style.display = "none";
+    // remet les pastilles du haut si tu veux
+    const elStart = $("pillExtStart");
+    const elEnd = $("pillExtEnd");
+    if (elStart) elStart.style.display = "";
+    if (elEnd) elEnd.style.display = "";
   });
 
   // ===== Simulation =====
@@ -383,281 +389,267 @@
     };
   }
 
-// ===== Dessin =====
-function drawChart(data) {
-  const c = $("chart");
-  const ctx = c.getContext("2d");
-  const W = c.width, H = c.height;
-  ctx.clearRect(0, 0, W, H);
+  // ===== Dessin =====
+  function drawChart(data) {
+    const c = $("chart");
+    const ctx = c.getContext("2d");
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
 
-  // Marges (réduit l’espace sous l’axe X)
-  const mL = 88, mR = 92, mT = 58, mB = 60;
-  const plotW = W - mL - mR;
-  const plotH = H - mT - mB;
+    // Marges (réduit l’espace sous l’axe X)
+    const mL = 88, mR = 92, mT = 58, mB = 60;
+    const plotW = W - mL - mR;
+    const plotH = H - mT - mB;
 
-  const xMax = HORIZON_MIN;
+    const xMax = HORIZON_MIN;
 
-  const maxFlow = Math.max(data.Qext, ...data.flowAvailSerie) || 1000;
-  const yFlowMax = maxFlow * 1.15;
+    const maxFlow = Math.max(data.Qext, ...data.flowAvailSerie) || 1000;
+    const yFlowMax = maxFlow * 1.15;
 
-  const maxEmul = Math.max(...data.emulSerie, data.needExtTotal, 1);
-  const yEmulMax = maxEmul * 1.15;
+    const maxEmul = Math.max(...data.emulSerie, data.needExtTotal, 1);
+    const yEmulMax = maxEmul * 1.15;
 
-  const x = (t) => mL + (t / xMax) * plotW;
-  const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
-  const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
+    const x = (t) => mL + (t / xMax) * plotW;
+    const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
+    const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
 
-  // Helpers temps
-  const pad2 = (n) => String(n).padStart(2, "0");
-  const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
-  const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
+    // Helpers temps
+    const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
+    const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
 
-  // roundRect compat
-  if (!ctx.roundRect) {
-    ctx.roundRect = function (x0, y0, w, h, r) {
-      const rr = Math.min(r, w / 2, h / 2);
-      this.beginPath();
-      this.moveTo(x0 + rr, y0);
-      this.arcTo(x0 + w, y0, x0 + w, y0 + h, rr);
-      this.arcTo(x0 + w, y0 + h, x0, y0 + h, rr);
-      this.arcTo(x0, y0 + h, x0, y0, rr);
-      this.arcTo(x0, y0, x0 + w, y0, rr);
-      this.closePath();
-      return this;
-    };
-  }
+    // roundRect compat
+    if (!ctx.roundRect) {
+      ctx.roundRect = function (x0, y0, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        this.beginPath();
+        this.moveTo(x0 + rr, y0);
+        this.arcTo(x0 + w, y0, x0 + w, y0 + h, rr);
+        this.arcTo(x0 + w, y0 + h, x0, y0 + h, rr);
+        this.arcTo(x0, y0 + h, x0, y0, rr);
+        this.arcTo(x0, y0, x0 + w, y0, rr);
+        this.closePath();
+        return this;
+      };
+    }
 
-  // === Cadre ===
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = "#cbd5e1";
-  ctx.strokeRect(mL, mT, plotW, plotH);
+    // Cadre
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.strokeRect(mL, mT, plotW, plotH);
 
-  // === Grille verticale (20 min) ===
-  ctx.strokeStyle = "#e5e7eb";
-  for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
-    ctx.beginPath();
-    ctx.moveTo(x(t), mT);
-    ctx.lineTo(x(t), mT + plotH);
-    ctx.stroke();
-  }
-
-  // === Axe X labels ===
-  ctx.fillStyle = "#111";
-  ctx.font = "12px system-ui, Arial";
-  for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
-    const idx = Math.round(t / STEP_MIN);
-    const label = data.labels[idx] || "";
-    ctx.fillText(label, x(t) - 16, mT + plotH + 20);
-  }
-
-  // === Axe Y gauche ===
-  ctx.fillStyle = "#111";
-  ctx.fillText("Débit solution (L/min)", mL, mT - 16);
-  for (let i = 0; i <= 5; i++) {
-    const v = (yFlowMax * i / 5);
-    const yy = yFlow(v);
-
+    // Grille verticale
     ctx.strokeStyle = "#e5e7eb";
-    ctx.beginPath();
-    ctx.moveTo(mL, yy);
-    ctx.lineTo(mL + plotW, yy);
-    ctx.stroke();
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
+      ctx.beginPath();
+      ctx.moveTo(x(t), mT);
+      ctx.lineTo(x(t), mT + plotH);
+      ctx.stroke();
+    }
 
+    // Axe X labels
     ctx.fillStyle = "#111";
-    ctx.fillText(Math.round(v).toString(), mL - 38, yy + 4);
-  }
+    ctx.font = "12px system-ui, Arial";
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
+      const idx = Math.round(t / STEP_MIN);
+      const label = data.labels[idx] || "";
+      ctx.fillText(label, x(t) - 16, mT + plotH + 20);
+    }
 
-  // === Axe Y droit (rouge) ===
-  ctx.font = "12px system-ui, Arial";
-  for (let i = 0; i <= 5; i++) {
-    const v = (yEmulMax * i / 5);
-    const yy = yEmul(v);
+    // Axe Y gauche
+    ctx.fillStyle = "#111";
+    ctx.fillText("Débit solution (L/min)", mL, mT - 16);
+    for (let i = 0; i <= 5; i++) {
+      const v = (yFlowMax * i / 5);
+      const yy = yFlow(v);
+
+      ctx.strokeStyle = "#e5e7eb";
+      ctx.beginPath();
+      ctx.moveTo(mL, yy);
+      ctx.lineTo(mL + plotW, yy);
+      ctx.stroke();
+
+      ctx.fillStyle = "#111";
+      ctx.fillText(Math.round(v).toString(), mL - 38, yy + 4);
+    }
+
+    // Axe Y droit (rouge)
+    ctx.font = "12px system-ui, Arial";
+    for (let i = 0; i <= 5; i++) {
+      const v = (yEmulMax * i / 5);
+      const yy = yEmul(v);
+      ctx.fillStyle = "#ef4444";
+      ctx.fillText(Math.round(v).toString(), mL + plotW + 10, yy + 4);
+    }
     ctx.fillStyle = "#ef4444";
-    ctx.fillText(Math.round(v).toString(), mL + plotW + 10, yy + 4);
-  }
-  ctx.fillStyle = "#ef4444";
-  ctx.fillText("Stock émulseur (L)", mL + plotW - 118, mT - 16);
+    ctx.fillText("Stock émulseur (L)", mL + plotW - 118, mT - 16);
 
-  // === Bande extinction (vert clair) ===
-  if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
-    const x1 = x(data.tExtStart);
-    const x2 = x(Math.min(data.tExtEnd, HORIZON_MIN));
-    ctx.fillStyle = "rgba(34,197,94,0.10)";
-    ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
-  }
+    // Bande extinction
+    if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
+      const x1 = x(data.tExtStart);
+      const x2 = x(Math.min(data.tExtEnd, HORIZON_MIN));
+      ctx.fillStyle = "rgba(34,197,94,0.10)";
+      ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
+    }
 
-  // === NOIR : débit dispo (escaliers) ===
-  ctx.strokeStyle = "#111";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(x(0), yFlow(data.flowAvailSerie[0] || 0));
-  for (let t = 1; t <= HORIZON_MIN; t++) {
-    const prev = data.flowAvailSerie[t - 1] || 0;
-    const cur = data.flowAvailSerie[t] || 0;
-    const xx = x(t);
-    ctx.lineTo(xx, yFlow(prev));
-    if (cur !== prev) ctx.lineTo(xx, yFlow(cur));
-  }
-  ctx.stroke();
-
-  // === ROUGE : stock émulseur (escaliers) ===
-  ctx.strokeStyle = "#ef4444";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(x(0), yEmul(data.emulSerie[0] || 0));
-  for (let t = 1; t <= HORIZON_MIN; t++) {
-    const prev = data.emulSerie[t - 1] || 0;
-    const cur = data.emulSerie[t] || 0;
-    const xx = x(t);
-    ctx.lineTo(xx, yEmul(prev));
-    if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
-  }
-  ctx.stroke();
-
-  // === Débit cible Qext (bleu pointillés) ===
-  ctx.strokeStyle = "#2563eb";
-  ctx.setLineDash([6, 6]);
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(mL, yFlow(data.Qext));
-  ctx.lineTo(mL + plotW, yFlow(data.Qext));
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // === Volume émulseur extinction (vert pointillés) ===
-  ctx.strokeStyle = "#16a34a";
-  ctx.setLineDash([6, 6]);
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(mL, yEmul(data.needExtTotal));
-  ctx.lineTo(mL + plotW, yEmul(data.needExtTotal));
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // === Lignes verticales extinction (vertes) ===
-  function drawVLine(tMin, color) {
-    if (!Number.isFinite(tMin)) return;
-    const xx = x(tMin);
-    ctx.strokeStyle = color;
-    ctx.setLineDash([4, 4]);
+    // NOIR : débit dispo (escaliers)
+    ctx.strokeStyle = "#111";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(xx, mT);
-    ctx.lineTo(xx, mT + plotH);
+    ctx.moveTo(x(0), yFlow(data.flowAvailSerie[0] || 0));
+    for (let t = 1; t <= HORIZON_MIN; t++) {
+      const prev = data.flowAvailSerie[t - 1] || 0;
+      const cur = data.flowAvailSerie[t] || 0;
+      const xx = x(t);
+      ctx.lineTo(xx, yFlow(prev));
+      if (cur !== prev) ctx.lineTo(xx, yFlow(cur));
+    }
+    ctx.stroke();
+
+    // ROUGE : stock émulseur (escaliers)
+    ctx.strokeStyle = "#ef4444";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x(0), yEmul(data.emulSerie[0] || 0));
+    for (let t = 1; t <= HORIZON_MIN; t++) {
+      const prev = data.emulSerie[t - 1] || 0;
+      const cur = data.emulSerie[t] || 0;
+      const xx = x(t);
+      ctx.lineTo(xx, yEmul(prev));
+      if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
+    }
+    ctx.stroke();
+
+    // Débit cible Qext (bleu)
+    ctx.strokeStyle = "#2563eb";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(mL, yFlow(data.Qext));
+    ctx.lineTo(mL + plotW, yFlow(data.Qext));
     ctx.stroke();
     ctx.setLineDash([]);
-  }
-  drawVLine(data.tExtStart, "#16a34a");
-  drawVLine(data.tExtEnd, "#16a34a");
 
-  // ========= Ligne grise + pastilles =========
-  const hintY = mT + plotH + 14;
-  ctx.strokeStyle = "#cbd5e1";
-  ctx.setLineDash([4, 4]);
-  ctx.lineWidth = 1.2;
-  ctx.beginPath();
-  ctx.moveTo(mL, hintY);
-  ctx.lineTo(mL + plotW, hintY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  function pillBox(xCenter, yTop, text) {
-    ctx.font = "12px system-ui, Arial";
-    const padX = 10;
-    const w = ctx.measureText(text).width + padX * 2;
-    const h = 22;
-
-    const x0 = Math.round(xCenter - w / 2);
-    const y0 = Math.round(yTop);
-
-    ctx.fillStyle = "rgba(22,163,74,0.12)";
+    // Volume émulseur extinction (vert)
     ctx.strokeStyle = "#16a34a";
-    ctx.lineWidth = 1.5;
-    ctx.roundRect(x0, y0, w, h, 12);
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(mL, yEmul(data.needExtTotal));
+    ctx.lineTo(mL + plotW, yEmul(data.needExtTotal));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Lignes verticales extinction
+    function drawVLine(tMin, color) {
+      if (!Number.isFinite(tMin)) return;
+      const xx = x(tMin);
+      ctx.strokeStyle = color;
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(xx, mT);
+      ctx.lineTo(xx, mT + plotH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    drawVLine(data.tExtStart, "#16a34a");
+    drawVLine(data.tExtEnd, "#16a34a");
+
+    // Ligne grise (zone indicateurs sous X)
+    const hintY = mT + plotH + 14;
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(mL, hintY);
+    ctx.lineTo(mL + plotW, hintY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // LÉGENDE (ordre demandé)
+    const legendX = mL + 10;
+    const legendY = mT + 14;
+
+    function legendItem(x0, y0, color, label, dash = null) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      if (dash) ctx.setLineDash(dash);
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x0 + 26, y0);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#111";
+      ctx.font = "12px system-ui, Arial";
+      ctx.fillText(label, x0 + 32, y0 + 4);
+    }
+
+    const boxW = 860;
+    const boxH = 24;
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.lineWidth = 1;
+    ctx.roundRect(legendX - 8, legendY - 14, boxW, boxH, 10);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "#166534";
-    ctx.fillText(text, x0 + padX, y0 + 15);
+    legendItem(legendX + 0,   legendY, "#111",    "Débit dispo (somme engins)");
+    legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
+    legendItem(legendX + 440, legendY, "#ef4444", "Stock émulseur dispo");
+    legendItem(legendX + 620, legendY, "#16a34a", "Volume émulseur extinction (cible)", [6, 6]);
+
+    // IMPORTANT : les “pastilles” visuelles sont gérées en HTML (extIndStart/extIndEnd),
+    // donc on ne dessine PAS de pastilles dans le canvas => aucun doublon.
   }
 
-  const pillsY = hintY + 8;
-  const p1X = mL + plotW * 0.42;
-  const p2X = mL + plotW * 0.58;
+  // ===== Tracer (une seule fois) =====
+  $("btnTracer").addEventListener("click", () => {
+    if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
 
-  const startTxt = (data.tExtStart == null) ? "Début ext. : —" : `Début ext. : ${labelAt(data.tExtStart)}`;
-  const endTxt   = (data.tExtEnd   == null) ? "Fin ext. : —"   : `Fin ext. : ${labelAt(data.tExtEnd)}`;
+    let data;
+    try { data = simulate(); }
+    catch (e) { alert(e.message || "Erreur simulation."); return; }
 
-  pillBox(p1X, pillsY, startTxt);
-  pillBox(p2X, pillsY, endTxt);
+    $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
+    $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
+    $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
+    $("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${Math.round(data.needExtTotal)} L`;
+    $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
 
-  // ========= LÉGENDE =========
-  const legendX = mL + 10;
-  const legendY = mT + 14;
+    const t0Str = minToHHMM(data.t0Abs);
 
-  function legendItem(x0, y0, color, label, dash = null) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-    if (dash) ctx.setLineDash(dash);
-    ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 + 26, y0);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    $("pillStockOK").textContent =
+      (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
-    ctx.fillStyle = "#111";
-    ctx.font = "12px system-ui, Arial";
-    ctx.fillText(label, x0 + 32, y0 + 4);
-  }
+    // Pastilles DU HAUT (on les garde ou on les masque au choix)
+    // Ici : on les garde visibles ET on les met à jour
+    $("pillExtStart").style.display = "";
+    $("pillExtEnd").style.display = "";
+    $("pillExtStart").textContent =
+      (data.tExtStart === null) ? "Début extinction : —" : `Début extinction : ${addMinToHHMM(t0Str, data.tExtStart)}`;
+    $("pillExtEnd").textContent =
+      (data.tExtEnd === null) ? "Fin extinction : —" : `Fin extinction : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
 
-  const boxW = 860;
-  const boxH = 24;
-  ctx.fillStyle = "rgba(255,255,255,0.85)";
-  ctx.strokeStyle = "#e5e7eb";
-  ctx.lineWidth = 1;
-  ctx.roundRect(legendX - 8, legendY - 14, boxW, boxH, 10);
-  ctx.fill();
-  ctx.stroke();
+    // Indicateurs visuels sous l’axe X (FIXES, sans superposition)
+    const extIndStart = $("extIndStart");
+    const extIndEnd = $("extIndEnd");
+    if (extIndStart) {
+      extIndStart.textContent =
+        (data.tExtStart === null) ? "Début ext. : —" : `Début ext. : ${addMinToHHMM(t0Str, data.tExtStart)}`;
+    }
+    if (extIndEnd) {
+      extIndEnd.textContent =
+        (data.tExtEnd === null) ? "Fin ext. : —" : `Fin ext. : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
+    }
 
-  legendItem(legendX + 0,   legendY, "#111",    "Débit dispo (somme engins)");
-  legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
-  legendItem(legendX + 440, legendY, "#ef4444", "Stock émulseur dispo");
-  legendItem(legendX + 620, legendY, "#16a34a", "Volume émulseur extinction (cible)", [6, 6]);
-}
+    blocCourbe.style.display = "block";
+    drawChart(data);
+    blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
-
-// ===== Tracer =====
-// ⚠️ IMPORTANT : ne pas ré-attacher l'event si ce bloc est collé plusieurs fois.
-// Si tu as déjà un addEventListener ailleurs, supprime celui-ci.
-$("btnTracer").addEventListener("click", () => {
-  if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
-
-  let data;
-  try { data = simulate(); }
-  catch (e) { alert(e.message || "Erreur simulation."); return; }
-
-  $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
-  $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
-  $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
-  $("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${Math.round(data.needExtTotal)} L`;
-  $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
-
-  const t0Str = minToHHMM(data.t0Abs);
-
-  $("pillStockOK").textContent =
-    (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
-
-  // On garde les indicateurs dans le CANVAS, donc on masque ceux du haut (début/fin)
-  const elStart = $("pillExtStart");
-  const elEnd = $("pillExtEnd");
-  if (elStart) elStart.style.display = "none";
-  if (elEnd) elEnd.style.display = "none";
-
-  blocCourbe.style.display = "block";
-  drawChart(data);
-  blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
-});
-
+  render();
+})();
 </script>
 
 </body>

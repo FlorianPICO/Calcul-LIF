@@ -450,7 +450,7 @@ function drawChart(data) {
     ctx.fillText(label, x(t) - 16, mT + plotH + 20);
   }
 
-  // === Axe Y gauche (valeurs proches de l’axe) ===
+  // === Axe Y gauche ===
   ctx.fillStyle = "#111";
   ctx.fillText("Débit solution (L/min)", mL, mT - 16);
   for (let i = 0; i <= 5; i++) {
@@ -467,7 +467,7 @@ function drawChart(data) {
     ctx.fillText(Math.round(v).toString(), mL - 38, yy + 4);
   }
 
-  // === Axe Y droit (valeurs + titre en rouge) ===
+  // === Axe Y droit (rouge) ===
   ctx.font = "12px system-ui, Arial";
   for (let i = 0; i <= 5; i++) {
     const v = (yEmulMax * i / 5);
@@ -524,7 +524,7 @@ function drawChart(data) {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // === Volume émulseur extinction (cible) (vert pointillés) ===
+  // === Volume émulseur extinction (vert pointillés) ===
   ctx.strokeStyle = "#16a34a";
   ctx.setLineDash([6, 6]);
   ctx.lineWidth = 2;
@@ -550,7 +550,7 @@ function drawChart(data) {
   drawVLine(data.tExtStart, "#16a34a");
   drawVLine(data.tExtEnd, "#16a34a");
 
-  // ========= Ligne pointillée grise + pastilles fixes =========
+  // ========= Ligne grise + pastilles =========
   const hintY = mT + plotH + 14;
   ctx.strokeStyle = "#cbd5e1";
   ctx.setLineDash([4, 4]);
@@ -585,19 +585,13 @@ function drawChart(data) {
   const p1X = mL + plotW * 0.42;
   const p2X = mL + plotW * 0.58;
 
-  // ⚠️ Important : on utilise tExtStart/tExtEnd même si c’est 0
-  const startTxt = (data.tExtStart === null || data.tExtStart === undefined)
-    ? "Début ext. : —"
-    : `Début ext. : ${labelAt(data.tExtStart)}`;
-
-  const endTxt = (data.tExtEnd === null || data.tExtEnd === undefined)
-    ? "Fin ext. : —"
-    : `Fin ext. : ${labelAt(data.tExtEnd)}`;
+  const startTxt = (data.tExtStart == null) ? "Début ext. : —" : `Début ext. : ${labelAt(data.tExtStart)}`;
+  const endTxt   = (data.tExtEnd   == null) ? "Fin ext. : —"   : `Fin ext. : ${labelAt(data.tExtEnd)}`;
 
   pillBox(p1X, pillsY, startTxt);
   pillBox(p2X, pillsY, endTxt);
 
-  // ========= LÉGENDE (ordre demandé) =========
+  // ========= LÉGENDE =========
   const legendX = mL + 10;
   const legendY = mT + 14;
 
@@ -632,8 +626,9 @@ function drawChart(data) {
 }
 
 
-
 // ===== Tracer =====
+// ⚠️ IMPORTANT : ne pas ré-attacher l'event si ce bloc est collé plusieurs fois.
+// Si tu as déjà un addEventListener ailleurs, supprime celui-ci.
 $("btnTracer").addEventListener("click", () => {
   if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
 
@@ -652,7 +647,7 @@ $("btnTracer").addEventListener("click", () => {
   $("pillStockOK").textContent =
     (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
-  // ✅ IMPORTANT : on masque les 2 pastilles HTML (sinon doublon avec celles du canvas)
+  // On garde les indicateurs dans le CANVAS, donc on masque ceux du haut (début/fin)
   const elStart = $("pillExtStart");
   const elEnd = $("pillExtEnd");
   if (elStart) elStart.style.display = "none";
@@ -663,8 +658,6 @@ $("btnTracer").addEventListener("click", () => {
   blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-render();
-})();
 </script>
 
 </body>

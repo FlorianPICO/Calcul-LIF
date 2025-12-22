@@ -223,77 +223,58 @@ th, td {
 
 @media (max-width: 720px){
 
-  /* Grille en 2 colonnes sur mobile, plus “app” */
+  /* 2 colonnes fixes */
   .grid{
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     align-items: start;
   }
 
-  /* Chaque champ : label + input + aide */
-  .grid .cell{
-    display: grid;
-    grid-template-rows: auto 54px auto;
-    row-gap: 8px;
-    min-width: 0;
-  }
-
-  /* Inputs/select même hauteur et look */
-  .grid select,
-  .grid input[type="time"],
-  .grid input[type="number"]{
-    height: 54px;
-    border-radius: 16px;
-    box-sizing: border-box;
+  /* FORCE la même taille pour les "cases" */
+  .grid .field,
+  .grid .field-btn{
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
     width: 100%;
-    padding: 0 14px;
-    font-size: 18px;
+    box-sizing: border-box;
+    border-radius: 18px;
   }
 
-  /* iOS : éviter les styles bizarres */
-  .grid select,
-  .grid input[type="time"]{
+  /* Centrage visuel */
+  .grid input[type="time"].field{
+    text-align: center;
+  }
+
+  /* Le bouton: même hauteur, pas de padding qui casse tout */
+  .grid .field-btn{
+    padding: 0 14px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Sur iOS, le select a souvent une hauteur différente → on neutralise */
+  .grid select.field{
     -webkit-appearance: none;
     appearance: none;
+    padding-right: 36px; /* place pour la flèche */
   }
 
-  /* Centrer l'heure visuellement */
-  .grid input[type="time"]{ text-align: center; }
-
-  /* Bouton “Ajouter” même hauteur que Quantité */
-  .grid .cell-add button{
-    height: 54px;
-    border-radius: 16px;
-    font-size: 18px;
-    padding: 0 14px;
-  }
-
-  /* Label fantôme invisible mais garde la hauteur */
-  .grid .ghost-label{
-    visibility: hidden;
-    height: 1em;
-  }
-
-  /* Textes d’aide plus compacts */
-  .grid .small{
-    font-size: 12px;
-    line-height: 1.25;
-    margin: 0;
-    color: #666;
-  }
-}
-@media (max-width: 720px){
-  .cell-type{ position: relative; }
-  .cell-type::after{
+  /* Petite flèche propre sur le select */
+  .grid .cell:first-child{ position: relative; }
+  .grid .cell:first-child::after{
     content: "▾";
     position: absolute;
     right: 16px;
-    top: 44px;  /* ajuste si besoin */
+    top: 46px;  /* aligné verticalement au milieu du champ */
+    transform: translateY(-50%);
     font-size: 18px;
     color: #222;
     pointer-events: none;
   }
 }
+
 
 
   </style>
@@ -326,7 +307,7 @@ th, td {
     <div class="grid">
    <div class="cell cell-type">
         <label>Type d’engin</label>
-        <select id="enginType">
+        <select id="enginType" class="field">>
           <option value="FPT">FPT</option>
           <option value="CCRM">CCRM</option>
           <option value="CCR">CCR</option>
@@ -342,17 +323,17 @@ th, td {
 
        <div class="cell cell-time">
         <label>Heure d’arrivée (hh:mm)</label>
-        <input id="arrivee" type="time" value="00:00">
+        <input id="arrivee" class="field" type="time" value="00:00">
         <div class="small">Heure à laquelle l'engin commence à cracher de la mousse.</div>
       </div>
 
       <div class="cell cell-qty">
         <label>Quantité</label>
-        <input id="qty" type="number" min="1" step="1" value="1">
+        <input id="qty" class="field" type="number" min="1" step="1" value="1">
       </div>
 
      <div class="cell cell-add">
-        <button id="btnAdd" class="btn btn-primary" type="button">Ajouter</button>
+        <button id="btnAdd" class="btn btn-primary field-btn" type="button">Ajouter</button>
       </div>
     </div>
 

@@ -221,6 +221,29 @@ th, td {
 
 }
 
+/* MOBILE ONLY : aligner Type d’engin + Heure d’arrivée */
+@media (max-width: 720px) {
+
+  /* on force les 2 premiers blocs du .grid à être sur une ligne */
+  .grid{
+    grid-template-columns: 1fr 1fr !important;
+    align-items: start;
+  }
+
+  /* aligne les champs en imposant une même "hauteur" de label */
+  .grid > div:nth-child(1) label,
+  .grid > div:nth-child(2) label{
+    min-height: 44px;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  /* évite que les textes d'aide créent des décalages visuels */
+  .grid > div:nth-child(1) .small,
+  .grid > div:nth-child(2) .small{
+    min-height: 36px; /* ajuste si tu veux */
+  }
+}
 
 
 
@@ -334,6 +357,12 @@ th, td {
       <u>Marqueur :</u> Stock émulseur OK (volume émulseur ≥ besoin extinction)<br>
       <u>Extinction :</u> Possible si débit ≥ Q ext ET volume émulseur ≥ besoin.
     </div>
+
+<div class="lif-signature">
+  © Capitaine Florian PICO – Tous droits réservés<br>
+  <small>Version 1.0 – 2026</small>
+</div>
+    
   </div>
 </main>
 
@@ -835,15 +864,6 @@ function legendItem(x0, y0, color, label, dash = null) {
   render();
 })();
 </script>
-
-<footer>
-  © Capitaine Florian PICO – Tous droits réservés<br><br>
-
-  <p class="licence-inline">
-  Licence d’utilisation : usage autorisé pour les SIS (cadre opérationnel/pédagogique).
-  Toute utilisation commerciale ou appropriation du code est interdite.
-</p>
-</footer>
   
 </body>
 </html>

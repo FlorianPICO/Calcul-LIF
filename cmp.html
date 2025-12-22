@@ -163,11 +163,12 @@ th, td {
 /* AFFICHAGE MOBILE PROPRE  */
 /* ========================= */
 @media (max-width: 768px) {
-  thead { display: none; }
 
+  /* --- TABLE mobile --- */
+  thead { display: none; }
   table, tbody, tr, td { display: block; width: 100%; }
 
-  tr {
+  tr{
     border: 1px solid #e5e7eb;
     border-radius: 14px;
     padding: 12px;
@@ -175,78 +176,57 @@ th, td {
     background: #fff;
   }
 
-@media (max-width: 768px) {
-
-  td {
+  td{
     display: grid;
-    grid-template-columns: 120px auto; /* ← largeur fixe label */
-    column-gap: 80px;                   /* ← écart contrôlé */
+    grid-template-columns: 110px 1fr; /* label / valeur */
+    column-gap: 14px;                 /* <<<<< PAS 80px */
     align-items: center;
-    padding: 4px 0;
+    padding: 6px 0;
   }
 
-}
-@media (max-width: 768px) {
-
-  td span,
-  td strong {
-    text-align: right;
-    justify-self: start;
-  }
-
-}
-
-
-  td::before {
+  td::before{
     content: attr(data-label);
     font-weight: 800;
     color: #555;
     text-align: left;
   }
 
-@media (max-width: 768px) {
+  /* valeurs */
+  td span, td strong{
+    justify-self: end;
+    text-align: right;
+  }
 
-  td:last-child {
+  /* ligne action / bouton supprimer */
+  td:last-child{
     grid-template-columns: 1fr;
     justify-items: center;
     margin-top: 6px;
   }
-
-  td:last-child button {
+  td:last-child button{
     padding: 6px 10px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     width: auto;
     border-radius: 10px;
   }
 
-}
-
-@media (max-width: 720px){
-
-  /* 2 colonnes fixes */
+  /* --- FORMULAIRE "grid" mobile: alignement des cases --- */
   .grid{
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     align-items: start;
   }
 
-  /* FORCE la même taille pour les "cases" */
+  /* FORCE la même hauteur/largeur des cases */
   .grid .field,
   .grid .field-btn{
     height: 56px !important;
-    min-height: 56px !important;
-    max-height: 56px !important;
     width: 100%;
     box-sizing: border-box;
     border-radius: 18px;
   }
 
-  /* Centrage visuel */
-  .grid input[type="time"].field{
-    text-align: center;
-  }
-
-  /* Le bouton: même hauteur, pas de padding qui casse tout */
+  /* Le bouton: même hauteur, centré */
   .grid .field-btn{
     padding: 0 14px !important;
     display: inline-flex;
@@ -254,28 +234,35 @@ th, td {
     justify-content: center;
   }
 
-  /* Sur iOS, le select a souvent une hauteur différente → on neutralise */
-  .grid select.field{
-    -webkit-appearance: none;
-    appearance: none;
-    padding-right: 36px; /* place pour la flèche */
+  /* iOS select/time: uniformisation */
+  .grid select.field,
+  .grid input[type="time"].field,
+  .grid input[type="number"].field{
+    font-size: 16px; /* évite zoom iOS + homogénéise hauteur */
+    padding: 10px 12px;
   }
 
-  /* Petite flèche propre sur le select */
-  .grid .cell:first-child{ position: relative; }
-  .grid .cell:first-child::after{
+  .grid input[type="time"].field{ text-align: center; }
+
+  /* Flèche custom du select */
+  .grid .cell-type{ position: relative; }
+  .grid .cell-type::after{
     content: "▾";
     position: absolute;
     right: 16px;
-    top: 46px;  /* aligné verticalement au milieu du champ */
+    top: 52px;           /* ajuste au milieu du champ */
     transform: translateY(-50%);
     font-size: 18px;
     color: #222;
     pointer-events: none;
   }
+
+  .grid select.field{
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 38px;
+  }
 }
-
-
 
   </style>
 </head>
@@ -307,7 +294,7 @@ th, td {
     <div class="grid">
    <div class="cell cell-type">
         <label>Type d’engin</label>
-        <select id="enginType" class="field">>
+        <select id="enginType" class="field">
           <option value="FPT">FPT</option>
           <option value="CCRM">CCRM</option>
           <option value="CCR">CCR</option>

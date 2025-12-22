@@ -391,7 +391,7 @@ function drawChart(data) {
   ctx.clearRect(0, 0, W, H);
 
   // Marges (réduit l’espace sous l’axe X)
-  const mL = 88, mR = 92, mT = 58, mB = 72; // <-- mB réduit
+  const mL = 88, mR = 92, mT = 58, mB = 60; // <-- encore un peu réduit
   const plotW = W - mL - mR;
   const plotH = H - mT - mB;
 
@@ -449,22 +449,23 @@ function drawChart(data) {
     const label = data.labels[idx] || "";
     ctx.fillText(label, x(t) - 16, mT + plotH + 20);
   }
-
-  // ❌ On supprime le texte sous la courbe "Temps (T0 → ...)" :
-  // ctx.fillText(`Temps (T0 → T0+${HORIZON_H}h, pas ${STEP_MIN} min)`, mL, H - 18);
+  // (supprimé volontairement) ctx.fillText("Temps ...", ...)
 
   // === Axe Y gauche (valeurs proches de l’axe) ===
   ctx.fillStyle = "#111";
-  ctx.fillText("Débit solution (L/min)", mL, mT - 16); // aligné comme "Stock émulseur"
+  ctx.fillText("Débit solution (L/min)", mL, mT - 16);
   for (let i = 0; i <= 5; i++) {
     const v = (yFlowMax * i / 5);
     const yy = yFlow(v);
 
     ctx.strokeStyle = "#e5e7eb";
-    ctx.beginPath(); ctx.moveTo(mL, yy); ctx.lineTo(mL + plotW, yy); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(mL, yy);
+    ctx.lineTo(mL + plotW, yy);
+    ctx.stroke();
 
     ctx.fillStyle = "#111";
-    ctx.fillText(Math.round(v).toString(), mL - 40, yy + 4); // <-- plus proche de l’axe
+    ctx.fillText(Math.round(v).toString(), mL - 38, yy + 4);
   }
 
   // === Axe Y droit (valeurs + titre en rouge) ===
@@ -472,11 +473,9 @@ function drawChart(data) {
   for (let i = 0; i <= 5; i++) {
     const v = (yEmulMax * i / 5);
     const yy = yEmul(v);
-    ctx.fillStyle = "#ef4444"; // valeurs en rouge
-    ctx.fillText(Math.round(v).toString(), mL + plotW + 12, yy + 4); // <-- plus proche de l’axe droit
+    ctx.fillStyle = "#ef4444";
+    ctx.fillText(Math.round(v).toString(), mL + plotW + 10, yy + 4);
   }
-
-  // Titre "Stock émulseur (L)" aligné avec "Débit solution"
   ctx.fillStyle = "#ef4444";
   ctx.fillText("Stock émulseur (L)", mL + plotW - 118, mT - 16);
 
@@ -552,9 +551,8 @@ function drawChart(data) {
   drawVLine(data.tExtStart, "#16a34a");
   drawVLine(data.tExtEnd, "#16a34a");
 
-  // ========= Pastilles fixes sous l’axe X (plus haut + non superposées) =========
-  // Encadré pointillé remonte (moins d’espace vide)
-  const hintY = mT + plotH + 18; // <-- plus proche de l’axe X
+  // ========= Ligne pointillée grise + pastilles fixes (ET RIEN D’AUTRE) =========
+  const hintY = mT + plotH + 14; // <-- remonte (moins d’espace vide)
   ctx.strokeStyle = "#cbd5e1";
   ctx.setLineDash([4, 4]);
   ctx.lineWidth = 1.2;
@@ -569,6 +567,7 @@ function drawChart(data) {
     const padX = 10;
     const w = ctx.measureText(text).width + padX * 2;
     const h = 22;
+
     const x0 = Math.round(xCenter - w / 2);
     const y0 = Math.round(yTop);
 
@@ -583,10 +582,10 @@ function drawChart(data) {
     ctx.fillText(text, x0 + padX, y0 + 15);
   }
 
-  // Position des pastilles : fixes, dans la zone libre, sans collision
-  const pillsY = hintY + 10; // <-- remonte (avant tu étais plus bas)
-  const p1X = mL + plotW * 0.40;
-  const p2X = mL + plotW * 0.60;
+  // pastilles un peu plus haut (proche de la ligne pointillée)
+  const pillsY = hintY + 8;
+  const p1X = mL + plotW * 0.42;
+  const p2X = mL + plotW * 0.58;
 
   const startTxt = Number.isFinite(data.tExtStart) ? `Début ext. : ${labelAt(data.tExtStart)}` : "Début ext. : —";
   const endTxt   = Number.isFinite(data.tExtEnd)   ? `Fin ext. : ${labelAt(data.tExtEnd)}`   : "Fin ext. : —";
@@ -613,7 +612,6 @@ function drawChart(data) {
     ctx.fillText(label, x0 + 32, y0 + 4);
   }
 
-  // fond légende
   const boxW = 860;
   const boxH = 24;
   ctx.fillStyle = "rgba(255,255,255,0.85)";
@@ -624,55 +622,45 @@ function drawChart(data) {
   ctx.stroke();
 
   // Ordre demandé :
-  legendItem(legendX + 0,   legendY, "#111",     "Débit dispo (somme engins)");
-  legendItem(legendX + 250, legendY, "#2563eb",  "Débit cible (Q ext)", [6, 6]);
-  legendItem(legendX + 440, legendY, "#ef4444",  "Stock émulseur dispo");
-  legendItem(legendX + 620, legendY, "#16a34a",  "Volume émulseur extinction (cible)", [6, 6]);
+  legendItem(legendX + 0,   legendY, "#111",    "Débit dispo (somme engins)");
+  legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
+  legendItem(legendX + 440, legendY, "#ef4444", "Stock émulseur dispo");
+  legendItem(legendX + 620, legendY, "#16a34a", "Volume émulseur extinction (cible)", [6, 6]);
 }
 
 
 
-  // ===== Tracer =====
-  $("btnTracer").addEventListener("click", () => {
-    if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
+// ===== Tracer =====
+$("btnTracer").addEventListener("click", () => {
+  if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
 
-    let data;
-    try { data = simulate(); }
-    catch (e) { alert(e.message || "Erreur simulation."); return; }
+  let data;
+  try { data = simulate(); }
+  catch (e) { alert(e.message || "Erreur simulation."); return; }
 
-    $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
-    $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
-    $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
-    $("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${Math.round(data.needExtTotal)} L`;
-    $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
+  $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
+  $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
+  $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
+  $("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${Math.round(data.needExtTotal)} L`;
+  $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
 
-    const t0Str = minToHHMM(data.t0Abs);
+  const t0Str = minToHHMM(data.t0Abs);
 
-    $("pillStockOK").textContent =
-      (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
+  $("pillStockOK").textContent =
+    (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
-    $("pillExtStart").textContent =
-      (data.tExtStart === null) ? "Début extinction : —" : `Début extinction : ${addMinToHHMM(t0Str, data.tExtStart)}`;
+  $("pillExtStart").textContent =
+    (data.tExtStart === null) ? "Début extinction : —" : `Début extinction : ${addMinToHHMM(t0Str, data.tExtStart)}`;
 
-    $("pillExtEnd").textContent =
-      (data.tExtEnd === null) ? "Fin extinction : —" : `Fin extinction : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
+  $("pillExtEnd").textContent =
+    (data.tExtEnd === null) ? "Fin extinction : —" : `Fin extinction : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
 
-    // ✅ Indicateurs FIXES sous l’axe du temps (jamais de superposition)
-    const extIndStart = $("extIndStart");
-    const extIndEnd = $("extIndEnd");
-    if (extIndStart && extIndEnd) {
-      extIndStart.textContent =
-        (data.tExtStart === null) ? "Début ext. : —" : `Début ext. : ${addMinToHHMM(t0Str, data.tExtStart)}`;
-      extIndEnd.textContent =
-        (data.tExtEnd === null) ? "Fin ext. : —" : `Fin ext. : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
-    }
+  blocCourbe.style.display = "block";
+  drawChart(data);
+  blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
-    blocCourbe.style.display = "block";
-    drawChart(data);
-    blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-
-  render();
+render();
 })();
 </script>
 

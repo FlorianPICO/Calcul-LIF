@@ -749,20 +749,25 @@ tr.innerHTML = `
     const legendX = mL + 10;
     const legendY = mT + 14;
 
-    function legendItem(x0, y0, color, label, dash = null) {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 3;
-      if (dash) ctx.setLineDash(dash);
-      ctx.beginPath();
-      ctx.moveTo(x0, y0);
-      ctx.lineTo(x0 + 26, y0);
-      ctx.stroke();
-      ctx.setLineDash([]);
+function legendItem(x0, y0, color, label, dash = null) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";          // 🔥 clé visuelle
+  if (dash) ctx.setLineDash([4,4]); // 🔥 adapté à une ligne courte
 
-      ctx.fillStyle = "#111";
-      ctx.font = "12px system-ui, Arial";
-      ctx.fillText(label, x0 + 32, y0 + 4);
-    }
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + 26, y0);
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+  ctx.lineCap = "butt";
+
+  ctx.fillStyle = "#111";
+  ctx.font = "12px system-ui, Arial";
+  ctx.fillText(label, x0 + 32, y0 + 4);
+}
+
 
     const boxW = 860;
     const boxH = 24;

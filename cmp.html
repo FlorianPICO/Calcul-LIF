@@ -245,6 +245,55 @@ th, td {
   }
 }
 
+/* ===========================
+   MOBILE ONLY – ALIGNEMENTS
+   =========================== */
+@media (max-width: 720px) {
+
+  /* Grille mobile propre : 2 colonnes nettes */
+  .grid{
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px;
+    align-items: start;
+  }
+
+  /* Uniformisation hauteur + largeur des champs du haut */
+  .grid select,
+  .grid input[type="time"]{
+    height: 56px;
+    width: 100%;
+  }
+
+  /* Labels : même hauteur pour aligner les champs */
+  .grid > div:nth-child(1) label,
+  .grid > div:nth-child(2) label{
+    min-height: 44px;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  /* Textes d’aide : même hauteur pour éviter les décalages */
+  .grid > div:nth-child(1) .small,
+  .grid > div:nth-child(2) .small{
+    min-height: 40px;
+  }
+
+  /* ===== Quantité + Ajouter alignés ===== */
+
+  .grid input[type="number"],
+  .grid button{
+    height: 56px;
+  }
+
+  /* Bouton Ajouter pleine hauteur et bien centré */
+  .grid button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 900;
+  }
+}
 
 
   </style>

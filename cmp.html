@@ -431,17 +431,17 @@ thead, tbody, tr{
       const emul = def.emul * r.qty;
 
       const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td> data-label="Type"><b>${r.type}</b></td>
-        <td> data-label="Arrivée">${r.atStr}</td>
-        <td> data-label="Qté">${r.qty}</td>
-        <td> data-label="(Débit L/min)">${flow}</td>
-        <td> data-label="Émulseur (L)">${emul}</td>
-        <td><button data-i="${idx}" class="btn btn-ghost">
-         Supprimer
-         </button>
-         </td>
-      `;
+tr.innerHTML = `
+  <td data-label="Type"><b>${r.type}</b></td>
+  <td data-label="Arrivée">${r.atStr}</td>
+  <td data-label="Qté">${r.qty}</td>
+  <td data-label="Débit (L/min)">${flow}</td>
+  <td data-label="Émulseur (L)">${emul}</td>
+  <td data-label="Action">
+    <button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
+  </td>
+`;
+
       tbody.appendChild(tr);
     });
 

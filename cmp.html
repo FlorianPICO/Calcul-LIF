@@ -223,38 +223,42 @@ th, td {
 
 @media (max-width: 720px){
 
-  /* Chaque cellule de la grille devient une colonne flex */
-  .grid > div{
-    display: flex;
-    flex-direction: column;
+  /* On garde 2 colonnes */
+  .grid{
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
   }
 
-  /* On pousse le champ vers le bas */
-  .grid select,
-  .grid input[type="time"]{
-    margin-top: auto;
+  /* Chaque cellule devient une mini-grille :
+     label en haut / input aligné / aide en bas */
+  .grid .cell{
+    display: grid;
+    grid-template-rows: auto 58px auto; /* <- hauteur fixe de la case */
+    row-gap: 8px;
   }
 
-  /* Hauteur identique des deux cases */
+  /* Les 2 cases ont la même hauteur */
   .grid select,
   .grid input[type="time"]{
     height: 58px;
-    padding: 0 14px;
-    font-size: 18px;
     border-radius: 16px;
     box-sizing: border-box;
-  }
-
-  /* iOS : neutraliser l’apparence native */
-  .grid select,
-  .grid input[type="time"]{
+    padding: 0 14px;
+    font-size: 18px;
+    width: 100%;
     -webkit-appearance: none;
     appearance: none;
   }
 
-  /* Centrage visuel */
+  /* Centrer l’heure visuellement */
   .grid input[type="time"]{
     text-align: center;
+  }
+
+  /* Aides : même taille et marge */
+  .grid .small{
+    margin-top: 0;
+    min-height: 0;
   }
 }
 
@@ -285,8 +289,7 @@ th, td {
   <div class="card" id="blocSaisie" style="display:none;">
     <h2>5) Saisir les engins (arrivée échelonnée)</h2>
 
-    <div class="grid">
-      <div>
+   <div class="cell cell-type">
         <label>Type d’engin</label>
         <select id="enginType">
           <option value="FPT">FPT</option>

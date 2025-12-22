@@ -263,6 +263,36 @@ th, td {
     padding-right: 38px;
   }
 }
+@media (max-width: 768px) {
+
+  /* ✅ 1) Chaque cellule devient une mini-grille :
+        label / champ / aide (small) */
+  .grid .cell{
+    display: grid;
+    grid-template-rows: auto 56px auto; /* label / champ / small */
+    row-gap: 8px;
+    align-content: start;               /* évite les décalages verticaux */
+  }
+
+  /* ✅ 2) Garantit que le label ne "pousse" pas le champ */
+  .grid .cell > label{
+    margin: 0;
+    line-height: 1.15;
+    min-height: 2.3em; /* réserve ~2 lignes max => même hauteur partout */
+  }
+
+  /* ✅ 3) Fixe une hauteur identique pour les textes d'aide (small)
+        pour que les deux colonnes aient la même base */
+  .grid .cell > .small{
+    margin: 0;
+    min-height: 2.8em; /* réserve une place identique */
+  }
+
+  /* ✅ 4) Cas particulier : bouton Ajouter, pas de texte d’aide => on réserve aussi */
+  .grid .cell-add > .small{
+    min-height: 2.8em;
+  }
+}
 
   </style>
 </head>

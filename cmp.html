@@ -168,8 +168,8 @@ thead, tbody, tr{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    padding: 6px 0;
+    gap: 4px;
+    padding: 4px 0;
     border: 0 !important;
     text-align: right;
   }
@@ -181,11 +181,21 @@ thead, tbody, tr{
     text-align: left;
   }
 
+@media (max-width: 768px) {
+  td:last-child {
+    justify-content: center;
+    padding-top: 8px;
+  }
+
   td:last-child button {
-    width: 100%;
-    font-weight: 900;
+    width: auto;              /* ← plus full width */
+    min-width: 120px;         /* ← taille contrôlée */
+    padding: 6px 12px;        /* ← moins haut */
+    font-size: 0.9rem;        /* ← texte plus discret */
+    border-radius: 10px;
   }
 }
+
 
 
   </style>

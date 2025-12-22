@@ -223,44 +223,78 @@ th, td {
 
 @media (max-width: 720px){
 
-  /* On garde 2 colonnes */
+  /* Grille en 2 colonnes sur mobile, plus “app” */
   .grid{
     grid-template-columns: 1fr 1fr;
+    gap: 12px;
     align-items: start;
   }
 
-  /* Chaque cellule devient une mini-grille :
-     label en haut / input aligné / aide en bas */
+  /* Chaque champ : label + input + aide */
   .grid .cell{
     display: grid;
-    grid-template-rows: auto 58px auto; /* <- hauteur fixe de la case */
+    grid-template-rows: auto 54px auto;
     row-gap: 8px;
+    min-width: 0;
   }
 
-  /* Les 2 cases ont la même hauteur */
+  /* Inputs/select même hauteur et look */
   .grid select,
-  .grid input[type="time"]{
-    height: 58px;
+  .grid input[type="time"],
+  .grid input[type="number"]{
+    height: 54px;
     border-radius: 16px;
     box-sizing: border-box;
+    width: 100%;
     padding: 0 14px;
     font-size: 18px;
-    width: 100%;
+  }
+
+  /* iOS : éviter les styles bizarres */
+  .grid select,
+  .grid input[type="time"]{
     -webkit-appearance: none;
     appearance: none;
   }
 
-  /* Centrer l’heure visuellement */
-  .grid input[type="time"]{
-    text-align: center;
+  /* Centrer l'heure visuellement */
+  .grid input[type="time"]{ text-align: center; }
+
+  /* Bouton “Ajouter” même hauteur que Quantité */
+  .grid .cell-add button{
+    height: 54px;
+    border-radius: 16px;
+    font-size: 18px;
+    padding: 0 14px;
   }
 
-  /* Aides : même taille et marge */
+  /* Label fantôme invisible mais garde la hauteur */
+  .grid .ghost-label{
+    visibility: hidden;
+    height: 1em;
+  }
+
+  /* Textes d’aide plus compacts */
   .grid .small{
-    margin-top: 0;
-    min-height: 0;
+    font-size: 12px;
+    line-height: 1.25;
+    margin: 0;
+    color: #666;
   }
 }
+@media (max-width: 720px){
+  .cell-type{ position: relative; }
+  .cell-type::after{
+    content: "▾";
+    position: absolute;
+    right: 16px;
+    top: 44px;  /* ajuste si besoin */
+    font-size: 18px;
+    color: #222;
+    pointer-events: none;
+  }
+}
+
 
   </style>
 </head>
@@ -289,6 +323,7 @@ th, td {
   <div class="card" id="blocSaisie" style="display:none;">
     <h2>5) Saisir les engins (arrivée échelonnée)</h2>
 
+    <div class="grid">
    <div class="cell cell-type">
         <label>Type d’engin</label>
         <select id="enginType">
@@ -305,18 +340,18 @@ th, td {
         <div class="small">Débit + volume émulseur propre au Sdis 27.</div>
       </div>
 
-      <div>
+       <div class="cell cell-time">
         <label>Heure d’arrivée (hh:mm)</label>
         <input id="arrivee" type="time" value="00:00">
         <div class="small">Heure à laquelle l'engin commence à cracher de la mousse.</div>
       </div>
 
-      <div>
+      <div class="cell cell-qty">
         <label>Quantité</label>
         <input id="qty" type="number" min="1" step="1" value="1">
       </div>
 
-      <div>
+     <div class="cell cell-add">
         <button id="btnAdd" class="btn btn-primary" type="button">Ajouter</button>
       </div>
     </div>

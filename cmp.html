@@ -221,62 +221,69 @@ th, td {
 
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px){
 
-  /* 2 colonnes strictes */
+  /* grille 2 colonnes */
   .grid{
     grid-template-columns: 1fr 1fr !important;
     gap: 10px;
-    align-items: end; /* <-- clé : aligne les champs sur une même ligne */
+    align-items: start; /* on gère l'alignement via les champs */
   }
 
-  /* Labels */
-  .grid label{
-    display:block;
+  /* Hauteur unique pour les champs "Type" et "Heure" */
+  :root{
+    --fieldH: 58px;
   }
 
-  /* iOS: input time ignore parfois height -> on force via padding/line-height */
-  .grid select,
-  .grid input[type="time"],
-  .grid input[type="number"],
-  .grid button{
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 14px;
-  }
-
-  /* Même “hauteur visuelle” pour Type + Heure */
+  /* Force la même box */
   .grid select,
   .grid input[type="time"]{
-    padding: 14px 12px;     /* <-- fait la hauteur */
-    line-height: 1.2;
+    width:100%;
+    box-sizing:border-box;
+    height: var(--fieldH);
+    padding: 0 14px;          /* pas de padding vertical -> hauteur fixe */
     font-size: 18px;
-    height: auto;           /* <-- important pour iOS */
+    border-radius: 16px;
+    line-height: var(--fieldH); /* centre le texte */
+    background:#eee;          /* si tu veux garder ton style gris */
+  }
+
+  /* iOS: neutraliser l'apparence native pour que height/line-height marchent */
+  .grid select{
     -webkit-appearance: none;
     appearance: none;
+    background-image: none; /* évite certains décalages iOS */
+  }
+  .grid input[type="time"]{
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* iOS time: le texte n'est pas toujours centré -> on le force */
+  .grid input[type="time"]{
+    text-align: center;
   }
 
   /* Même hauteur pour Quantité + Ajouter */
   .grid input[type="number"],
   .grid button{
-    padding: 14px 12px;
-    line-height: 1.2;
-    height: auto;
+    height: var(--fieldH);
+    padding: 0 14px;
+    line-height: var(--fieldH);
+    border-radius: 16px;
+    font-size: 18px;
+    box-sizing:border-box;
   }
 
-  /* Bouton Ajouter bien centré */
   .grid button{
     display:flex;
     align-items:center;
     justify-content:center;
     font-weight:900;
-  }
-
-  /* Option : rendre les aides sous les champs moins "hautes" */
-  .grid .small{
-    margin-top: 6px;
+    line-height: normal; /* on laisse flex centrer */
   }
 }
+
 
 
   </style>

@@ -164,15 +164,27 @@ thead, tbody, tr{
     background: #fff;
   }
 
+@media (max-width: 768px) {
+
   td {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 120px auto; /* ← largeur fixe label */
+    column-gap: 8px;                   /* ← écart contrôlé */
     align-items: center;
-    gap: 4px;
     padding: 4px 0;
-    border: 0 !important;
-    text-align: right;
   }
+
+}
+@media (max-width: 768px) {
+
+  td span,
+  td strong {
+    text-align: right;
+    justify-self: start;
+  }
+
+}
+
 
   td::before {
     content: attr(data-label);
@@ -182,19 +194,22 @@ thead, tbody, tr{
   }
 
 @media (max-width: 768px) {
+
   td:last-child {
-    justify-content: center;
-    padding-top: 8px;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    margin-top: 6px;
   }
 
   td:last-child button {
-    width: auto;              /* ← plus full width */
-    min-width: 120px;         /* ← taille contrôlée */
-    padding: 6px 12px;        /* ← moins haut */
-    font-size: 0.9rem;        /* ← texte plus discret */
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    min-width: 110px;
     border-radius: 10px;
   }
+
 }
+
 
 
 

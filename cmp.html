@@ -152,19 +152,9 @@ thead, tbody, tr{
 /* AFFICHAGE MOBILE PROPRE  */
 /* ========================= */
 @media (max-width: 768px) {
+  thead { display: none; }
 
-  table {
-    border: none;
-  }
-
-  thead {
-    display: none; /* on supprime l'en-tête */
-  }
-
-  tbody, tr {
-    display: block;
-    width: 100%;
-  }
+  table, tbody, tr, td { display: block; width: 100%; }
 
   tr {
     border: 1px solid #e5e7eb;
@@ -178,26 +168,21 @@ thead, tbody, tr{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
     padding: 6px 0;
-    border: none;
-    font-size: 0.95rem;
+    border: 0 !important;
+    text-align: right;
   }
 
-  /* Libellés à gauche */
   td::before {
     content: attr(data-label);
     font-weight: 800;
     color: #555;
-  }
-
-  /* Bouton supprimer */
-  td:last-child {
-    margin-top: 8px;
+    text-align: left;
   }
 
   td:last-child button {
-    width: 100% !important;
-    justify-content: center;
+    width: 100%;
     font-weight: 900;
   }
 }

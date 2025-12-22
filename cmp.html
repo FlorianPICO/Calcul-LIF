@@ -147,7 +147,62 @@ thead, tbody, tr{
   background:rgba(22,163,74,0.10) !important;
   color:#166534 !important;
 }
-    
+
+/* ========================= */
+/* AFFICHAGE MOBILE PROPRE  */
+/* ========================= */
+@media (max-width: 768px) {
+
+  table {
+    border: none;
+  }
+
+  thead {
+    display: none; /* on supprime l'en-tête */
+  }
+
+  tbody, tr {
+    display: block;
+    width: 100%;
+  }
+
+  tr {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #fff;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border: none;
+    font-size: 0.95rem;
+  }
+
+  /* Libellés à gauche */
+  td::before {
+    content: attr(data-label);
+    font-weight: 800;
+    color: #555;
+  }
+
+  /* Bouton supprimer */
+  td:last-child {
+    margin-top: 8px;
+  }
+
+  td:last-child button {
+    width: 100% !important;
+    justify-content: center;
+    font-weight: 900;
+  }
+}
+
+
   </style>
 </head>
 
@@ -189,13 +244,13 @@ thead, tbody, tr{
           <option value="CDHR">CDHR</option>
           <option value="CEEM">CEEM (émulseur)</option>
         </select>
-        <div class="small">Débit solution + stock émulseur selon table SDIS 27.</div>
+        <div class="small">Débit + volume émulseur propore au SDIS 27.</div>
       </div>
 
       <div>
         <label>Heure d’arrivée (hh:mm)</label>
         <input id="arrivee" type="time" value="00:00">
-        <div class="small">00:00 = sur place immédiat.</div>
+        <div class="small">Heure à laquelle l'engin commence à cracher de la mousse.</div>
       </div>
 
       <div>
@@ -377,12 +432,15 @@ thead, tbody, tr{
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><b>${r.type}</b></td>
-        <td>${r.atStr}</td>
-        <td>${r.qty}</td>
-        <td>${flow}</td>
-        <td>${emul}</td>
-        <td><button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button></td>
+        <td> data-label="Type"><b>${r.type}</b></td>
+        <td> data-label="Arrivée">${r.atStr}</td>
+        <td> data-label="Qté">${r.qty}</td>
+        <td> data-label="(Débit L/min)">${flow}</td>
+        <td> data-label="Émulseur (L)">${emul}</td>
+        <td><button data-i="${idx}" class="btn btn-ghost">
+         Supprimer
+         </button>
+         </td>
       `;
       tbody.appendChild(tr);
     });

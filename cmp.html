@@ -391,7 +391,7 @@ function drawChart(data) {
   ctx.clearRect(0, 0, W, H);
 
   // Marges (réduit l’espace sous l’axe X)
-  const mL = 88, mR = 92, mT = 58, mB = 60; // <-- encore un peu réduit
+  const mL = 88, mR = 92, mT = 58, mB = 60;
   const plotW = W - mL - mR;
   const plotH = H - mT - mB;
 
@@ -449,7 +449,6 @@ function drawChart(data) {
     const label = data.labels[idx] || "";
     ctx.fillText(label, x(t) - 16, mT + plotH + 20);
   }
-  // (supprimé volontairement) ctx.fillText("Temps ...", ...)
 
   // === Axe Y gauche (valeurs proches de l’axe) ===
   ctx.fillStyle = "#111";
@@ -551,8 +550,8 @@ function drawChart(data) {
   drawVLine(data.tExtStart, "#16a34a");
   drawVLine(data.tExtEnd, "#16a34a");
 
-  // ========= Ligne pointillée grise + pastilles fixes (ET RIEN D’AUTRE) =========
-  const hintY = mT + plotH + 14; // <-- remonte (moins d’espace vide)
+  // ========= Ligne pointillée grise + pastilles fixes =========
+  const hintY = mT + plotH + 14;
   ctx.strokeStyle = "#cbd5e1";
   ctx.setLineDash([4, 4]);
   ctx.lineWidth = 1.2;
@@ -582,13 +581,18 @@ function drawChart(data) {
     ctx.fillText(text, x0 + padX, y0 + 15);
   }
 
-  // pastilles un peu plus haut (proche de la ligne pointillée)
   const pillsY = hintY + 8;
   const p1X = mL + plotW * 0.42;
   const p2X = mL + plotW * 0.58;
 
-  const startTxt = Number.isFinite(data.tExtStart) ? `Début ext. : ${labelAt(data.tExtStart)}` : "Début ext. : —";
-  const endTxt   = Number.isFinite(data.tExtEnd)   ? `Fin ext. : ${labelAt(data.tExtEnd)}`   : "Fin ext. : —";
+  // ⚠️ Important : on utilise tExtStart/tExtEnd même si c’est 0
+  const startTxt = (data.tExtStart === null || data.tExtStart === undefined)
+    ? "Début ext. : —"
+    : `Début ext. : ${labelAt(data.tExtStart)}`;
+
+  const endTxt = (data.tExtEnd === null || data.tExtEnd === undefined)
+    ? "Fin ext. : —"
+    : `Fin ext. : ${labelAt(data.tExtEnd)}`;
 
   pillBox(p1X, pillsY, startTxt);
   pillBox(p2X, pillsY, endTxt);
@@ -621,7 +625,6 @@ function drawChart(data) {
   ctx.fill();
   ctx.stroke();
 
-  // Ordre demandé :
   legendItem(legendX + 0,   legendY, "#111",    "Débit dispo (somme engins)");
   legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
   legendItem(legendX + 440, legendY, "#ef4444", "Stock émulseur dispo");
@@ -649,11 +652,11 @@ $("btnTracer").addEventListener("click", () => {
   $("pillStockOK").textContent =
     (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
-  $("pillExtStart").textContent =
-    (data.tExtStart === null) ? "Début extinction : —" : `Début extinction : ${addMinToHHMM(t0Str, data.tExtStart)}`;
-
-  $("pillExtEnd").textContent =
-    (data.tExtEnd === null) ? "Fin extinction : —" : `Fin extinction : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
+  // ✅ IMPORTANT : on masque les 2 pastilles HTML (sinon doublon avec celles du canvas)
+  const elStart = $("pillExtStart");
+  const elEnd = $("pillExtEnd");
+  if (elStart) elStart.style.display = "none";
+  if (elEnd) elEnd.style.display = "none";
 
   blocCourbe.style.display = "block";
   drawChart(data);

@@ -221,77 +221,60 @@ th, td {
 
 }
 
-/* MOBILE ONLY : aligner Type d’engin + Heure d’arrivée */
 @media (max-width: 720px) {
 
-  /* on force les 2 premiers blocs du .grid à être sur une ligne */
-  .grid{
-    grid-template-columns: 1fr 1fr !important;
-    align-items: start;
-  }
-
-  /* aligne les champs en imposant une même "hauteur" de label */
-  .grid > div:nth-child(1) label,
-  .grid > div:nth-child(2) label{
-    min-height: 44px;
-    display: flex;
-    align-items: flex-end;
-  }
-
-  /* évite que les textes d'aide créent des décalages visuels */
-  .grid > div:nth-child(1) .small,
-  .grid > div:nth-child(2) .small{
-    min-height: 36px; /* ajuste si tu veux */
-  }
-}
-
-/* ===========================
-   MOBILE ONLY – ALIGNEMENTS
-   =========================== */
-@media (max-width: 720px) {
-
-  /* Grille mobile propre : 2 colonnes nettes */
+  /* 2 colonnes strictes */
   .grid{
     grid-template-columns: 1fr 1fr !important;
     gap: 10px;
-    align-items: start;
+    align-items: end; /* <-- clé : aligne les champs sur une même ligne */
   }
 
-  /* Uniformisation hauteur + largeur des champs du haut */
+  /* Labels */
+  .grid label{
+    display:block;
+  }
+
+  /* iOS: input time ignore parfois height -> on force via padding/line-height */
   .grid select,
-  .grid input[type="time"]{
-    height: 56px;
-    width: 100%;
-  }
-
-  /* Labels : même hauteur pour aligner les champs */
-  .grid > div:nth-child(1) label,
-  .grid > div:nth-child(2) label{
-    min-height: 44px;
-    display: flex;
-    align-items: flex-end;
-  }
-
-  /* Textes d’aide : même hauteur pour éviter les décalages */
-  .grid > div:nth-child(1) .small,
-  .grid > div:nth-child(2) .small{
-    min-height: 40px;
-  }
-
-  /* ===== Quantité + Ajouter alignés ===== */
-
+  .grid input[type="time"],
   .grid input[type="number"],
   .grid button{
-    height: 56px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 14px;
   }
 
-  /* Bouton Ajouter pleine hauteur et bien centré */
+  /* Même “hauteur visuelle” pour Type + Heure */
+  .grid select,
+  .grid input[type="time"]{
+    padding: 14px 12px;     /* <-- fait la hauteur */
+    line-height: 1.2;
+    font-size: 18px;
+    height: auto;           /* <-- important pour iOS */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Même hauteur pour Quantité + Ajouter */
+  .grid input[type="number"],
   .grid button{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    font-weight: 900;
+    padding: 14px 12px;
+    line-height: 1.2;
+    height: auto;
+  }
+
+  /* Bouton Ajouter bien centré */
+  .grid button{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+  }
+
+  /* Option : rendre les aides sous les champs moins "hautes" */
+  .grid .small{
+    margin-top: 6px;
   }
 }
 

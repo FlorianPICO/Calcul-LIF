@@ -130,14 +130,18 @@
     </div>
 
     <!-- Indicateurs VISUELS sous l’axe X (fixes, pas de superposition) -->
-    <div id="extIndicators" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:-8px;">
-      <span id="extIndStart" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
-        Début ext. : —
-      </span>
-      <span id="extIndEnd" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
-        Fin ext. : —
-      </span>
-    </div>
+<div id="extIndicators"
+     style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+            margin-top:6px; padding-top:8px; padding-bottom:8px;
+            border-top:1.2px dashed #cbd5e1;">
+  <span id="extIndStart" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
+    Début ext. : —
+  </span>
+  <span id="extIndEnd" style="display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:2px solid #16a34a; background:rgba(22,163,74,0.10); color:#166534;">
+    Fin ext. : —
+  </span>
+</div>
+
 
     <div class="small">
       Axe gauche : débit solution (L/min). Axe droit : stock émulseur (L). Courbes en escaliers.
@@ -555,17 +559,6 @@
     }
     drawVLine(data.tExtStart, "#16a34a");
     drawVLine(data.tExtEnd, "#16a34a");
-
-    // Ligne grise (zone indicateurs sous X)
-    const hintY = mT + plotH + 14;
-    ctx.strokeStyle = "#cbd5e1";
-    ctx.setLineDash([4, 4]);
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.moveTo(mL, hintY);
-    ctx.lineTo(mL + plotW, hintY);
-    ctx.stroke();
-    ctx.setLineDash([]);
 
     // LÉGENDE (ordre demandé)
     const legendX = mL + 10;

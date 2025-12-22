@@ -218,13 +218,12 @@ th, td {
   }
 
   /* FORCE la même hauteur/largeur des cases */
-  .grid .field,
-  .grid .field-btn{
-    height: 56px !important;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 18px;
-  }
+.grid .field{
+  height: 56px !important;
+  min-height: 56px;
+  max-height: 56px;
+  line-height: 56px; /* clé pour l’alignement */
+}
 
   /* Le bouton: même hauteur, centré */
   .grid .field-btn{
@@ -237,12 +236,24 @@ th, td {
   /* iOS select/time: uniformisation */
   .grid select.field,
   .grid input[type="time"].field,
+  .grid select.field,
+.grid input[type="time"].field{
+  -webkit-appearance: none;
+  appearance: none;
+}
+
   .grid input[type="number"].field{
     font-size: 16px; /* évite zoom iOS + homogénéise hauteur */
     padding: 10px 12px;
   }
 
-  .grid input[type="time"].field{ text-align: center; }
+ .grid .field{
+  height: 56px !important;
+  min-height: 56px;
+  max-height: 56px;
+  line-height: 56px; /* clé pour l’alignement */
+}
+
 
   /* Flèche custom du select */
   .grid .cell-type{ position: relative; }

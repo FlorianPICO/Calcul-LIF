@@ -226,6 +226,30 @@ th, td {
     min-height: 2.6em; /* ajuste si tu veux (2.2 à 3em) */
   }
 }
+@media (min-width: 769px){
+
+  /* même hauteur pour TOUS les champs + bouton */
+  .grid .field,
+  .grid .field-btn{
+    height: 56px;
+    box-sizing: border-box;
+  }
+
+  /* bouton: on neutralise le padding qui le rend plus haut */
+  .grid .field-btn{
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  /* inputs/select : padding OK mais sans changer la hauteur */
+  .grid select.field,
+  .grid input.field{
+    padding: 0 12px;
+  }
+}
 
 /* ===================================== */
 /* ALIGNEMENT PARFAIT DES CHAMPS (MOBILE) */

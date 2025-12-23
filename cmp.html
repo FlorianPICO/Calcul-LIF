@@ -146,6 +146,36 @@ th, td {
   vertical-align: middle;
   text-align: left;
 }
+@media (max-width: 768px) {
+
+  thead {
+    display: none;
+  }
+
+  table, tbody, tr {
+    display: block;
+    width: 100%;
+  }
+
+  td {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    column-gap: 14px;
+    padding: 6px 0;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: 800;
+    color: #555;
+  }
+
+  /* bouton supprimer */
+  td:last-child {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
 
 
     .pill{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:0.85rem; border:1px solid #ddd; background:#f8fafc; }

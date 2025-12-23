@@ -255,6 +255,15 @@ th, td {
   min-height: var(--btn-h);
   max-height: var(--btn-h);
 }
+.grid .field{
+  background: #f1f1f1;
+  border: 2px solid #d1d5db;
+}
+
+.grid .field:focus{
+  border-color: #2563eb;
+  background: #fff;
+}
 
 .cell-type{
   display: flex;
@@ -300,6 +309,11 @@ th, td {
   .grid .cell-add > .small{
     min-height: 2.8em;
   }
+}
+.grid label{
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
   </style>

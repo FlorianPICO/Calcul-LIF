@@ -107,6 +107,19 @@ header img.Logo {
     .card{ background:#fff; border:1px solid #ddd; border-radius:14px; padding:14px; margin-top:12px; }
     .card h2{ margin:0 0 10px 0; font-size:1.1rem; font-weight:900; }
     .grid{ display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:start; }
+    .grid .field,
+.grid .field-btn{
+  height: 56px;
+  box-sizing: border-box;
+}
+
+.grid .field-btn{
+  padding: 0 !important;   /* neutralise le padding .btn */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
     @media (max-width:720px){ .grid{ grid-template-columns: 1fr 1fr; } }
     label{ font-weight:800; font-size:0.95rem; }
     input, select, button{ width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; box-sizing:border-box; font-family:inherit; font-size:1rem; }

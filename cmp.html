@@ -242,30 +242,32 @@ th, td {
   color:#166534 !important;
 }
 
+/* ===== Desktop : aligner le bouton avec les champs (pas les titres) ===== */
 @media (min-width: 769px){
 
-  /* même hauteur pour TOUS les champs + bouton */
-  .grid .field,
-  .grid .field-btn{
-    height: 56px;
-    box-sizing: border-box;
+  /* Toutes les cellules ont la même structure verticale */
+  .grid .cell{
+    display: grid;
+    grid-template-rows: auto 56px auto;
+    row-gap: 6px;
   }
 
-  /* bouton: on neutralise le padding qui le rend plus haut */
-  .grid .field-btn{
-    padding: 0 !important;
+  /* Le bouton n’a pas de label → on réserve la place du label */
+  .grid .cell-add::before{
+    content: "";
+    height: 1.4em; /* même hauteur qu’un label */
+  }
+
+  /* Bouton exactement à la hauteur des champs */
+  #btnAdd{
+    height: 56px;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1;
-  }
-
-  /* inputs/select : padding OK mais sans changer la hauteur */
-  .grid select.field,
-  .grid input.field{
-    padding: 0 12px;
   }
 }
+
 
 /* ===================================== */
 /* ALIGNEMENT PARFAIT DES CHAMPS (MOBILE) */

@@ -219,19 +219,12 @@ th, td {
 
   /* FORCE la même hauteur/largeur des cases */
 .grid .field{
-  height: 64px !important;
-  min-height: 64px;
-  max-height: 64px;
-  line-height: 64px; /* clé pour l’alignement */
+  height: 56px !important;
+  min-height: 56px;
+  max-height: 56px;
+  line-height: 56px; /* clé pour l’alignement */
 }
 
-  /* Le bouton: même hauteur, centré */
-  .grid .field-btn{
-    padding: 0 14px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
   /* iOS select/time: uniformisation */
   .grid select.field,
@@ -252,6 +245,15 @@ th, td {
   min-height: 56px;
   max-height: 56px;
   line-height: 56px; /* clé pour l’alignement */
+}
+:root{
+  --btn-h: 64px;
+}
+
+.grid .field-btn{
+  height: var(--btn-h);
+  min-height: var(--btn-h);
+  max-height: var(--btn-h);
 }
 
 

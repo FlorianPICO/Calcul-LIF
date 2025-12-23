@@ -160,160 +160,100 @@ th, td {
 }
 
 /* ========================= */
-/* AFFICHAGE MOBILE PROPRE  */
+/* FORMULAIRE CMP : ALIGNEMENT MOBILE */
 /* ========================= */
-@media (max-width: 768px) {
+@media (max-width: 768px){
 
-  /* --- TABLE mobile --- */
-  thead { display: none; }
-  table, tbody, tr, td { display: block; width: 100%; }
-
-  tr{
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    padding: 12px;
-    margin-bottom: 12px;
-    background: #fff;
-  }
-
-  td{
-    display: grid;
-    grid-template-columns: 110px 1fr; /* label / valeur */
-    column-gap: 14px;                 /* <<<<< PAS 80px */
-    align-items: center;
-    padding: 6px 0;
-  }
-
-  td::before{
-    content: attr(data-label);
-    font-weight: 800;
-    color: #555;
-    text-align: left;
-  }
-
-  /* valeurs */
-  td span, td strong{
-    justify-self: end;
-    text-align: right;
-  }
-
-  /* ligne action / bouton supprimer */
-  td:last-child{
-    grid-template-columns: 1fr;
-    justify-items: center;
-    margin-top: 6px;
-  }
-  td:last-child button{
-    padding: 6px 10px;
-    font-size: 0.85rem;
-    width: auto;
-    border-radius: 10px;
-  }
-
-  /* --- FORMULAIRE "grid" mobile: alignement des cases --- */
+  /* 2 colonnes fixes */
   .grid{
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     align-items: start;
   }
 
-  /* FORCE la même hauteur/largeur des cases */
-.grid .field{
-  height: 56px !important;
-  min-height: 56px;
-  max-height: 56px;
-  line-height: 56px; /* clé pour l’alignement */
-}
-
-
-  /* iOS select/time: uniformisation */
-  .grid select.field,
-  .grid input[type="time"].field,
-  .grid select.field,
-.grid input[type="time"].field{
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-  .grid input[type="number"].field{
-    font-size: 16px; /* évite zoom iOS + homogénéise hauteur */
-    padding: 10px 12px;
-  }
-
- .grid .field{
-  height: 56px !important;
-  min-height: 56px;
-  max-height: 56px;
-  line-height: 56px; /* clé pour l’alignement */
-}
-:root{
-  --btn-h: 64px;
-}
-
-.grid .field-btn{
-  height: var(--btn-h);
-  min-height: var(--btn-h);
-  max-height: var(--btn-h);
-}
-.grid .field{
-  background: #f1f1f1;
-  border: 2px solid #d1d5db;
-}
-
-.grid .field:focus{
-  border-color: #2563eb;
-  background: #fff;
-}
-
-.cell-type{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.cell-type label,
-.cell-type .small{
-  text-align: left;
-}
-
-.cell-type select{
-  text-align-last: center;
-}
-
-@media (max-width: 768px) {
-
-  /* ✅ 1) Chaque cellule devient une mini-grille :
-        label / champ / aide (small) */
+  /* chaque case a la même structure : label / champ / small */
   .grid .cell{
     display: grid;
-    grid-template-rows: auto 56px auto; /* label / champ / small */
+    grid-template-rows: auto auto auto;
     row-gap: 8px;
-    align-content: start;               /* évite les décalages verticaux */
+    align-content: start;
   }
 
-  /* ✅ 2) Garantit que le label ne "pousse" pas le champ */
+  /* même hauteur réservée pour les labels (évite décalage entre colonnes) */
   .grid .cell > label{
     margin: 0;
-    line-height: 1.15;
-    min-height: 2.3em; /* réserve ~2 lignes max => même hauteur partout */
+    min-height: 2.4em;  /* ≈ 2 lignes */
+    line-height: 1.2;
   }
 
-  /* ✅ 3) Fixe une hauteur identique pour les textes d'aide (small)
-        pour que les deux colonnes aient la même base */
+  /* champ : taille identique partout */
+  .grid .field{
+    height: 56px;
+    padding: 10px 12px;
+    border-radius: 18px;
+    background: #f1f1f1;
+    border: 2px solid #d1d5db;
+    box-sizing: border-box;
+    font-size: 16px; /* évite zoom iOS */
+  }
+
+  /* focus */
+  .grid .field:focus{
+    border-color: #2563eb;
+    background: #fff;
+    outline: none;
+  }
+
+  /* time au centre */
+  .grid input[type="time"].field{
+    text-align: center;
+  }
+
+  /* bouton Ajouter aligné avec Quantité */
+  .grid .cell-add{
+    display: grid;
+    grid-template-rows: auto 56px auto;
+    row-gap: 8px;
+  }
+  .grid .field-btn{
+    height: 56px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    font-weight: 900;
+    padding: 0 14px;
+  }
+
+  /* aide (small) : même hauteur partout sinon ça décale */
   .grid .cell > .small{
     margin: 0;
     min-height: 2.8em; /* réserve une place identique */
+    font-size: 0.8rem;
+    color: #6b7280;
+    line-height: 1.3;
   }
 
-  /* ✅ 4) Cas particulier : bouton Ajouter, pas de texte d’aide => on réserve aussi */
-  .grid .cell-add > .small{
-    min-height: 2.8em;
+  /* select iOS : neutraliser l’apparence */
+  .grid select.field{
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 38px;
   }
-}
-.grid label{
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 6px;
+
+  /* flèche propre du select (dans la cellule type) */
+  .grid .cell-type{ position: relative; }
+  .grid .cell-type::after{
+    content: "▾";
+    position: absolute;
+    right: 16px;
+    top: calc(2.4em + 28px); /* label(≈2 lignes) + moitié du champ */
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #222;
+    pointer-events: none;
+  }
 }
 
   </style>

@@ -264,6 +264,17 @@ th, td {
     pointer-events: none;
   }
 }
+@media (max-width: 768px){
+
+  /* 🔧 CORRECTION iOS / mobile input time */
+  .grid input[type="time"].field{
+    padding: 0 !important;        /* SUPPRIME le padding fantôme */
+    line-height: 56px;            /* force l’alignement vertical */
+    height: 56px !important;
+    text-align: center;
+  }
+
+}
 
 
 

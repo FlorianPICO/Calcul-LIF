@@ -186,58 +186,28 @@ th, td {
     line-height: 1.3;
   }
 
-  @media (max-width: 768px){
+@media (max-width: 768px){
 
-  /* 1️⃣ Même hauteur VISUELLE pour tous les champs */
-  .grid select.field,
-  .grid input[type="time"].field,
-  .grid input[type="number"].field{
-    height: 56px;
-    padding: 0 14px;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
+  .grid{
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: start;
   }
 
-  /* 2️⃣ Neutralise les comportements natifs mobiles */
-  .grid select.field,
-  .grid input[type="time"].field{
-    -webkit-appearance: none;
-    appearance: none;
+  /* même structure pour toutes les cellules */
+  .grid .cell{
+    display: grid;
+    grid-template-rows: 2.6em 56px 3.2em; /* label / champ / aide */
+    row-gap: 6px;
+    align-content: start;
   }
 
-  /* 3️⃣ Centre le contenu */
-  .grid select.field{
-    text-align-last: center;
+  .grid .cell > label{
+    margin: 0;
+    font-weight: 800;
+    line-height: 1.3;
   }
 
-  .grid input[type="time"].field{
-    text-align: center;
-  }
-
-  /* 4️⃣ Bouton Ajouter = EXACTEMENT même logique */
-  .grid .field-btn{
-    height: 56px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* 5️⃣ Aligne Quantité et Ajouter */
-  .cell-qty,
-  .cell-add{
-    align-self: end;
-  }
-}
-
-
-  /* champ heure centré */
-  .grid input[type="time"].field{
-    text-align: center;
-  }
-
-  /* texte d’aide : réserve TOUJOURS la même place */
   .grid .cell > .small{
     margin: 0;
     font-size: 0.8rem;
@@ -245,29 +215,40 @@ th, td {
     color: #6b7280;
   }
 
-  /* cellule bouton Ajouter = même logique */
+  /* champs : hauteur identique (sans flex) */
+  .grid .field{
+    height: 56px !important;
+    box-sizing: border-box;
+    padding: 10px 14px;   /* padding normal */
+    border-radius: 18px;
+  }
+
+  .grid input[type="time"].field{ text-align: center; }
+
+  .grid select.field{
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 40px;
+    text-align-last: center;
+  }
+
+  /* ✅ bouton Ajouter : placé sur la rangée 2 comme les inputs */
   .grid .cell-add{
     display: grid;
     grid-template-rows: 2.6em 56px 3.2em;
     row-gap: 6px;
+    align-content: start;
   }
-
-  .grid .field-btn{
-    height: 56px;
+  .grid .cell-add > button{
+    grid-row: 2;                    /* <<< alignement parfait avec Quantité */
+    height: 56px !important;
+    padding: 0 16px;
     border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 900;
     font-size: 1.05rem;
-    padding: 0 16px;
-  }
-
-  /* select iOS */
-  .grid select.field{
-    -webkit-appearance: none;
-    appearance: none;
-    padding-right: 40px;
   }
 
   /* flèche select */
@@ -276,13 +257,14 @@ th, td {
     content: "▾";
     position: absolute;
     right: 16px;
-    top: calc(2.6em + 28px); /* label + moitié du champ */
+    top: calc(2.6em + 28px);
     transform: translateY(-50%);
     font-size: 18px;
     color: #222;
     pointer-events: none;
   }
 }
+
 
 
   </style>

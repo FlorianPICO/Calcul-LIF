@@ -186,23 +186,51 @@ th, td {
     line-height: 1.3;
   }
 
-  /* champs : même taille partout */
-  .grid .field{
+  @media (max-width: 768px){
+
+  /* 1️⃣ Même hauteur VISUELLE pour tous les champs */
+  .grid select.field,
+  .grid input[type="time"].field,
+  .grid input[type="number"].field{
     height: 56px;
-    padding: 10px 14px;
-    border-radius: 18px;
-    background: #f1f1f1;
-    border: 2px solid #d1d5db;
-    font-size: 16px; /* évite zoom iOS */
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
     box-sizing: border-box;
   }
 
-  /* focus */
-  .grid .field:focus{
-    border-color: #2563eb;
-    background: #fff;
-    outline: none;
+  /* 2️⃣ Neutralise les comportements natifs mobiles */
+  .grid select.field,
+  .grid input[type="time"].field{
+    -webkit-appearance: none;
+    appearance: none;
   }
+
+  /* 3️⃣ Centre le contenu */
+  .grid select.field{
+    text-align-last: center;
+  }
+
+  .grid input[type="time"].field{
+    text-align: center;
+  }
+
+  /* 4️⃣ Bouton Ajouter = EXACTEMENT même logique */
+  .grid .field-btn{
+    height: 56px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 5️⃣ Aligne Quantité et Ajouter */
+  .cell-qty,
+  .cell-add{
+    align-self: end;
+  }
+}
+
 
   /* champ heure centré */
   .grid input[type="time"].field{

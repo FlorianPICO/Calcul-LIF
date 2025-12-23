@@ -160,6 +160,15 @@ header img.Logo {
     .btn-ghost{ background:#fff; border:1px solid #ccc; }
     .small{ font-size:12px; color:#555; margin-top:6px; }
     .warn{ background:#fff3cd; border:1px solid #ffeeba; padding:10px 12px; border-radius:12px; font-size:0.95rem; }
+/* ===== Desktop : aligner hauteur du bouton "Ajouter" avec les champs ===== */
+@media (min-width: 769px){
+  #btnAdd{
+    height: 56px;
+    padding: 0;            /* annule le padding de .btn */
+    line-height: 56px;     /* centre le texte verticalement */
+    border-radius: 12px;   /* garde ton style */
+  }
+}
 
    /* Empêche le débordement du tableau sur mobile */
 table{

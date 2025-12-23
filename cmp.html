@@ -107,18 +107,49 @@ header img.Logo {
     .card{ background:#fff; border:1px solid #ddd; border-radius:14px; padding:14px; margin-top:12px; }
     .card h2{ margin:0 0 10px 0; font-size:1.1rem; font-weight:900; }
     .grid{ display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:start; }
-    .grid .field,
-.grid .field-btn{
-  height: 56px;
-  box-sizing: border-box;
+/* ===================================== */
+/* ALIGNEMENT PARFAIT DES 4 CASES (DESKTOP) */
+/* ===================================== */
+@media (min-width: 769px){
+
+  /* même structure pour chaque colonne */
+  .grid .cell{
+    display: grid;
+    grid-template-rows: 2.2em 56px 2.6em; /* label / champ / aide */
+    row-gap: 6px;
+    align-content: start;
+  }
+
+  /* uniformise la hauteur des labels */
+  .grid .cell > label{
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  /* uniformise la hauteur des champs + bouton */
+  .grid .field,
+  .grid .field-btn{
+    height: 56px !important;
+    box-sizing: border-box;
+  }
+
+  /* bouton = même hauteur et centré */
+  .grid .field-btn{
+    padding: 0 !important; /* annule padding .btn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* réserve la même "ligne aide" pour Quantité + Ajouter même si pas de .small */
+  .grid .cell-qty::after,
+  .grid .cell-add::after{
+    content: "";
+    display: block;
+    height: 2.6em; /* même que la 3e ligne */
+  }
 }
 
-.grid .field-btn{
-  padding: 0 !important;   /* neutralise le padding .btn */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
     @media (max-width:720px){ .grid{ grid-template-columns: 1fr 1fr; } }
     label{ font-weight:800; font-size:0.95rem; }

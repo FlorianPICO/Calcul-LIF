@@ -850,48 +850,46 @@ const numFromText = (txt) => {
   return Number.isFinite(x) ? x : NaN;
 };
 
-if (btnCmp) {
-  btnCmp.addEventListener("click", (e) => {
-    e.preventDefault();
+btnCmp.addEventListener("click", (e) => {
+  e.preventDefault();
 
-    // ✅ 1) On lit le mode
-    const mode = $("modeSdis").value; // "lock" ou "custom"
+  const mode = $("modeSdis").value; // lock | custom
 
-    // ✅ 2) On choisit la page cible en fonction du mode
-    const targetPage = (mode === "custom") ? "cmp_autre_sdis.html" : "cmp.html";
+  // Valeurs calculées
+  const Qext   = numFromText($("oQext").textContent);
+  const Qtempo = numFromText($("oQtempo").textContent);
+  const tExt   = numFromText($("oT").textContent);
+  const concPct = numFromText($("oConc").textContent);
 
-    // Valeurs calculées
-    const Qext   = numFromText($("oQext").textContent);
-    const Qtempo = numFromText($("oQtempo").textContent);
-    const tExt   = numFromText($("oT").textContent);
-    const concPct = numFromText($("oConc").textContent);
+  if (![Qext, Qtempo, tExt, concPct].every(Number.isFinite)) {
+    alert("Fais un calcul avant d’ouvrir la courbe.");
+    return;
+  }
 
-    // Sécurité : si pas encore calculé
-    if (![Qext, Qtempo, tExt, concPct].every(Number.isFinite) || Qext <= 0 || Qtempo <= 0 || tExt <= 0 || concPct <= 0) {
-      alert("Fais un calcul d’abord pour générer Q ext / Q tempo / durée.");
-      return;
-    }
+  const conc = concPct / 100;
+  const besoinExt = Qext * tExt * conc;
 
-    // Besoin émulseur extinction complet
-    const conc = concPct / 100;
-    const besoinExt = Qext * tExt * conc;
+  const payload = {
+    mode,
+    Qext,
+    Qtempo,
+    tExt,
+    concPct,
+    besoinExt,
+    savedAt: Date.now()
+  };
 
-    // ✅ 3) On stocke aussi le mode (important pour la page CMP)
-    const payload = {
-      mode,           // "lock" ou "custom"
-      Qext,
-      Qtempo,
-      tExt,
-      concPct,
-      besoinExt,
-      savedAt: Date.now()
-    };
-    localStorage.setItem("LIF_CMP_INPUTS", JSON.stringify(payload));
+  localStorage.setItem("LIF_CMP_INPUTS", JSON.stringify(payload));
 
-    // ✅ 4) Navigation vers la bonne page
-    window.location.href = targetPage;
-  });
-}
+  // 🔀 Redirection selon le mode
+  const target =
+    mode === "custom"
+      ? "cmp_autre_sdis.html"
+      : "cmp.html";
+
+  window.location.href = target;
+});
+
 
 
   resetAll();
@@ -900,6 +898,7 @@ if (btnCmp) {
  
 </body>
 </html>
+
 
 
 

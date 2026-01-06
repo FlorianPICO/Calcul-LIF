@@ -843,9 +843,9 @@ const btnCmp = $("btnCmp");
 const numFromText = (txt) => {
   if (txt == null) return NaN;
   const s = String(txt)
-    .replace(/\s/g, "")      // enlève espaces
-    .replace(",", ".")       // virgule -> point
-    .replace(/[^0-9.\-]/g, ""); // garde chiffres + . + -
+    .replace(/\s/g, "")
+    .replace(",", ".")
+    .replace(/[^0-9.\-]/g, "");
   const x = Number(s);
   return Number.isFinite(x) ? x : NaN;
 };
@@ -854,17 +854,17 @@ if (btnCmp) {
   btnCmp.addEventListener("click", (e) => {
     e.preventDefault();
 
-    // CMP dispo uniquement en mode SDIS 27 verrouillé
-    if ($("modeSdis").value !== "lock") {
-      alert("Courbe de montée en puissance disponible uniquement en mode SDIS 27.");
-      return;
-    }
+    // ✅ 1) On lit le mode
+    const mode = $("modeSdis").value; // "lock" ou "custom"
+
+    // ✅ 2) On choisit la page cible en fonction du mode
+    const targetPage = (mode === "custom") ? "cmp_autre_sdis.html" : "cmp.html";
 
     // Valeurs calculées
-    const Qext   = numFromText($("oQext").textContent);   // L/min
-    const Qtempo = numFromText($("oQtempo").textContent); // L/min
-    const tExt   = numFromText($("oT").textContent);      // min
-    const concPct = numFromText($("oConc").textContent);  // ex "3 %"
+    const Qext   = numFromText($("oQext").textContent);
+    const Qtempo = numFromText($("oQtempo").textContent);
+    const tExt   = numFromText($("oT").textContent);
+    const concPct = numFromText($("oConc").textContent);
 
     // Sécurité : si pas encore calculé
     if (![Qext, Qtempo, tExt, concPct].every(Number.isFinite) || Qext <= 0 || Qtempo <= 0 || tExt <= 0 || concPct <= 0) {
@@ -876,9 +876,9 @@ if (btnCmp) {
     const conc = concPct / 100;
     const besoinExt = Qext * tExt * conc;
 
-    // Stockage local
+    // ✅ 3) On stocke aussi le mode (important pour la page CMP)
     const payload = {
-      mode: "lock",
+      mode,           // "lock" ou "custom"
       Qext,
       Qtempo,
       tExt,
@@ -888,8 +888,8 @@ if (btnCmp) {
     };
     localStorage.setItem("LIF_CMP_INPUTS", JSON.stringify(payload));
 
-    // Navigation
-    window.location.href = btnCmp.getAttribute("href") || "cmp.html";
+    // ✅ 4) Navigation vers la bonne page
+    window.location.href = targetPage;
   });
 }
 
@@ -900,6 +900,7 @@ if (btnCmp) {
  
 </body>
 </html>
+
 
 
 

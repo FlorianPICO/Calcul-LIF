@@ -578,8 +578,10 @@ th, td {
     return labels;
   };
 
-  // ===== Engins =====
-  const ENGINS = {
+  // ============================================================
+  //  ENGINS : base + personnalisation + ajout "Autre"
+  // ============================================================
+  const ENGINS_BASE = {
     FPT:   { flow: 2000, emul: 200 },
     CCRM:  { flow: 1500, emul: 200 },
     CCR:   { flow: 1000, emul: 40  },
@@ -591,7 +593,185 @@ th, td {
     CEEM:  { flow: 0,    emul: 6000 }
   };
 
-  // ===== Charge params =====
+  const ENGINS_STORAGE_KEY = "LIF_CMP_ENGINS_CUSTOM";
+
+  function loadCustomEngins(){
+    try {
+      return JSON.parse(localStorage.getItem(ENGINS_STORAGE_KEY)) || { overrides:{}, others:[] };
+    } catch(e) {
+      return { overrides:{}, others:[] };
+    }
+  }
+
+  function saveCustomEngins(data){
+    localStorage.setItem(ENGINS_STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function buildEngins(){
+    const custom = loadCustomEngins();
+    const merged = {};
+
+    // base + overrides
+    for (const [code, vals] of Object.entries(ENGINS_BASE)) {
+      merged[code] = { ...vals, ...(custom.overrides?.[code] || {}), label: code, isOther: false };
+    }
+
+    // others (engins ajoutés)
+    (custom.others || []).forEach(o => {
+      merged[o.id] = { flow: o.flow, emul: o.emul, label: o.label, isOther: true };
+    });
+
+    return merged;
+  }
+
+  let ENGINS = buildEngins();
+
+  // Remplit le select de saisie (#enginType) => utilisé pour ajouter dans la liste
+  function refreshEnginTypeSelect(){
+    const sel = $("enginType");
+    if (!sel) return;
+
+    const current = sel.value;
+    sel.innerHTML = "";
+
+    // base d'abord
+    Object.keys(ENGINS_BASE).forEach(code => {
+      const opt = document.createElement("option");
+      opt.value = code;
+      opt.textContent = code;
+      sel.appendChild(opt);
+    });
+
+    // others ensuite
+    const custom = loadCustomEngins();
+    (custom.others || []).forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o.id;
+      opt.textContent = o.label; // nom libre
+      sel.appendChild(opt);
+    });
+
+    // restore valeur si possible
+    if ([...sel.options].some(o => o.value === current)) sel.value = current;
+  }
+
+  // Remplit le select d’édition (#enginEditSelect)
+  function refreshEnginEditSelect(){
+    const sel = $("enginEditSelect");
+    if (!sel) return;
+
+    const current = sel.value;
+    sel.innerHTML = "";
+
+    Object.keys(ENGINS_BASE).forEach(code => {
+      const opt = document.createElement("option");
+      opt.value = code;
+      opt.textContent = code;
+      sel.appendChild(opt);
+    });
+
+    const custom = loadCustomEngins();
+    (custom.others || []).forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o.id;
+      opt.textContent = o.label;
+      sel.appendChild(opt);
+    });
+
+    if ([...sel.options].some(o => o.value === current)) sel.value = current;
+
+    sel.dispatchEvent(new Event("change"));
+  }
+
+  function fillEditFieldsFromSelection(){
+    const sel  = $("enginEditSelect");
+    const flow = $("enginEditFlow");
+    const emul = $("enginEditEmul");
+    if (!sel || !flow || !emul) return;
+
+    ENGINS = buildEngins();
+    const e = ENGINS[sel.value];
+    if (!e) return;
+
+    flow.value = e.flow ?? 0;
+    emul.value = e.emul ?? 0;
+  }
+
+  function saveSelectedEngin(){
+    const sel  = $("enginEditSelect");
+    const flow = $("enginEditFlow");
+    const emul = $("enginEditEmul");
+    if (!sel || !flow || !emul) return;
+
+    const id = sel.value;
+    const f = Number(flow.value);
+    const m = Number(emul.value);
+
+    if (!Number.isFinite(f) || f < 0 || !Number.isFinite(m) || m < 0) {
+      alert("Valeurs invalides (flow/emul).");
+      return;
+    }
+
+    const custom = loadCustomEngins();
+
+    // base => overrides
+    if (ENGINS_BASE[id]) {
+      custom.overrides = custom.overrides || {};
+      custom.overrides[id] = { flow: f, emul: m };
+      saveCustomEngins(custom);
+    } else {
+      // other => update dans others
+      const idx = (custom.others || []).findIndex(o => o.id === id);
+      if (idx >= 0) {
+        custom.others[idx].flow = f;
+        custom.others[idx].emul = m;
+        saveCustomEngins(custom);
+      }
+    }
+
+    ENGINS = buildEngins();
+    refreshEnginTypeSelect();
+    refreshEnginEditSelect();
+    alert("Engin mis à jour.");
+  }
+
+  function addOtherEngin(){
+    const label = $("otherLabel");
+    const flow  = $("otherFlow");
+    const emul  = $("otherEmul");
+    if (!label || !flow || !emul) return;
+
+    const name = (label.value || "").trim();
+    const f = Number(flow.value);
+    const m = Number(emul.value);
+
+    if (!name) { alert("Donne un nom pour l’engin."); return; }
+    if (!Number.isFinite(f) || f < 0 || !Number.isFinite(m) || m < 0) {
+      alert("Valeurs invalides (flow/emul).");
+      return;
+    }
+
+    const custom = loadCustomEngins();
+    custom.others = custom.others || [];
+
+    const id = "OTHER_" + Date.now(); // id unique
+    custom.others.push({ id, label: name, flow: f, emul: m });
+
+    saveCustomEngins(custom);
+
+    label.value = "";
+    flow.value = "";
+    emul.value = "";
+
+    ENGINS = buildEngins();
+    refreshEnginTypeSelect();
+    refreshEnginEditSelect();
+    alert("Engin “Autre” ajouté.");
+  }
+
+  // ============================================================
+  // ===== Charge params CMP depuis calcul =====
+  // ============================================================
   let params = null;
   try { params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null"); }
   catch (e) { params = null; }
@@ -600,14 +780,13 @@ th, td {
   const blocSaisie = $("blocSaisie");
   const blocCourbe = $("blocCourbe");
 
- if (!params || params.mode !== "custom") {
-  status.textContent =
-    "Impossible : aucun calcul « Autre SDIS » n’a été transmis. " +
-    "Retourne sur la page calcul, active le mode « Autre SDIS », " +
-    "lance un calcul, puis clique sur « Courbe de montée en puissance ».";
-  return;
-}
-
+  if (!params || params.mode !== "custom") {
+    status.textContent =
+      "Impossible : aucun calcul « Autre SDIS » n’a été transmis. " +
+      "Retourne sur la page calcul, active le mode « Autre SDIS », " +
+      "lance un calcul, puis clique sur « Courbe de montée en puissance ».";
+    return;
+  }
 
   status.innerHTML =
     `✅ Paramètres reçus :<br>
@@ -616,31 +795,41 @@ th, td {
      - Durée ext. = <b>${Math.round(params.tExt)}</b> min<br>
      - Concentration = <b>${params.concPct}%</b><br>
      - Besoin extinction = <b>${Math.round(params.besoinExt)}</b> L émulseur`;
+
   blocSaisie.style.display = "block";
 
-  // ===== Liste engins =====
+  // ============================================================
+  // ===== Liste engins (table) =====
+  // ============================================================
   const rows = [];
   const tbody = $("liste");
+
+  function getEnginDef(type){
+    ENGINS = buildEngins(); // refresh
+    return ENGINS[type] || null;
+  }
 
   const render = () => {
     tbody.innerHTML = "";
     rows.forEach((r, idx) => {
-      const def = ENGINS[r.type];
-      const flow = def.flow * r.qty;
-      const emul = def.emul * r.qty;
+      const def = getEnginDef(r.type);
+      if (!def) return;
+
+      const flow = (def.flow || 0) * r.qty;
+      const emul = (def.emul || 0) * r.qty;
+      const label = def.label || r.type;
 
       const tr = document.createElement("tr");
-tr.innerHTML = `
-  <td data-label="Type"><b>${r.type}</b></td>
-  <td data-label="Arrivée">${r.atStr}</td>
-  <td data-label="Qté">${r.qty}</td>
-  <td data-label="Débit (L/min)">${flow}</td>
-  <td data-label="Émulseur (L)">${emul}</td>
-  <td data-label="Action">
-    <button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
-  </td>
-`;
-
+      tr.innerHTML = `
+        <td data-label="Type"><b>${label}</b></td>
+        <td data-label="Arrivée">${r.atStr}</td>
+        <td data-label="Qté">${r.qty}</td>
+        <td data-label="Débit (L/min)">${flow}</td>
+        <td data-label="Émulseur (L)">${emul}</td>
+        <td data-label="Action">
+          <button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
+        </td>
+      `;
       tbody.appendChild(tr);
     });
 
@@ -653,12 +842,24 @@ tr.innerHTML = `
     });
   };
 
+  // init selects
+  refreshEnginTypeSelect();
+  refreshEnginEditSelect();
+
+  // events "paramétrage engins"
+  $("enginEditSelect")?.addEventListener("change", fillEditFieldsFromSelection);
+  $("btnSaveEngin")?.addEventListener("click", saveSelectedEngin);
+  $("btnAddOther")?.addEventListener("click", addOtherEngin);
+
+  // Ajout engin dans la liste
   $("btnAdd").addEventListener("click", () => {
     const type = $("enginType").value;
     const atStr = $("arrivee").value || "00:00";
     const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
 
-    if (!ENGINS[type]) return;
+    const def = getEnginDef(type);
+    if (!def) return;
+
     if (!Number.isFinite(timeToMin(atStr))) { alert("Heure d’arrivée invalide."); return; }
 
     rows.push({ type, atStr, qty });
@@ -672,8 +873,12 @@ tr.innerHTML = `
     blocCourbe.style.display = "none";
   });
 
+  // ============================================================
   // ===== Simulation =====
+  // ============================================================
   function simulate() {
+    ENGINS = buildEngins(); // important : prend en compte les modifs
+
     const Qext = params.Qext;
     const Qtempo = params.Qtempo;
     const tExt = params.tExt;
@@ -689,11 +894,12 @@ tr.innerHTML = `
 
     rows.forEach(r => {
       const def = ENGINS[r.type];
+      if (!def) return;
       const rel = arrivalRelMin(r.atStr, t0Abs);
       if (!Number.isFinite(rel)) return;
       const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
-      addFlow[m] += def.flow * r.qty;
-      addEmul[m] += def.emul * r.qty;
+      addFlow[m] += (def.flow || 0) * r.qty;
+      addEmul[m] += (def.emul || 0) * r.qty;
     });
 
     let flowAvail = 0;
@@ -757,14 +963,15 @@ tr.innerHTML = `
     };
   }
 
+  // ============================================================
   // ===== Dessin =====
+  // ============================================================
   function drawChart(data) {
     const c = $("chart");
     const ctx = c.getContext("2d");
     const W = c.width, H = c.height;
     ctx.clearRect(0, 0, W, H);
 
-    // Marges (réduit l’espace sous l’axe X)
     const mL = 88, mR = 92, mT = 58, mB = 60;
     const plotW = W - mL - mR;
     const plotH = H - mT - mB;
@@ -781,11 +988,8 @@ tr.innerHTML = `
     const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
     const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
 
-    // Helpers temps
     const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
-    const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
 
-    // roundRect compat
     if (!ctx.roundRect) {
       ctx.roundRect = function (x0, y0, w, h, r) {
         const rr = Math.min(r, w / 2, h / 2);
@@ -800,12 +1004,10 @@ tr.innerHTML = `
       };
     }
 
-    // Cadre
     ctx.lineWidth = 1;
     ctx.strokeStyle = "#cbd5e1";
     ctx.strokeRect(mL, mT, plotW, plotH);
 
-    // Grille verticale
     ctx.strokeStyle = "#e5e7eb";
     for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
       ctx.beginPath();
@@ -814,7 +1016,6 @@ tr.innerHTML = `
       ctx.stroke();
     }
 
-    // Axe X labels
     ctx.fillStyle = "#111";
     ctx.font = "12px system-ui, Arial";
     for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
@@ -823,7 +1024,6 @@ tr.innerHTML = `
       ctx.fillText(label, x(t) - 16, mT + plotH + 20);
     }
 
-    // Axe Y gauche
     ctx.fillStyle = "#111";
     ctx.fillText("Débit solution (L/min)", mL, mT - 16);
     for (let i = 0; i <= 5; i++) {
@@ -840,7 +1040,6 @@ tr.innerHTML = `
       ctx.fillText(Math.round(v).toString(), mL - 38, yy + 4);
     }
 
-    // Axe Y droit (rouge)
     ctx.font = "12px system-ui, Arial";
     for (let i = 0; i <= 5; i++) {
       const v = (yEmulMax * i / 5);
@@ -851,7 +1050,6 @@ tr.innerHTML = `
     ctx.fillStyle = "#ef4444";
     ctx.fillText("Stock émulseur (L)", mL + plotW - 118, mT - 16);
 
-    // Bande extinction
     if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
       const x1 = x(data.tExtStart);
       const x2 = x(Math.min(data.tExtEnd, HORIZON_MIN));
@@ -859,7 +1057,7 @@ tr.innerHTML = `
       ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
     }
 
-    // NOIR : débit dispo (escaliers)
+    // NOIR : débit dispo
     ctx.strokeStyle = "#111";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -873,7 +1071,7 @@ tr.innerHTML = `
     }
     ctx.stroke();
 
-    // ROUGE : stock émulseur (escaliers)
+    // ROUGE : stock émulseur
     ctx.strokeStyle = "#ef4444";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -887,7 +1085,7 @@ tr.innerHTML = `
     }
     ctx.stroke();
 
-    // Débit cible Qext (bleu)
+    // Qext (bleu)
     ctx.strokeStyle = "#2563eb";
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
@@ -897,7 +1095,7 @@ tr.innerHTML = `
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Volume émulseur extinction (orange)
+    // besoin extinction (orange)
     ctx.strokeStyle = "#ff8800";
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
@@ -907,7 +1105,6 @@ tr.innerHTML = `
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Lignes verticales extinction
     function drawVLine(tMin, color) {
       if (!Number.isFinite(tMin)) return;
       const xx = x(tMin);
@@ -923,29 +1120,28 @@ tr.innerHTML = `
     drawVLine(data.tExtStart, "#16a34a");
     drawVLine(data.tExtEnd, "#16a34a");
 
-    // LÉGENDE (ordre demandé)
+    // Légende
     const legendX = mL + 10;
     const legendY = mT + 14;
 
-function legendItem(x0, y0, color, label, dash = null) {
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 3;
-  ctx.lineCap = "round";          // 🔥 clé visuelle
-  if (dash) ctx.setLineDash([4,4]); // 🔥 adapté à une ligne courte
+    function legendItem(x0, y0, color, label, dash = null) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      if (dash) ctx.setLineDash([4,4]);
 
-  ctx.beginPath();
-  ctx.moveTo(x0, y0);
-  ctx.lineTo(x0 + 26, y0);
-  ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x0 + 26, y0);
+      ctx.stroke();
 
-  ctx.setLineDash([]);
-  ctx.lineCap = "butt";
+      ctx.setLineDash([]);
+      ctx.lineCap = "butt";
 
-  ctx.fillStyle = "#111";
-  ctx.font = "12px system-ui, Arial";
-  ctx.fillText(label, x0 + 32, y0 + 4);
-}
-
+      ctx.fillStyle = "#111";
+      ctx.font = "12px system-ui, Arial";
+      ctx.fillText(label, x0 + 32, y0 + 4);
+    }
 
     const boxW = 860;
     const boxH = 24;
@@ -960,12 +1156,11 @@ function legendItem(x0, y0, color, label, dash = null) {
     legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
     legendItem(legendX + 440, legendY, "#ff0303", "Volume émulseur dispo");
     legendItem(legendX + 620, legendY, "#ff8800", "Volume émulseur extinction (cible)", [6, 6]);
-
-    // IMPORTANT : les “pastilles” visuelles sont gérées en HTML (extIndStart/extIndEnd),
-    // donc on ne dessine PAS de pastilles dans le canvas => aucun doublon.
   }
 
-  // ===== Tracer (une seule fois) =====
+  // ============================================================
+  // ===== Tracer =====
+  // ============================================================
   $("btnTracer").addEventListener("click", () => {
     if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
 
@@ -984,8 +1179,6 @@ function legendItem(x0, y0, color, label, dash = null) {
     $("pillStockOK").textContent =
       (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
-    // Pastilles DU HAUT (on les garde ou on les masque au choix)
-    // Ici : on les garde visibles ET on les met à jour
     $("pillExtStart").style.display = "";
     $("pillExtEnd").style.display = "";
     $("pillExtStart").textContent =
@@ -993,7 +1186,6 @@ function legendItem(x0, y0, color, label, dash = null) {
     $("pillExtEnd").textContent =
       (data.tExtEnd === null) ? "Fin extinction : —" : `Fin extinction : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
 
-    // Indicateurs visuels sous l’axe X (FIXES, sans superposition)
     const extIndStart = $("extIndStart");
     const extIndEnd = $("extIndEnd");
     if (extIndStart) {
@@ -1010,9 +1202,11 @@ function legendItem(x0, y0, color, label, dash = null) {
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
+  // init
   render();
 })();
 </script>
+
   
 </body>
 </html>

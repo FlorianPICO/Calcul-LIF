@@ -414,7 +414,7 @@ th, td {
   <div class="card" id="blocStatus">
     <h2>Paramètres importés depuis le calcul</h2>
     <div id="status" class="warn">Chargement…</div>
-    <div class="small"> </div>
+    <div class="small">CMP mode autre Sdis.</div>
   </div>
 
   <div class="card" id="blocSaisie" style="display:none;">

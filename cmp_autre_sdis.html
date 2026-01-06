@@ -600,10 +600,14 @@ th, td {
   const blocSaisie = $("blocSaisie");
   const blocCourbe = $("blocCourbe");
 
-  if (!params || params.mode !== "lock") {
-    status.textContent = "Impossible : aucun calcul SDIS 27 n’a été transmis. Retourne sur la page calcul, fais un calcul en mode SDIS 27, puis clique sur “Courbe de montée en puissance”.";
-    return;
-  }
+ if (!params || params.mode !== "custom") {
+  status.textContent =
+    "Impossible : aucun calcul « Autre SDIS » n’a été transmis. " +
+    "Retourne sur la page calcul, active le mode « Autre SDIS », " +
+    "lance un calcul, puis clique sur « Courbe de montée en puissance ».";
+  return;
+}
+
 
   status.innerHTML =
     `✅ Paramètres reçus :<br>

@@ -48,37 +48,40 @@
 
     input[type="time"]{ color:#2563eb; font-weight:700; }
 
-    /* =========================
-       HEADER (LOGO + TITRE + BOUTON)
-       ========================= */
-    header{
-      background:#0b1220;
-      color:#fff;
-      padding:18px 14px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
+  header{
+  background:#0b1220;
+  color:#fff;
+  padding:42px 16px;
+  text-align:center;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
     header img.logo{
-      width: min(220px, 45vw);
-      max-height: 70px;
+      width: min(220px, 60vw);
+      max-height: 140px;
       height:auto;
-      object-fit:contain;
-      flex:0 0 auto;
-    }
-    header .hero-title{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      margin:0;
-      line-height:1.2;
-      text-align:center;
-    }
-    header .hero-title span{ display:block; white-space:normal; font-weight:900; }
-    header .hero-title p{ margin:0; opacity:.9; font-weight:700; }
+      object-fit: contain;
+ margin: 0;
+}
+/* ✅ Titre multi-lignes */
+header .hero-title{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  margin:0;
+  line-height:1.2;
+  text-align:center;
+}
+
+header .hero-title span{
+  display:block;
+  white-space:normal;
+}
 
     header a{
       color:#fff;
@@ -88,8 +91,6 @@
       border-radius:10px;
       background:rgba(255,255,255,0.12);
       white-space:nowrap;
-      flex:0 0 auto;
-    }
 
     /* Mobile : header en colonne (logo visible + centré) */
     @media (max-width: 720px){

@@ -170,21 +170,50 @@
       font-weight: 700;
     }
 
-    /* ===== Grille 2 lignes x 3 colonnes ===== */
-    .engins-grid{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:14px;
-      align-items:end; /* aligne le bouton avec les champs */
-    }
-    .engins-grid .cell{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    @media (max-width: 768px){
-      .engins-grid{ grid-template-columns: 1fr; }
-    }
+   /* ===== Grille saisie engins : 2 lignes x 3 colonnes (desktop) ===== */
+.engins-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+/* Chaque cellule = même structure : label / champ / aide */
+.engins-grid .cell{
+  display: grid;
+  grid-template-rows: 2.2em 56px 2.6em; /* label / input / aide */
+  row-gap: 6px;
+}
+
+/* Champ */
+.engins-grid input,
+.engins-grid button{
+  height: 56px;
+  box-sizing: border-box;
+}
+
+/* Centre le bouton verticalement */
+.engins-grid .cell-add button{
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Si une cellule n’a pas d’aide, on garde la place */
+.engins-grid .cell.no-help::after{
+  content: "";
+  display: block;
+  height: 2.6em;
+}
+
+/* Mobile : repasse en 1 colonne */
+@media (max-width: 768px){
+  .engins-grid{
+    grid-template-columns: 1fr;
+  }
+}
+
   </style>
 </head>
 
@@ -223,12 +252,12 @@
         <div class="small">Champ libre (texte).</div>
       </div>
 
-      <div class="cell">
+      <div class="cell no-help">
         <label>Débit (L/min)</label>
         <input id="enginFlow" type="number" min="0" step="10" value="0">
       </div>
 
-      <div class="cell">
+      <div class="cell no help">
         <label>Émulseur (L)</label>
         <input id="enginEmul" type="number" min="0" step="10" value="0">
       </div>
@@ -240,12 +269,12 @@
         <div class="small">Heure à laquelle l'engin commence à projeter de la mousse.</div>
       </div>
 
-      <div class="cell">
+      <div class="cell no help">
         <label>Quantité :</label>
         <input id="qty" type="number" min="1" value="1">
       </div>
 
-      <div class="cell cell-add">
+      <div class="cell no help cell-add">
         <label>&nbsp;</label>
         <button id="btnAdd" class="btn btn-primary" type="button">Ajouter</button>
       </div>

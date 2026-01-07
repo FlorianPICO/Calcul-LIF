@@ -73,7 +73,6 @@
       height:auto;
       object-fit:contain;
       margin:0;
-      display:block;
     }
 
     .hero-title{
@@ -88,10 +87,10 @@
     .hero-title span{ display:block; white-space:normal; }
 
     header p{
-      margin:0;
-      opacity:.9;
-      font-size:clamp(0.95rem, 3.2vw, 1.1rem);
-      line-height:1.25;
+      opacity: 0.9;
+      font-size: clamp(0.95rem, 3.2vw, 1.1rem);
+      margin: 0;
+      line-height: 1.25;
     }
 
     header a.back-btn{
@@ -117,12 +116,20 @@
       margin-top:10px;
       display:block;
       overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
+      -webkit-overflow-scrolling: touch;
     }
     thead, tbody, tr{ display:table; width:100%; table-layout:fixed; }
-    table{ border-collapse:collapse; }
-    th, td{ display:table-cell; vertical-align:middle; text-align:left; }
+/* ===== TABLE DESKTOP : ALIGNEMENT STRICT ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
+th, td {
+  display: table-cell;   /* ← CRITIQUE */
+  vertical-align: middle;
+  text-align: left;
+  }
     @media (max-width:768px){
       thead{ display:none; }
       table, tbody, tr{ display:block; width:100%; }

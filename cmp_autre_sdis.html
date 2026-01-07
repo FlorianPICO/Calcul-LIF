@@ -66,7 +66,58 @@
       font-family:inherit;
       font-size:1rem;
     }
+     body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: #f5f7fa;
+      color: #111;
+      line-height: 1.6;
+    }
 
+    /* ✅ HEADER RESPONSIVE (logo centré + texte adaptable) */
+    header {
+      background: #0b1220;
+      color: white;
+      padding: 42px 16px;
+      text-align: center;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 4.8vw, 2.2rem);
+      line-height: 1.2;
+      max-width: 28ch;
+    }
+
+    header p {
+      opacity: 0.9;
+      font-size: clamp(0.95rem, 3.2vw, 1.1rem);
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    section.page {
+      max-width: 900px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+    @media (max-width: 520px) {
+      section.page { padding: 14px 8px; }   /* ✅ moins de marge sur mobile */
+      .card { padding: 12px; }             /* ✅ la carte prend plus de largeur */
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #ddd;
     .row{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
     .btn{ cursor:pointer; font-weight:900; border:0; border-radius:12px; padding:12px 14px; }
     .btn-primary{ background:#2563eb; color:#fff; }

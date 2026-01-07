@@ -5,75 +5,107 @@
   <title>CMP – Courbe de montée en puissance (autre Sdis)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    body{
-      margin:0;
-      font-family:system-ui, Arial, sans-serif;
-      background:#f5f7fa;
-      color:#111;
-      line-height:1.5;
+   <style>
+
+     body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: #f5f7fa;
+      color: #111;
+      line-height: 1.6;
     }
 
-    header{
-      background:#0b1220;
-      color:#fff;
-      padding:18px 14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-    header a{
-      color:#fff;
-      text-decoration:none;
-      font-weight:800;
-      padding:10px 12px;
-      border-radius:10px;
-      background:rgba(255,255,255,0.12);
-      white-space:nowrap;
-    }
-    header .hero-title{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:6px;
-      margin:0;
-      line-height:1.2;
-      text-align:center;
-      flex:1;
-    }
-    header .hero-title span{ display:block; white-space:normal; }
-    header p{ margin:0; opacity:.9; }
+    /* ✅ HEADER RESPONSIVE (logo centré + texte adaptable) */
+    header {
+      background: #0b1220;
+      color: white;
+      padding: 42px 16px;
+      text-align: center;
 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 4.8vw, 2.2rem);
+      line-height: 1.2;
+      max-width: 28ch;
+    }
+
+    header p {
+      opacity: 0.9;
+      font-size: clamp(0.95rem, 3.2vw, 1.1rem);
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    section.page {
+      max-width: 900px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+    @media (max-width: 520px) {
+      section.page { padding: 14px 8px; }   /* ✅ moins de marge sur mobile */
+      .card { padding: 12px; }             /* ✅ la carte prend plus de largeur */
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #ddd;
+    }
+
+    /* ✅ Signature centrée et lisible (sans rognage) */
+    .lif-signature {
+      margin-top: 18px;
+      padding-top: 10px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+      border-top: 1px solid #eee;
+    }
+
+    @media (max-width: 420px) {
+      .lif-signature { font-size: 11px; padding-left: 10px; padding-right: 10px; }
+    }
+
+/* ===== LOGO HEADER (aligné avec index) ===== */
+header img.Logo {
+  width: min(220px, 60vw);
+  max-height: 140px;
+  height: auto;
+  object-fit: contain;
+  margin: 0;
+}
+
+    .hero-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .hero-title span { display: block; white-space: normal; }
+    
+    body{ margin:0; font-family:system-ui, Arial, sans-serif; background:#f5f7fa; color:#111; line-height:1.5; }
+    header{ background:#0b1220; color:#fff; padding:18px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    header .title{ font-weight:900; font-size:1.1rem; }
+    header a{ color:#fff; text-decoration:none; font-weight:800; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.12); white-space:nowrap; }
     main{ max-width:980px; margin:auto; padding:16px 12px 26px; }
-
-    .card{
-      background:#fff;
-      border:1px solid #ddd;
-      border-radius:14px;
-      padding:14px;
-      margin-top:12px;
-    }
+    .card{ background:#fff; border:1px solid #ddd; border-radius:14px; padding:14px; margin-top:12px; }
     .card h2{ margin:0 0 10px 0; font-size:1.1rem; font-weight:900; }
-
-    label{ font-weight:800; font-size:0.95rem; }
-    input, button{
-      width:100%;
-      padding:10px;
-      border-radius:10px;
-      border:1px solid #ccc;
-      box-sizing:border-box;
-      font-family:inherit;
-      font-size:1rem;
-    }
-
-    .row{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
-    .btn{ cursor:pointer; font-weight:900; border:0; border-radius:12px; padding:12px 14px; }
-    .btn-primary{ background:#2563eb; color:#fff; }
-    .btn-ghost{ background:#fff; border:1px solid #ccc; }
-
-    .small{ font-size:12px; color:#555; margin-top:6px; }
-    .warn{ background:#fff3cd; border:1px solid #ffeeba; padding:10px 12px; border-radius:12px; font-size:0.95rem; }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:start; }
 
     /* Heure en bleu */
     input[type="time"]{

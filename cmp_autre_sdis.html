@@ -213,6 +213,47 @@
     grid-template-columns: 1fr;
   }
 }
+/* ===========================
+   FIX iPhone (input time)
+   + layout mobile engins
+   =========================== */
+@media (max-width: 768px){
+
+  /* Mobile : 1 colonne OK, mais cellules plus souples */
+  .engins-grid{
+    grid-template-columns: 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  /* IMPORTANT : ne pas figer les 3 lignes sur mobile
+     sinon si le champ déborde (iOS time), ça recouvre l'aide */
+  .engins-grid .cell{
+    grid-template-rows: auto 56px auto;  /* label / champ / aide */
+  }
+
+  /* Hauteur uniforme des champs */
+  .engins-grid input,
+  .engins-grid button{
+    height: 56px;
+    box-sizing: border-box;
+  }
+
+  /* ✅ iOS: force vraiment le champ time à 56px (sinon il déborde) */
+  .engins-grid input[type="time"]{
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0 !important;      /* enlève le padding fantôme iOS */
+    line-height: 56px;          /* centre verticalement */
+    text-align: center;
+  }
+
+  /* Texte d’aide toujours sous le champ */
+  .engins-grid .small{
+    margin: 0;
+    line-height: 1.3;
+  }
+}
 
   </style>
 </head>

@@ -6,125 +6,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-     body {
-      margin: 0;
-      font-family: system-ui, Arial, sans-serif;
-      background: #f5f7fa;
-      color: #111;
-      line-height: 1.6;
+    body{
+      margin:0;
+      font-family:system-ui, Arial, sans-serif;
+      background:#f5f7fa;
+      color:#111;
+      line-height:1.5;
     }
 
-    /* ✅ HEADER RESPONSIVE (logo centré + texte adaptable) */
-    header {
-      background: #0b1220;
-      color: white;
-      padding: 42px 16px;
-      text-align: center;
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
+    header{
+      background:#0b1220;
+      color:#fff;
+      padding:18px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
     }
-
-    header h1 {
-      margin: 0;
-      font-size: clamp(1.3rem, 4.8vw, 2.2rem);
-      line-height: 1.2;
-      max-width: 28ch;
+    header a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+      padding:10px 12px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.12);
+      white-space:nowrap;
     }
-
-    header p {
-      opacity: 0.9;
-      font-size: clamp(0.95rem, 3.2vw, 1.1rem);
-      margin: 0;
-      line-height: 1.25;
+    header .hero-title{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      margin:0;
+      line-height:1.2;
+      text-align:center;
+      flex:1;
     }
+    header .hero-title span{ display:block; white-space:normal; }
+    header p{ margin:0; opacity:.9; }
 
-    section.page {
-      max-width: 900px;
-      margin: auto;
-      padding: 30px 20px;
-    }
-
-    @media (max-width: 520px) {
-      section.page { padding: 14px 8px; }
-      .card { padding: 12px; }
-    }
-
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid #ddd;
-    }
-
-    /* ✅ Signature centrée et lisible (sans rognage) */
-    .lif-signature {
-      margin-top: 18px;
-      padding-top: 10px;
-      font-size: 12px;
-      color: #666;
-      text-align: center;
-      line-height: 1.4;
-      overflow-wrap: anywhere;
-      border-top: 1px solid #eee;
-    }
-
-    @media (max-width: 420px) {
-      .lif-signature { font-size: 11px; padding-left: 10px; padding-right: 10px; }
-    }
-
-    /* ===== LOGO HEADER (aligné avec index) ===== */
-    header img.Logo {
-      width: min(220px, 60vw);
-      max-height: 140px;
-      height: auto;
-      object-fit: contain;
-      margin: 0;
-    }
-
-    .hero-title {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      margin: 0;
-      line-height: 1.2;
-      text-align: center;
-    }
-
-    .hero-title span { display: block; white-space: normal; }
-
-    body{ margin:0; font-family:system-ui, Arial, sans-serif; background:#f5f7fa; color:#111; line-height:1.5; }
-    header{ background:#0b1220; color:#fff; padding:18px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    header .title{ font-weight:900; font-size:1.1rem; }
-    header a{ color:#fff; text-decoration:none; font-weight:800; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.12); white-space:nowrap; }
     main{ max-width:980px; margin:auto; padding:16px 12px 26px; }
-    .card{ background:#fff; border:1px solid #ddd; border-radius:14px; padding:14px; margin-top:12px; }
+
+    .card{
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:14px;
+      padding:14px;
+      margin-top:12px;
+    }
     .card h2{ margin:0 0 10px 0; font-size:1.1rem; font-weight:900; }
 
     label{ font-weight:800; font-size:0.95rem; }
-    input, select, button{ width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; box-sizing:border-box; font-family:inherit; font-size:1rem; }
+    input, button{
+      width:100%;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      box-sizing:border-box;
+      font-family:inherit;
+      font-size:1rem;
+    }
+
     .row{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
     .btn{ cursor:pointer; font-weight:900; border:0; border-radius:12px; padding:12px 14px; }
     .btn-primary{ background:#2563eb; color:#fff; }
     .btn-ghost{ background:#fff; border:1px solid #ccc; }
+
     .small{ font-size:12px; color:#555; margin-top:6px; }
     .warn{ background:#fff3cd; border:1px solid #ffeeba; padding:10px 12px; border-radius:12px; font-size:0.95rem; }
 
-    /* ===== Desktop : aligner hauteur du bouton "Ajouter" avec les champs ===== */
-    @media (min-width: 769px){
-      #btnAdd{
-        height: 56px;
-        padding: 0;
-        line-height: 56px;
-        border-radius: 12px;
-      }
+    /* Heure en bleu */
+    input[type="time"]{
+      color:#2563eb;
+      font-weight:700;
     }
 
-    /* Empêche le débordement du tableau sur mobile */
+    /* ===== TABLE ===== */
     table{
       width:100%;
       border-collapse:separate;
@@ -134,279 +91,159 @@
       margin-top:10px;
       display:block;
       overflow-x:auto;
-      -webkit-overflow-scrolling: touch;
+      -webkit-overflow-scrolling:touch;
+    }
+    thead, tbody, tr{ display:table; width:100%; table-layout:fixed; }
+    table{ border-collapse:collapse; }
+    th, td{ display:table-cell; vertical-align:middle; text-align:left; }
+
+    @media (max-width:768px){
+      thead{ display:none; }
+      table, tbody, tr{ display:block; width:100%; }
+      td{
+        display:grid;
+        grid-template-columns:110px 1fr;
+        column-gap:14px;
+        padding:6px 0;
+      }
+      td::before{ content:attr(data-label); font-weight:800; color:#555; }
+      td:last-child{ grid-template-columns:1fr; justify-items:center; }
     }
 
-    thead, tbody, tr{
-      display:table;
-      width:100%;
-      table-layout:fixed;
-    }
-
-    table { width: 100%; border-collapse: collapse; }
-    th, td { display: table-cell; vertical-align: middle; text-align: left; }
-
-    @media (max-width: 768px) {
-      thead { display: none; }
-      table, tbody, tr { display: block; width: 100%; }
-      td { display: grid; grid-template-columns: 110px 1fr; column-gap: 14px; padding: 6px 0; }
-      td::before { content: attr(data-label); font-weight: 800; color: #555; }
-      td:last-child { grid-template-columns: 1fr; justify-items: center; }
-    }
-
+    /* ===== Pills + canvas ===== */
     .pill{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:0.85rem; border:1px solid #ddd; background:#f8fafc; }
+    .pill-ext{ border-color:#16a34a !important; background:rgba(22,163,74,0.10) !important; color:#166534 !important; }
     .canvas-wrap{ width:100%; overflow:auto; border:1px dashed #cbd5e1; border-radius:12px; padding:10px; background:#fff; }
     canvas{ width:100%; height:auto; }
 
-    .pill-ext {
-      border-color:#16a34a !important;
-      background:rgba(22,163,74,0.10) !important;
-      color:#166534 !important;
+    .lif-signature{
+      margin-top:18px;
+      padding-top:10px;
+      font-size:12px;
+      color:#666;
+      text-align:center;
+      line-height:1.4;
+      overflow-wrap:anywhere;
+      border-top:1px solid #eee;
     }
 
-    /* Heure en bleu */
-    input[type="time"]{
-      color: #2563eb;
-      font-weight: 700;
+    /* ===== Desktop : bouton Ajouter aligné ===== */
+    @media (min-width:769px){
+      #btnAdd{ height:56px; padding:0; line-height:56px; border-radius:12px; }
     }
 
-   /* ===== Grille saisie engins : 2 lignes x 3 colonnes (desktop) ===== */
-.engins-grid{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  align-items: start;
-}
+    /* ==================================================
+       ENGINS GRID (DESKTOP) : 2 lignes x 3 colonnes
+       ================================================== */
+    .engins-grid{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:14px;
+      align-items:start;
+    }
 
-/* Chaque cellule = même structure : label / champ / aide */
-.engins-grid .cell{
-  display: grid;
-  grid-template-rows: 2.2em 56px 2.6em; /* label / input / aide */
-  row-gap: 6px;
-}
+    /* Desktop : label / champ / aide (réserve une place) */
+    .engins-grid .cell{
+      display:grid;
+      grid-template-rows:2.2em 56px 2.6em;
+      row-gap:6px;
+    }
 
-/* Champ */
-.engins-grid input,
-.engins-grid button{
-  height: 56px;
-  box-sizing: border-box;
-}
+    .engins-grid input,
+    .engins-grid button{
+      height:56px;
+      box-sizing:border-box;
+    }
 
-/* Centre le bouton verticalement */
-.engins-grid .cell-add button{
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    .engins-grid .cell-add button{
+      padding:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-/* Si une cellule n’a pas d’aide, on garde la place */
-.engins-grid .cell.no-help::after{
-  content: "";
-  display: block;
-  height: 2.6em;
-}
+    /* Desktop : si pas d’aide, on garde la place */
+    .engins-grid .cell.no-help::after{
+      content:"";
+      display:block;
+      height:2.6em;
+    }
 
-/* Mobile : repasse en 1 colonne */
-@media (max-width: 768px){
-  .engins-grid{
-    grid-template-columns: 1fr;
-  }
-}
-/* ===========================
-   FIX iPhone (input time)
-   + layout mobile engins
-   =========================== */
-@media (max-width: 768px){
+    /* ==================================================
+       MOBILE : 1 COLONNE COMPACTE (SUPPRIME LES VIDES)
+       ================================================== */
+    @media (max-width:768px){
 
-  /* Mobile : 1 colonne OK, mais cellules plus souples */
-  .engins-grid{
-    grid-template-columns: 1fr;
-    gap: 14px;
-    align-items: start;
-  }
+      /* 1 colonne */
+      .engins-grid{
+        grid-template-columns:1fr;
+        gap:8px; /* compact */
+      }
 
-  /* IMPORTANT : ne pas figer les 3 lignes sur mobile
-     sinon si le champ déborde (iOS time), ça recouvre l'aide */
-  .engins-grid .cell{
-    grid-template-rows: auto 56px auto;  /* label / champ / aide */
-  }
+      /* IMPORTANT : on passe en flex pour ne plus réserver de "lignes" */
+      .engins-grid .cell{
+        display:flex !important;
+        flex-direction:column;
+        gap:4px;
+      }
 
-  /* Hauteur uniforme des champs */
-  .engins-grid input,
-  .engins-grid button{
-    height: 56px;
-    box-sizing: border-box;
-  }
+      /* 🔥 SUPPRIME la réserve de vide des cellules sans aide */
+      .engins-grid .cell.no-help::after{
+        content:none !important;
+        display:none !important;
+        height:0 !important;
+      }
 
-  /* ✅ iOS: force vraiment le champ time à 56px (sinon il déborde) */
-  .engins-grid input[type="time"]{
-    -webkit-appearance: none;
-    appearance: none;
-    padding: 0 !important;      /* enlève le padding fantôme iOS */
-    line-height: 56px;          /* centre verticalement */
-    text-align: center;
-  }
+      /* labels plus serrés */
+      .engins-grid label{
+        margin:0;
+        font-size:0.92rem;
+        line-height:1.15;
+      }
 
-  /* Texte d’aide toujours sous le champ */
-  .engins-grid .small{
-    margin: 0;
-    line-height: 1.3;
-  }
-}
-/* =====================================
-   ENGINS – MOBILE 1 COLONNE COMPACTE
-   ===================================== */
-@media (max-width: 768px){
+      /* champs plus fins */
+      .engins-grid input,
+      .engins-grid button{
+        height:46px;
+        padding:8px 12px;
+        margin:0;
+      }
 
-  /* grille 1 colonne, mais compacte */
-  .engins-grid{
-    grid-template-columns: 1fr;
-    gap: 4px; /* ↓ espace vertical global */
-  }
+      /* iOS time : pas de hauteur fantôme */
+      .engins-grid input[type="time"]{
+        -webkit-appearance:none;
+        appearance:none;
+        padding:0 !important;
+        line-height:46px;
+        text-align:center;
+      }
 
-  /* cellule : moins d’air */
-  .engins-grid .cell{
-    gap: 4px; /* ↓ espace label / champ */
-  }
+      /* aide compacte */
+      .engins-grid .small{
+        margin:2px 0 0;
+        font-size:0.75rem;
+        line-height:1.25;
+      }
 
-  /* labels plus compacts */
-  .engins-grid label{
-    font-size: 0.9rem;
-    line-height: 1.2;
-    margin: 0;
-  }
+      .engins-grid .small:empty{ display:none; }
 
-  /* champs plus fins */
-  .engins-grid input,
-  .engins-grid button{
-    height: 48px;        /* ↓ 56 → 48 */
-    padding: 8px 12px;  /* ↓ padding */
-    font-size: 1rem;
-  }
-
-  /* FIX iPhone input time (sans hauteur fantôme) */
-  .engins-grid input[type="time"]{
-    padding: 0 !important;
-    line-height: 48px;
-    text-align: center;
-  }
-
-  /* texte d’aide discret */
-  .engins-grid .small{
-    font-size: 0.75rem;
-    line-height: 1.25;
-    margin-top: 2px;
-    margin-bottom: 4px;
-  }
-
-  /* bouton Ajouter collé au reste */
-  .engins-grid .cell-add{
-    margin-top: 6px;
-  }
-
-  .engins-grid .cell-add button{
-    height: 48px;
-    font-weight: 900;
-  }
-}
-/* =====================================
-   RÉDUCTION ESPACE DÉBIT → ÉMULSEUR
-   ===================================== */
-@media (max-width: 768px){
-
-  /* cellule plus compacte */
-  .engins-grid .cell{
-    gap: 2px; /* ↓ réduit l’espace vertical interne */
-  }
-
-  /* labels sans marge parasite */
-  .engins-grid label{
-    margin-bottom: 2px;
-  }
-
-  /* inputs sans marge basse implicite */
-  .engins-grid input{
-    margin-bottom: 0;
-  }
-
-  /* supprime toute "ligne fantôme" éventuelle */
-  .engins-grid .small:empty{
-    display: none;
-  }
-}
-/* ==================================================
-   MOBILE – COMPACTAGE DÉBIT / ÉMULSEUR (1 COLONNE)
-   ================================================== */
-@media (max-width: 768px){
-
-  /* Grille toujours 1 colonne */
-  .engins-grid{
-    grid-template-columns: 1fr;
-    gap: 6px; /* espace global réduit */
-  }
-
-  /* Cellules en flux naturel (FIN des lignes réservées) */
-  .engins-grid .cell{
-    display: flex;
-    flex-direction: column;
-    gap: 4px; /* label ↔ champ */
-  }
-
-  /* Labels plus serrés */
-  .engins-grid label{
-    margin: 0;
-    font-size: 0.9rem;
-    line-height: 1.2;
-  }
-
-  /* Champs plus compacts */
-  .engins-grid input,
-  .engins-grid button{
-    height: 46px;
-    padding: 8px 12px;
-    margin: 0;
-  }
-
-  /* iOS : corrige la hauteur fantôme du time */
-  .engins-grid input[type="time"]{
-    padding: 0 !important;
-    line-height: 46px;
-    text-align: center;
-  }
-
-  /* Texte d’aide : discret et sans réserve d’espace */
-  .engins-grid .small{
-    margin: 2px 0 4px;
-    font-size: 0.75rem;
-    line-height: 1.25;
-  }
-
-  /* Supprime toute aide vide */
-  .engins-grid .small:empty{
-    display: none;
-  }
-
-  /* Bouton Ajouter bien collé */
-  .engins-grid .cell-add{
-    margin-top: 6px;
-  }
-}
-
+      /* bouton Ajouter collé */
+      .engins-grid .cell-add{ margin-top:6px; }
+    }
   </style>
 </head>
 
 <body>
 <header>
-  <img src="Logo.png" alt="Logo SDIS 27" class="logo">
+  <div style="width:64px;"></div>
 
   <h1 class="hero-title">
     <span>Calcul LIF</span>
     <span>Outil opérationnel</span>
     <span>Feux de liquides&nbsp;inflammables</span>
+    <p>Sdis 27 – GGOC – Capitaine Florian PICO</p>
   </h1>
 
-  <p>Sdis 27 – GGOC – Capitaine Florian PICO</p>
   <a href="calcul.html">← Retour calcul</a>
 </header>
 
@@ -424,7 +261,6 @@
 
     <div class="engins-grid">
 
-      <!-- Ligne 1 -->
       <div class="cell">
         <label>Type d'engin :</label>
         <input id="enginType" type="text" placeholder="Ex : FPT / CCGCM / CCRM …">
@@ -436,24 +272,23 @@
         <input id="enginFlow" type="number" min="0" step="10" value="0">
       </div>
 
-      <div class="cell no help">
+      <div class="cell no-help">
         <label>Émulseur (L)</label>
         <input id="enginEmul" type="number" min="0" step="10" value="0">
       </div>
 
-      <!-- Ligne 2 -->
       <div class="cell">
         <label>Heure d’arrivée (hh:mm) :</label>
         <input id="arrivee" type="time" value="00:00">
         <div class="small">Heure à laquelle l'engin commence à projeter de la mousse.</div>
       </div>
 
-      <div class="cell no help">
+      <div class="cell no-help">
         <label>Quantité :</label>
         <input id="qty" type="number" min="1" value="1">
       </div>
 
-      <div class="cell no help cell-add">
+      <div class="cell no-help cell-add">
         <label>&nbsp;</label>
         <button id="btnAdd" class="btn btn-primary" type="button">Ajouter</button>
       </div>
@@ -522,9 +357,6 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
-  // =========================
-  // PARAMÈTRES CMP
-  // =========================
   const STEP_MIN = 20;
   const HORIZON_H = 5;
   const HORIZON_MIN = HORIZON_H * 60;
@@ -587,9 +419,6 @@
     return labels;
   };
 
-  // =========================
-  // CHARGE PARAMS (depuis calcul)
-  // =========================
   let params = null;
   try { params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null"); }
   catch (e) { params = null; }
@@ -616,9 +445,6 @@
 
   blocSaisie.style.display = "block";
 
-  // =========================
-  // LISTE DES ENGINS AJOUTÉS
-  // =========================
   const rows = [];
   const tbody = $("liste");
 
@@ -678,9 +504,6 @@
     blocCourbe.style.display = "none";
   });
 
-  // =========================
-  // SIMULATION
-  // =========================
   function simulate() {
     const Qext = params.Qext;
     const Qtempo = params.Qtempo;
@@ -764,9 +587,6 @@
     };
   }
 
-  // =========================
-  // DESSIN COURBE (identique)
-  // =========================
   function drawChart(data) {
     const c = $("chart");
     const ctx = c.getContext("2d");
@@ -900,21 +720,6 @@
     ctx.stroke();
     ctx.setLineDash([]);
 
-    function drawVLine(tMin, color) {
-      if (!Number.isFinite(tMin)) return;
-      const xx = x(tMin);
-      ctx.strokeStyle = color;
-      ctx.setLineDash([4, 4]);
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(xx, mT);
-      ctx.lineTo(xx, mT + plotH);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-    drawVLine(data.tExtStart, "#16a34a");
-    drawVLine(data.tExtEnd, "#16a34a");
-
     const legendX = mL + 10;
     const legendY = mT + 14;
 
@@ -952,9 +757,6 @@
     legendItem(legendX + 620, legendY, "#ff8800", "Volume émulseur extinction (cible)", [6, 6]);
   }
 
-  // =========================
-  // TRACER
-  // =========================
   $("btnTracer").addEventListener("click", () => {
     if (rows.length === 0) { alert("Ajoute au moins un engin (ex : FPT à 00:00)."); return; }
 
@@ -973,8 +775,6 @@
     $("pillStockOK").textContent =
       (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
-    $("pillExtStart").style.display = "";
-    $("pillExtEnd").style.display = "";
     $("pillExtStart").textContent =
       (data.tExtStart === null) ? "Début extinction : —" : `Début extinction : ${addMinToHHMM(t0Str, data.tExtStart)}`;
     $("pillExtEnd").textContent =

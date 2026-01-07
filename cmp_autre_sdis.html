@@ -335,6 +335,63 @@
     display: none;
   }
 }
+/* ==================================================
+   MOBILE – COMPACTAGE DÉBIT / ÉMULSEUR (1 COLONNE)
+   ================================================== */
+@media (max-width: 768px){
+
+  /* Grille toujours 1 colonne */
+  .engins-grid{
+    grid-template-columns: 1fr;
+    gap: 6px; /* espace global réduit */
+  }
+
+  /* Cellules en flux naturel (FIN des lignes réservées) */
+  .engins-grid .cell{
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* label ↔ champ */
+  }
+
+  /* Labels plus serrés */
+  .engins-grid label{
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+
+  /* Champs plus compacts */
+  .engins-grid input,
+  .engins-grid button{
+    height: 46px;
+    padding: 8px 12px;
+    margin: 0;
+  }
+
+  /* iOS : corrige la hauteur fantôme du time */
+  .engins-grid input[type="time"]{
+    padding: 0 !important;
+    line-height: 46px;
+    text-align: center;
+  }
+
+  /* Texte d’aide : discret et sans réserve d’espace */
+  .engins-grid .small{
+    margin: 2px 0 4px;
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+
+  /* Supprime toute aide vide */
+  .engins-grid .small:empty{
+    display: none;
+  }
+
+  /* Bouton Ajouter bien collé */
+  .engins-grid .cell-add{
+    margin-top: 6px;
+  }
+}
 
   </style>
 </head>

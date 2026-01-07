@@ -310,6 +310,31 @@
     font-weight: 900;
   }
 }
+/* =====================================
+   RÉDUCTION ESPACE DÉBIT → ÉMULSEUR
+   ===================================== */
+@media (max-width: 768px){
+
+  /* cellule plus compacte */
+  .engins-grid .cell{
+    gap: 2px; /* ↓ réduit l’espace vertical interne */
+  }
+
+  /* labels sans marge parasite */
+  .engins-grid label{
+    margin-bottom: 2px;
+  }
+
+  /* inputs sans marge basse implicite */
+  .engins-grid input{
+    margin-bottom: 0;
+  }
+
+  /* supprime toute "ligne fantôme" éventuelle */
+  .engins-grid .small:empty{
+    display: none;
+  }
+}
 
   </style>
 </head>

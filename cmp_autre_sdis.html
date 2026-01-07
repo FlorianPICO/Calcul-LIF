@@ -677,21 +677,6 @@ th, td {
 
   blocSaisie.style.display = "block";
 
-  // =========================
-  // UI : ajouter les champs "Débit" + "Émulseur" à côté du select
-  // + champ "Nom engin" si AUTRE (et on renomme l'option)
-  // =========================
-  const selectType = $("enginType");
-  if (!selectType) { console.error("enginType introuvable"); return; }
-
-  // S'assure que l'option AUTRE existe
-  if (![...selectType.options].some(o => o.value === "AUTRE")) {
-    const opt = document.createElement("option");
-    opt.value = "AUTRE";
-    opt.textContent = "Autre…";
-    selectType.appendChild(opt);
-  }
-
   // Crée un conteneur visuel à côté / sous le select (sans toucher ton HTML)
   const customWrap = document.createElement("div");
   customWrap.id = "enginCustomWrap";

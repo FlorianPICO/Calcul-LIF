@@ -388,6 +388,32 @@ th, td {
 }
 }
 
+/* ===== Grille saisie engins (desktop & mobile) ===== */
+.engins-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  align-items: end;
+}
+
+/* cellule générique */
+.engins-grid .cell{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* bouton aligné avec les champs */
+.engins-grid .cell-add button{
+  height: 48px;
+}
+
+/* Mobile : repasse en 1 colonne */
+@media (max-width: 768px){
+  .engins-grid{
+    grid-template-columns: 1fr;
+  }
+}
 
 
 
@@ -420,38 +446,41 @@ th, td {
   <div class="card" id="blocSaisie" style="display:none;">
     <h2>5) Saisir les engins (arrivée échelonnée)</h2>
 
-    <div class="grid">
-   <div class="cell cell-type">
-        <label>Type d’engin :</label>
-        <select id="enginType" class="field">
-          <option value="FPT">FPT</option>
-          <option value="CCRM">CCRM</option>
-          <option value="CCR">CCR</option>
-          <option value="CCGC">CCGC</option>
-          <option value="CCGCM">CCGCM</option>
-          <option value="CED">CED</option>
-          <option value="CEDEM">CEDEM</option>
-          <option value="CDHR">CDHR</option>
-          <option value="CEEM">CEEM (émulseur)</option>
-        </select>
-        <div class="small">Débit + volume émulseur propre au Sdis.</div>
-      </div>
+  <div class="engins-grid">
 
-       <div class="cell cell-time">
-        <label>Heure d’arrivée (hh:mm) :</label>
-        <input id="arrivee" class="field" type="time" value="00:00">
-        <div class="small">Heure à laquelle l'engin commence à projeter de la mousse.</div>
-      </div>
+  <!-- Ligne 1 -->
+  <div class="cell">
+    <label>Type d'engin :</label>
+    <select id="enginType"></select>
+  </div>
 
-      <div class="cell cell-qty">
-        <label>Quantité :</label>
-        <input id="qty" class="field" type="number" min="1" step="1" value="1">
-      </div>
+  <div class="cell">
+    <label>Débit (L/min)</label>
+    <input id="enginFlow" type="number">
+  </div>
 
-     <div class="cell cell-add">
-        <button id="btnAdd" class="btn btn-primary field-btn" type="button">Ajouter</button>
-      </div>
-    </div>
+  <div class="cell">
+    <label>Émulseur (L)</label>
+    <input id="enginEmul" type="number">
+  </div>
+
+  <!-- Ligne 2 -->
+  <div class="cell">
+    <label>Heure d’arrivée (hh:mm) :</label>
+    <input id="arrivee" type="time">
+  </div>
+
+  <div class="cell">
+    <label>Quantité :</label>
+    <input id="qty" type="number" min="1" value="1">
+  </div>
+
+  <div class="cell cell-add">
+    <label>&nbsp;</label>
+    <button id="btnAdd" class="btn-primary">Ajouter</button>
+  </div>
+
+</div>
 
     <table>
       <thead>

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>CMP – Courbe de montée en puissance (autre Sdis)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+
   <style>
      body {
       margin: 0;
@@ -49,8 +49,8 @@
     }
 
     @media (max-width: 520px) {
-      section.page { padding: 14px 8px; }   /* ✅ moins de marge sur mobile */
-      .card { padding: 12px; }             /* ✅ la carte prend plus de largeur */
+      section.page { padding: 14px 8px; }
+      .card { padding: 12px; }
     }
 
     .card {
@@ -76,14 +76,14 @@
       .lif-signature { font-size: 11px; padding-left: 10px; padding-right: 10px; }
     }
 
-/* ===== LOGO HEADER (aligné avec index) ===== */
-header img.Logo {
-  width: min(220px, 60vw);
-  max-height: 140px;
-  height: auto;
-  object-fit: contain;
-  margin: 0;
-}
+    /* ===== LOGO HEADER (aligné avec index) ===== */
+    header img.Logo {
+      width: min(220px, 60vw);
+      max-height: 140px;
+      height: auto;
+      object-fit: contain;
+      margin: 0;
+    }
 
     .hero-title {
       display: flex;
@@ -96,7 +96,7 @@ header img.Logo {
     }
 
     .hero-title span { display: block; white-space: normal; }
-    
+
     body{ margin:0; font-family:system-ui, Arial, sans-serif; background:#f5f7fa; color:#111; line-height:1.5; }
     header{ background:#0b1220; color:#fff; padding:18px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
     header .title{ font-weight:900; font-size:1.1rem; }
@@ -104,52 +104,7 @@ header img.Logo {
     main{ max-width:980px; margin:auto; padding:16px 12px 26px; }
     .card{ background:#fff; border:1px solid #ddd; border-radius:14px; padding:14px; margin-top:12px; }
     .card h2{ margin:0 0 10px 0; font-size:1.1rem; font-weight:900; }
-    .grid{ display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:start; }
-/* ===================================== */
-/* ALIGNEMENT PARFAIT DES 4 CASES (DESKTOP) */
-/* ===================================== */
-@media (min-width: 769px){
 
-  /* même structure pour chaque colonne */
-  .grid .cell{
-    display: grid;
-    grid-template-rows: 2.2em 56px 2.6em; /* label / champ / aide */
-    row-gap: 6px;
-    align-content: start;
-  }
-
-  /* uniformise la hauteur des labels */
-  .grid .cell > label{
-    margin: 0;
-    line-height: 1.2;
-  }
-
-  /* uniformise la hauteur des champs + bouton */
-  .grid .field,
-  .grid .field-btn{
-    height: 56px !important;
-    box-sizing: border-box;
-  }
-
-  /* bouton = même hauteur et centré */
-  .grid .field-btn{
-    padding: 0 !important; /* annule padding .btn */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* réserve la même "ligne aide" pour Quantité + Ajouter même si pas de .small */
-  .grid .cell-qty::after,
-  .grid .cell-add::after{
-    content: "";
-    display: block;
-    height: 2.6em; /* même que la 3e ligne */
-  }
-}
-
-
-    @media (max-width:720px){ .grid{ grid-template-columns: 1fr 1fr; } }
     label{ font-weight:800; font-size:0.95rem; }
     input, select, button{ width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; box-sizing:border-box; font-family:inherit; font-size:1rem; }
     .row{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
@@ -158,265 +113,78 @@ header img.Logo {
     .btn-ghost{ background:#fff; border:1px solid #ccc; }
     .small{ font-size:12px; color:#555; margin-top:6px; }
     .warn{ background:#fff3cd; border:1px solid #ffeeba; padding:10px 12px; border-radius:12px; font-size:0.95rem; }
-/* ===== Desktop : aligner hauteur du bouton "Ajouter" avec les champs ===== */
-@media (min-width: 769px){
-  #btnAdd{
-    height: 56px;
-    padding: 0;            /* annule le padding de .btn */
-    line-height: 56px;     /* centre le texte verticalement */
-    border-radius: 12px;   /* garde ton style */
-  }
-}
 
-   /* Empêche le débordement du tableau sur mobile */
-table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  margin-top:10px;
-  display:block;              /* clé */
-  overflow-x:auto;            /* clé */
-  -webkit-overflow-scrolling: touch;
-}
+    /* ===== Desktop : aligner hauteur du bouton "Ajouter" avec les champs ===== */
+    @media (min-width: 769px){
+      #btnAdd{
+        height: 56px;
+        padding: 0;
+        line-height: 56px;
+        border-radius: 12px;
+      }
+    }
 
-thead, tbody, tr{
-  display:table;
-  width:100%;
-  table-layout:fixed;
-}
-/* ===== TABLE DESKTOP : ALIGNEMENT STRICT ===== */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+    /* Empêche le débordement du tableau sur mobile */
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      margin-top:10px;
+      display:block;
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
-th, td {
-  display: table-cell;   /* ← CRITIQUE */
-  vertical-align: middle;
-  text-align: left;
-}
-@media (max-width: 768px) {
+    thead, tbody, tr{
+      display:table;
+      width:100%;
+      table-layout:fixed;
+    }
 
-  thead {
-    display: none;
-  }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { display: table-cell; vertical-align: middle; text-align: left; }
 
-  table, tbody, tr {
-    display: block;
-    width: 100%;
-  }
-
-  td {
-    display: grid;
-    grid-template-columns: 110px 1fr;
-    column-gap: 14px;
-    padding: 6px 0;
-  }
-
-  td::before {
-    content: attr(data-label);
-    font-weight: 800;
-    color: #555;
-  }
-
-  /* bouton supprimer */
-  td:last-child {
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
-}
-
+    @media (max-width: 768px) {
+      thead { display: none; }
+      table, tbody, tr { display: block; width: 100%; }
+      td { display: grid; grid-template-columns: 110px 1fr; column-gap: 14px; padding: 6px 0; }
+      td::before { content: attr(data-label); font-weight: 800; color: #555; }
+      td:last-child { grid-template-columns: 1fr; justify-items: center; }
+    }
 
     .pill{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:0.85rem; border:1px solid #ddd; background:#f8fafc; }
-
     .canvas-wrap{ width:100%; overflow:auto; border:1px dashed #cbd5e1; border-radius:12px; padding:10px; background:#fff; }
     canvas{ width:100%; height:auto; }
-    
-.pill-ext {
-  border-color:#16a34a !important;
-  background:rgba(22,163,74,0.10) !important;
-  color:#166534 !important;
-}
 
-/* ===== Desktop : aligner le bouton avec les champs (pas les titres) ===== */
-@media (min-width: 769px){
+    .pill-ext {
+      border-color:#16a34a !important;
+      background:rgba(22,163,74,0.10) !important;
+      color:#166534 !important;
+    }
 
-  /* Toutes les cellules ont la même structure verticale */
-  .grid .cell{
-    display: grid;
-    grid-template-rows: auto 56px auto;
-    row-gap: 6px;
-  }
+    /* Heure en bleu */
+    input[type="time"]{
+      color: #2563eb;
+      font-weight: 700;
+    }
 
-  /* Le bouton n’a pas de label → on réserve la place du label */
-  .grid .cell-add::before{
-    content: "";
-    height: 1.4em; /* même hauteur qu’un label */
-  }
-
-  /* Bouton exactement à la hauteur des champs */
-  #btnAdd{
-    height: 56px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-
-/* ===================================== */
-/* ALIGNEMENT PARFAIT DES CHAMPS (MOBILE) */
-/* ===================================== */
-@media (max-width: 768px){
-
-  /* grille 2 colonnes */
-  .grid{
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    align-items: start;
-  }
-
-  /* chaque cellule a EXACTEMENT la même structure */
-  .grid .cell{
-    display: grid;
-    grid-template-rows: 2.6em 56px 3.2em; 
-    /* label / champ / aide */
-    row-gap: 6px;
-  }
-
-  /* labels : hauteur figée */
-  .grid .cell > label{
-    margin: 0;
-    font-weight: 800;
-    line-height: 1.3;
-  }
-
-@media (max-width: 768px){
-
-  .grid{
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    align-items: start;
-  }
-
-  /* même structure pour toutes les cellules */
-  .grid .cell{
-    display: grid;
-    grid-template-rows: 2.6em 56px 3.2em; /* label / champ / aide */
-    row-gap: 6px;
-    align-content: start;
-  }
-
-  .grid .cell > label{
-    margin: 0;
-    font-weight: 800;
-    line-height: 1.3;
-  }
-
-  .grid .cell > .small{
-    margin: 0;
-    font-size: 0.8rem;
-    line-height: 1.3;
-    color: #6b7280;
-  }
-
-  /* champs : hauteur identique (sans flex) */
-  .grid .field{
-    height: 56px !important;
-    box-sizing: border-box;
-    padding: 10px 14px;   /* padding normal */
-    border-radius: 18px;
-  }
-
-  .grid input[type="time"].field{ text-align: center; }
-
-  .grid select.field{
-    -webkit-appearance: none;
-    appearance: none;
-    padding-right: 40px;
-    text-align-last: center;
-  }
-
-  /* ✅ bouton Ajouter : placé sur la rangée 2 comme les inputs */
-  .grid .cell-add{
-    display: grid;
-    grid-template-rows: 2.6em 56px 3.2em;
-    row-gap: 6px;
-    align-content: start;
-  }
-  .grid .cell-add > button{
-    grid-row: 2;                    /* <<< alignement parfait avec Quantité */
-    height: 56px !important;
-    padding: 0 16px;
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-    font-size: 1.05rem;
-  }
-
-  /* flèche select */
-  .grid .cell-type{ position: relative; }
-  .grid .cell-type::after{
-    content: "▾";
-    position: absolute;
-    right: 16px;
-    top: calc(2.6em + 28px);
-    transform: translateY(-50%);
-    font-size: 18px;
-    color: #222;
-    pointer-events: none;
-  }
-}
-@media (max-width: 768px){
-
-  /* 🔧 CORRECTION iOS / mobile input time */
-  .grid input[type="time"].field{
-    padding: 0 !important;        /* SUPPRIME le padding fantôme */
-    line-height: 56px;            /* force l’alignement vertical */
-    height: 56px !important;
-    text-align: center;
-  }
-/* Heure en bleu */
-.grid input[type="time"].field{
-  color: #2563eb;          /* bleu */
-  font-weight: 700;
-}
-}
-
-/* ===== Grille saisie engins (desktop & mobile) ===== */
-.engins-grid{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  align-items: end;
-}
-
-/* cellule générique */
-.engins-grid .cell{
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* bouton aligné avec les champs */
-.engins-grid .cell-add button{
-  height: 48px;
-}
-
-/* Mobile : repasse en 1 colonne */
-@media (max-width: 768px){
-  .engins-grid{
-    grid-template-columns: 1fr;
-  }
-}
-
-
-
+    /* ===== Grille 2 lignes x 3 colonnes ===== */
+    .engins-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+      align-items:end; /* aligne le bouton avec les champs */
+    }
+    .engins-grid .cell{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    @media (max-width: 768px){
+      .engins-grid{ grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
@@ -442,45 +210,47 @@ th, td {
   </div>
 
   <hr style="margin:14px 0; border:none; border-top:1px solid #eee;">
- 
+
   <div class="card" id="blocSaisie" style="display:none;">
     <h2>5) Saisir les engins (arrivée échelonnée)</h2>
 
-  <div class="engins-grid">
+    <div class="engins-grid">
 
-  <!-- Ligne 1 -->
-  <div class="cell">
-    <label>Type d'engin :</label>
-    <select id="enginType"> type="text"</select>
-  </div>
+      <!-- Ligne 1 -->
+      <div class="cell">
+        <label>Type d'engin :</label>
+        <input id="enginType" type="text" placeholder="Ex : FPT / CCRM / VLOG …">
+        <div class="small">Champ libre (texte).</div>
+      </div>
 
-  <div class="cell">
-    <label>Débit (L/min)</label>
-    <input id="enginFlow" type="number">
-  </div>
+      <div class="cell">
+        <label>Débit (L/min)</label>
+        <input id="enginFlow" type="number" min="0" step="10" value="0">
+      </div>
 
-  <div class="cell">
-    <label>Émulseur (L)</label>
-    <input id="enginEmul" type="number">
-  </div>
+      <div class="cell">
+        <label>Émulseur (L)</label>
+        <input id="enginEmul" type="number" min="0" step="10" value="0">
+      </div>
 
-  <!-- Ligne 2 -->
-  <div class="cell">
-    <label>Heure d’arrivée (hh:mm) :</label>
-    <input id="arrivee" type="time">
-  </div>
+      <!-- Ligne 2 -->
+      <div class="cell">
+        <label>Heure d’arrivée (hh:mm) :</label>
+        <input id="arrivee" type="time" value="00:00">
+        <div class="small">Heure à laquelle l'engin commence à projeter de la mousse.</div>
+      </div>
 
-  <div class="cell">
-    <label>Quantité :</label>
-    <input id="qty" type="number" min="1" value="1">
-  </div>
+      <div class="cell">
+        <label>Quantité :</label>
+        <input id="qty" type="number" min="1" value="1">
+      </div>
 
-  <div class="cell cell-add">
-    <label>&nbsp;</label>
-    <button id="btnAdd" class="btn-primary">Ajouter</button>
-  </div>
+      <div class="cell cell-add">
+        <label>&nbsp;</label>
+        <button id="btnAdd" class="btn btn-primary" type="button">Ajouter</button>
+      </div>
 
-</div>
+    </div>
 
     <table>
       <thead>
@@ -518,10 +288,10 @@ th, td {
       <span class="pill" id="pillBesoin">Besoin en émulseur pour extinction : —</span>
       <span class="pill" id="pillT0">T0 : —</span>
       <span class="pill" id="pillStockOK">Stock émulseur OK : —</span>
-<span class="pill pill-ext" id="pillExtStart">Début extinction : —</span>
-<span class="pill pill-ext" id="pillExtEnd">Fin extinction : —</span>
+      <span class="pill pill-ext" id="pillExtStart">Début extinction : —</span>
+      <span class="pill pill-ext" id="pillExtEnd">Fin extinction : —</span>
     </div>
-    
+
     <div class="canvas-wrap" style="margin-top:10px;">
       <canvas id="chart" width="1100" height="520"></canvas>
     </div>
@@ -533,11 +303,10 @@ th, td {
       <u>Extinction :</u> Possible si débit ≥ Q ext ET volume émulseur ≥ besoin.
     </div>
 
-<div class="lif-signature">
-  © Capitaine Florian PICO – Tous droits réservés<br>
-  <small>Version 1.0 – 2026</small>
-</div>
-    
+    <div class="lif-signature">
+      © Capitaine Florian PICO – Tous droits réservés<br>
+      <small>Version 1.0 – 2026</small>
+    </div>
   </div>
 </main>
 
@@ -611,43 +380,6 @@ th, td {
   };
 
   // =========================
-  // ENGINS (valeurs par défaut)
-  // =========================
-  const ENGINS_BASE = {
-    FPT:   { flow: 2000, emul: 200  },
-    CCRM:  { flow: 1500, emul: 200  },
-    CCR:   { flow: 1000, emul: 40   },
-    CCGC:  { flow: 1000, emul: 0    },
-    CCGCM: { flow: 2000, emul: 1200 },
-    CED:   { flow: 4000, emul: 0    },
-    CEDEM: { flow: 2000, emul: 2000 },
-    CDHR:  { flow: 4000, emul: 0    },
-    CEEM:  { flow: 0,    emul: 6000 },
-    AUTRE: { flow: 0,    emul: 0    } // spécial "Autre..."
-  };
-
-  // Mémorisation des overrides (Autre SDIS uniquement)
-  const ENGINS_STORAGE_KEY = "LIF_CMP_ENGINS_OVERRIDES";
-
-  const loadOverrides = () => {
-    try { return JSON.parse(localStorage.getItem(ENGINS_STORAGE_KEY) || "{}"); }
-    catch(e){ return {}; }
-  };
-
-  const saveOverride = (type, flow, emul) => {
-    const o = loadOverrides();
-    o[type] = { flow, emul };
-    localStorage.setItem(ENGINS_STORAGE_KEY, JSON.stringify(o));
-  };
-
-  const getDef = (type) => {
-    const base = ENGINS_BASE[type];
-    if (!base) return null;
-    const ov = loadOverrides()[type];
-    return ov ? { ...base, ...ov } : base;
-  };
-
-  // =========================
   // CHARGE PARAMS (depuis calcul)
   // =========================
   let params = null;
@@ -658,7 +390,6 @@ th, td {
   const blocSaisie = $("blocSaisie");
   const blocCourbe = $("blocCourbe");
 
-  // Page cmp_autre_sdis : on exige mode "custom"
   if (!params || params.mode !== "custom") {
     status.textContent =
       "Impossible : aucun calcul « Autre SDIS » n’a été transmis. " +
@@ -676,86 +407,6 @@ th, td {
      - Besoin extinction = <b>${Math.round(params.besoinExt)}</b> L émulseur`;
 
   blocSaisie.style.display = "block";
-
-  // Crée un conteneur visuel à côté / sous le select (sans toucher ton HTML)
-  const customWrap = document.createElement("div");
-  customWrap.id = "enginCustomWrap";
-  customWrap.style.marginTop = "10px";
-  customWrap.innerHTML = `
-    <div style="display:flex; gap:12px; flex-wrap:wrap;">
-      <div style="flex:1; min-width:160px;">
-        <label style="font-weight:800; font-size:0.85rem; display:block; margin-bottom:6px;">Débit (L/min)</label>
-        <input id="enginFlow" class="field" type="number" min="0" step="10" placeholder="ex : 2000">
-      </div>
-      <div style="flex:1; min-width:160px;">
-        <label style="font-weight:800; font-size:0.85rem; display:block; margin-bottom:6px;">Émulseur (L)</label>
-        <input id="enginEmul" class="field" type="number" min="0" step="10" placeholder="ex : 200">
-      </div>
-    </div>
-
-    <div id="otherNameWrap" style="display:none; margin-top:10px;">
-      <label style="font-weight:800; font-size:0.85rem; display:block; margin-bottom:6px;">Nom engin (si “Autre”)</label>
-      <input id="otherName" class="field" type="text" placeholder="ex : VLOG / FPTL / MPR…">
-      <div class="small" style="margin-top:6px;">Le nom remplacera “Autre” partout.</div>
-    </div>
-
-    <div class="small" style="margin-top:8px;">
-      Astuce : les valeurs modifiées sont mémorisées sur ton navigateur.
-    </div>
-  `;
-
-  // On essaie d'insérer proprement juste après le select
-  selectType.insertAdjacentElement("afterend", customWrap);
-
-  const flowInput = $("enginFlow");
-  const emulInput = $("enginEmul");
-  const otherNameWrap = $("otherNameWrap");
-  const otherNameInput = $("otherName");
-
-  const getAutreOption = () => [...selectType.options].find(o => o.value === "AUTRE");
-
-  const updateAutreLabel = () => {
-    const opt = getAutreOption();
-    if (!opt) return;
-    const name = (otherNameInput?.value || "").trim();
-    opt.textContent = name ? name : "Autre…";
-  };
-
-  const syncCustomFields = () => {
-    const type = selectType.value;
-
-    // Affiche / masque "Nom" + renomme l'option
-    if (type === "AUTRE") {
-      otherNameWrap.style.display = "block";
-      updateAutreLabel();
-    } else {
-      otherNameWrap.style.display = "none";
-      // remet l'option AUTRE propre (elle peut rester renommée si l’utilisateur avait tapé)
-      const opt = getAutreOption();
-      if (opt && !otherNameInput.value.trim()) opt.textContent = "Autre…";
-    }
-
-    // Pré-remplir débit/émulseur
-    const def = getDef(type) || { flow: 0, emul: 0 };
-    flowInput.value = def.flow ?? 0;
-    emulInput.value = def.emul ?? 0;
-  };
-
-  selectType.addEventListener("change", syncCustomFields);
-  if (otherNameInput) otherNameInput.addEventListener("input", updateAutreLabel);
-
-  // Mémorise dès qu’on modifie flow/emul (pratique)
-  const maybeSaveOverrideFromInputs = () => {
-    const type = selectType.value;
-    const flow = n(flowInput.value);
-    const emul = n(emulInput.value);
-    if (!Number.isFinite(flow) || !Number.isFinite(emul)) return;
-    saveOverride(type, Math.max(0, flow), Math.max(0, emul));
-  };
-  flowInput.addEventListener("change", maybeSaveOverrideFromInputs);
-  emulInput.addEventListener("change", maybeSaveOverrideFromInputs);
-
-  syncCustomFields();
 
   // =========================
   // LISTE DES ENGINS AJOUTÉS
@@ -777,7 +428,7 @@ th, td {
         <td data-label="Débit (L/min)">${Math.round(flowTotal)}</td>
         <td data-label="Émulseur (L)">${Math.round(emulTotal)}</td>
         <td data-label="Action">
-          <button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
+          <button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;" type="button">Supprimer</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -793,33 +444,22 @@ th, td {
   };
 
   $("btnAdd").addEventListener("click", () => {
-    const type = selectType.value;
+    const label = ($("enginType").value || "").trim();
     const atStr = $("arrivee").value || "00:00";
     const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
 
+    if (!label) { alert("Renseigne le type d'engin (champ texte)."); return; }
     if (!Number.isFinite(timeToMin(atStr))) { alert("Heure d’arrivée invalide."); return; }
 
-    const flow = Math.max(0, n(flowInput.value));
-    const emul = Math.max(0, n(emulInput.value));
+    const flow = Math.max(0, n($("enginFlow").value));
+    const emul = Math.max(0, n($("enginEmul").value));
+
     if (!Number.isFinite(flow) || !Number.isFinite(emul)) {
       alert("Débit / Émulseur invalides.");
       return;
     }
 
-    // Label affiché
-    let label = type;
-    if (type === "AUTRE") {
-      const name = (otherNameInput.value || "").trim();
-      if (!name) { alert("Donne un nom à l’engin “Autre”."); return; }
-      label = name;
-      updateAutreLabel(); // renomme aussi l’option dans le select
-    }
-
-    // Mémorise ces valeurs pour ce "type" (FPT/CCRM/AUTRE…)
-    saveOverride(type, flow, emul);
-
-    // IMPORTANT : on stocke flow/emul DANS la ligne => si l’utilisateur modifie après, les lignes déjà ajoutées ne bougent pas
-    rows.push({ type, label, atStr, qty, flow, emul });
+    rows.push({ label, atStr, qty, flow, emul });
     rows.sort((a, b) => timeToMin(a.atStr) - timeToMin(b.atStr));
     render();
   });
@@ -917,7 +557,7 @@ th, td {
   }
 
   // =========================
-  // DESSIN COURBE (inchangé)
+  // DESSIN COURBE (identique)
   // =========================
   function drawChart(data) {
     const c = $("chart");
@@ -940,9 +580,6 @@ th, td {
     const x = (t) => mL + (t / xMax) * plotW;
     const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
     const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
-
-    const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
-    const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
 
     if (!ctx.roundRect) {
       ctx.roundRect = function (x0, y0, w, h, r) {
@@ -1111,7 +748,7 @@ th, td {
   // TRACER
   // =========================
   $("btnTracer").addEventListener("click", () => {
-    if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
+    if (rows.length === 0) { alert("Ajoute au moins un engin (ex : FPT à 00:00)."); return; }
 
     let data;
     try { data = simulate(); }
@@ -1135,17 +772,6 @@ th, td {
     $("pillExtEnd").textContent =
       (data.tExtEnd === null) ? "Fin extinction : —" : `Fin extinction : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
 
-    const extIndStart = $("extIndStart");
-    const extIndEnd = $("extIndEnd");
-    if (extIndStart) {
-      extIndStart.textContent =
-        (data.tExtStart === null) ? "Début ext. : —" : `Début ext. : ${addMinToHHMM(t0Str, data.tExtStart)}`;
-    }
-    if (extIndEnd) {
-      extIndEnd.textContent =
-        (data.tExtEnd === null) ? "Fin ext. : —" : `Fin ext. : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
-    }
-
     blocCourbe.style.display = "block";
     drawChart(data);
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1154,8 +780,5 @@ th, td {
   render();
 })();
 </script>
-
-
-  
 </body>
 </html>

@@ -579,7 +579,9 @@ th, td {
 (() => {
   const $ = (id) => document.getElementById(id);
 
-  // ===== Paramètres CMP =====
+  // =========================
+  // PARAMÈTRES CMP
+  // =========================
   const STEP_MIN = 20;
   const HORIZON_H = 5;
   const HORIZON_MIN = HORIZON_H * 60;
@@ -642,200 +644,46 @@ th, td {
     return labels;
   };
 
-  // ============================================================
-  //  ENGINS : base + personnalisation + ajout "Autre"
-  // ============================================================
+  // =========================
+  // ENGINS (valeurs par défaut)
+  // =========================
   const ENGINS_BASE = {
-    FPT:   { flow: 2000, emul: 200 },
-    CCRM:  { flow: 1500, emul: 200 },
-    CCR:   { flow: 1000, emul: 40  },
-    CCGC:  { flow: 1000, emul: 0   },
+    FPT:   { flow: 2000, emul: 200  },
+    CCRM:  { flow: 1500, emul: 200  },
+    CCR:   { flow: 1000, emul: 40   },
+    CCGC:  { flow: 1000, emul: 0    },
     CCGCM: { flow: 2000, emul: 1200 },
-    CED:   { flow: 4000, emul: 0   },
+    CED:   { flow: 4000, emul: 0    },
     CEDEM: { flow: 2000, emul: 2000 },
-    CDHR:  { flow: 4000, emul: 0   },
-    CEEM:  { flow: 0,    emul: 6000 }
+    CDHR:  { flow: 4000, emul: 0    },
+    CEEM:  { flow: 0,    emul: 6000 },
+    AUTRE: { flow: 0,    emul: 0    } // spécial "Autre..."
   };
 
-  const ENGINS_STORAGE_KEY = "LIF_CMP_ENGINS_CUSTOM";
+  // Mémorisation des overrides (Autre SDIS uniquement)
+  const ENGINS_STORAGE_KEY = "LIF_CMP_ENGINS_OVERRIDES";
 
-  function loadCustomEngins(){
-    try {
-      return JSON.parse(localStorage.getItem(ENGINS_STORAGE_KEY)) || { overrides:{}, others:[] };
-    } catch(e) {
-      return { overrides:{}, others:[] };
-    }
-  }
+  const loadOverrides = () => {
+    try { return JSON.parse(localStorage.getItem(ENGINS_STORAGE_KEY) || "{}"); }
+    catch(e){ return {}; }
+  };
 
-  function saveCustomEngins(data){
-    localStorage.setItem(ENGINS_STORAGE_KEY, JSON.stringify(data));
-  }
+  const saveOverride = (type, flow, emul) => {
+    const o = loadOverrides();
+    o[type] = { flow, emul };
+    localStorage.setItem(ENGINS_STORAGE_KEY, JSON.stringify(o));
+  };
 
-  function buildEngins(){
-    const custom = loadCustomEngins();
-    const merged = {};
+  const getDef = (type) => {
+    const base = ENGINS_BASE[type];
+    if (!base) return null;
+    const ov = loadOverrides()[type];
+    return ov ? { ...base, ...ov } : base;
+  };
 
-    // base + overrides
-    for (const [code, vals] of Object.entries(ENGINS_BASE)) {
-      merged[code] = { ...vals, ...(custom.overrides?.[code] || {}), label: code, isOther: false };
-    }
-
-    // others (engins ajoutés)
-    (custom.others || []).forEach(o => {
-      merged[o.id] = { flow: o.flow, emul: o.emul, label: o.label, isOther: true };
-    });
-
-    return merged;
-  }
-
-  let ENGINS = buildEngins();
-
-  // Remplit le select de saisie (#enginType) => utilisé pour ajouter dans la liste
-  function refreshEnginTypeSelect(){
-    const sel = $("enginType");
-    if (!sel) return;
-
-    const current = sel.value;
-    sel.innerHTML = "";
-
-    // base d'abord
-    Object.keys(ENGINS_BASE).forEach(code => {
-      const opt = document.createElement("option");
-      opt.value = code;
-      opt.textContent = code;
-      sel.appendChild(opt);
-    });
-
-    // others ensuite
-    const custom = loadCustomEngins();
-    (custom.others || []).forEach(o => {
-      const opt = document.createElement("option");
-      opt.value = o.id;
-      opt.textContent = o.label; // nom libre
-      sel.appendChild(opt);
-    });
-
-    // restore valeur si possible
-    if ([...sel.options].some(o => o.value === current)) sel.value = current;
-  }
-
-  // Remplit le select d’édition (#enginEditSelect)
-  function refreshEnginEditSelect(){
-    const sel = $("enginEditSelect");
-    if (!sel) return;
-
-    const current = sel.value;
-    sel.innerHTML = "";
-
-    Object.keys(ENGINS_BASE).forEach(code => {
-      const opt = document.createElement("option");
-      opt.value = code;
-      opt.textContent = code;
-      sel.appendChild(opt);
-    });
-
-    const custom = loadCustomEngins();
-    (custom.others || []).forEach(o => {
-      const opt = document.createElement("option");
-      opt.value = o.id;
-      opt.textContent = o.label;
-      sel.appendChild(opt);
-    });
-
-    if ([...sel.options].some(o => o.value === current)) sel.value = current;
-
-    sel.dispatchEvent(new Event("change"));
-  }
-
-  function fillEditFieldsFromSelection(){
-    const sel  = $("enginEditSelect");
-    const flow = $("enginEditFlow");
-    const emul = $("enginEditEmul");
-    if (!sel || !flow || !emul) return;
-
-    ENGINS = buildEngins();
-    const e = ENGINS[sel.value];
-    if (!e) return;
-
-    flow.value = e.flow ?? 0;
-    emul.value = e.emul ?? 0;
-  }
-
-  function saveSelectedEngin(){
-    const sel  = $("enginEditSelect");
-    const flow = $("enginEditFlow");
-    const emul = $("enginEditEmul");
-    if (!sel || !flow || !emul) return;
-
-    const id = sel.value;
-    const f = Number(flow.value);
-    const m = Number(emul.value);
-
-    if (!Number.isFinite(f) || f < 0 || !Number.isFinite(m) || m < 0) {
-      alert("Valeurs invalides (flow/emul).");
-      return;
-    }
-
-    const custom = loadCustomEngins();
-
-    // base => overrides
-    if (ENGINS_BASE[id]) {
-      custom.overrides = custom.overrides || {};
-      custom.overrides[id] = { flow: f, emul: m };
-      saveCustomEngins(custom);
-    } else {
-      // other => update dans others
-      const idx = (custom.others || []).findIndex(o => o.id === id);
-      if (idx >= 0) {
-        custom.others[idx].flow = f;
-        custom.others[idx].emul = m;
-        saveCustomEngins(custom);
-      }
-    }
-
-    ENGINS = buildEngins();
-    refreshEnginTypeSelect();
-    refreshEnginEditSelect();
-    alert("Engin mis à jour.");
-  }
-
-  function addOtherEngin(){
-    const label = $("otherLabel");
-    const flow  = $("otherFlow");
-    const emul  = $("otherEmul");
-    if (!label || !flow || !emul) return;
-
-    const name = (label.value || "").trim();
-    const f = Number(flow.value);
-    const m = Number(emul.value);
-
-    if (!name) { alert("Donne un nom pour l’engin."); return; }
-    if (!Number.isFinite(f) || f < 0 || !Number.isFinite(m) || m < 0) {
-      alert("Valeurs invalides (flow/emul).");
-      return;
-    }
-
-    const custom = loadCustomEngins();
-    custom.others = custom.others || [];
-
-    const id = "OTHER_" + Date.now(); // id unique
-    custom.others.push({ id, label: name, flow: f, emul: m });
-
-    saveCustomEngins(custom);
-
-    label.value = "";
-    flow.value = "";
-    emul.value = "";
-
-    ENGINS = buildEngins();
-    refreshEnginTypeSelect();
-    refreshEnginEditSelect();
-    alert("Engin “Autre” ajouté.");
-  }
-
-  // ============================================================
-  // ===== Charge params CMP depuis calcul =====
-  // ============================================================
+  // =========================
+  // CHARGE PARAMS (depuis calcul)
+  // =========================
   let params = null;
   try { params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null"); }
   catch (e) { params = null; }
@@ -844,6 +692,7 @@ th, td {
   const blocSaisie = $("blocSaisie");
   const blocCourbe = $("blocCourbe");
 
+  // Page cmp_autre_sdis : on exige mode "custom"
   if (!params || params.mode !== "custom") {
     status.textContent =
       "Impossible : aucun calcul « Autre SDIS » n’a été transmis. " +
@@ -862,34 +711,120 @@ th, td {
 
   blocSaisie.style.display = "block";
 
-  // ============================================================
-  // ===== Liste engins (table) =====
-  // ============================================================
+  // =========================
+  // UI : ajouter les champs "Débit" + "Émulseur" à côté du select
+  // + champ "Nom engin" si AUTRE (et on renomme l'option)
+  // =========================
+  const selectType = $("enginType");
+  if (!selectType) { console.error("enginType introuvable"); return; }
+
+  // S'assure que l'option AUTRE existe
+  if (![...selectType.options].some(o => o.value === "AUTRE")) {
+    const opt = document.createElement("option");
+    opt.value = "AUTRE";
+    opt.textContent = "Autre…";
+    selectType.appendChild(opt);
+  }
+
+  // Crée un conteneur visuel à côté / sous le select (sans toucher ton HTML)
+  const customWrap = document.createElement("div");
+  customWrap.id = "enginCustomWrap";
+  customWrap.style.marginTop = "10px";
+  customWrap.innerHTML = `
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:160px;">
+        <label style="font-weight:800; font-size:0.85rem; display:block; margin-bottom:6px;">Débit (L/min)</label>
+        <input id="enginFlow" class="field" type="number" min="0" step="10" placeholder="ex : 2000">
+      </div>
+      <div style="flex:1; min-width:160px;">
+        <label style="font-weight:800; font-size:0.85rem; display:block; margin-bottom:6px;">Émulseur (L)</label>
+        <input id="enginEmul" class="field" type="number" min="0" step="10" placeholder="ex : 200">
+      </div>
+    </div>
+
+    <div id="otherNameWrap" style="display:none; margin-top:10px;">
+      <label style="font-weight:800; font-size:0.85rem; display:block; margin-bottom:6px;">Nom engin (si “Autre”)</label>
+      <input id="otherName" class="field" type="text" placeholder="ex : VLOG / FPTL / MPR…">
+      <div class="small" style="margin-top:6px;">Le nom remplacera “Autre” partout.</div>
+    </div>
+
+    <div class="small" style="margin-top:8px;">
+      Astuce : les valeurs modifiées sont mémorisées sur ton navigateur.
+    </div>
+  `;
+
+  // On essaie d'insérer proprement juste après le select
+  selectType.insertAdjacentElement("afterend", customWrap);
+
+  const flowInput = $("enginFlow");
+  const emulInput = $("enginEmul");
+  const otherNameWrap = $("otherNameWrap");
+  const otherNameInput = $("otherName");
+
+  const getAutreOption = () => [...selectType.options].find(o => o.value === "AUTRE");
+
+  const updateAutreLabel = () => {
+    const opt = getAutreOption();
+    if (!opt) return;
+    const name = (otherNameInput?.value || "").trim();
+    opt.textContent = name ? name : "Autre…";
+  };
+
+  const syncCustomFields = () => {
+    const type = selectType.value;
+
+    // Affiche / masque "Nom" + renomme l'option
+    if (type === "AUTRE") {
+      otherNameWrap.style.display = "block";
+      updateAutreLabel();
+    } else {
+      otherNameWrap.style.display = "none";
+      // remet l'option AUTRE propre (elle peut rester renommée si l’utilisateur avait tapé)
+      const opt = getAutreOption();
+      if (opt && !otherNameInput.value.trim()) opt.textContent = "Autre…";
+    }
+
+    // Pré-remplir débit/émulseur
+    const def = getDef(type) || { flow: 0, emul: 0 };
+    flowInput.value = def.flow ?? 0;
+    emulInput.value = def.emul ?? 0;
+  };
+
+  selectType.addEventListener("change", syncCustomFields);
+  if (otherNameInput) otherNameInput.addEventListener("input", updateAutreLabel);
+
+  // Mémorise dès qu’on modifie flow/emul (pratique)
+  const maybeSaveOverrideFromInputs = () => {
+    const type = selectType.value;
+    const flow = n(flowInput.value);
+    const emul = n(emulInput.value);
+    if (!Number.isFinite(flow) || !Number.isFinite(emul)) return;
+    saveOverride(type, Math.max(0, flow), Math.max(0, emul));
+  };
+  flowInput.addEventListener("change", maybeSaveOverrideFromInputs);
+  emulInput.addEventListener("change", maybeSaveOverrideFromInputs);
+
+  syncCustomFields();
+
+  // =========================
+  // LISTE DES ENGINS AJOUTÉS
+  // =========================
   const rows = [];
   const tbody = $("liste");
-
-  function getEnginDef(type){
-    ENGINS = buildEngins(); // refresh
-    return ENGINS[type] || null;
-  }
 
   const render = () => {
     tbody.innerHTML = "";
     rows.forEach((r, idx) => {
-      const def = getEnginDef(r.type);
-      if (!def) return;
-
-      const flow = (def.flow || 0) * r.qty;
-      const emul = (def.emul || 0) * r.qty;
-      const label = def.label || r.type;
+      const flowTotal = (r.flow || 0) * r.qty;
+      const emulTotal = (r.emul || 0) * r.qty;
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td data-label="Type"><b>${label}</b></td>
+        <td data-label="Type"><b>${r.label}</b></td>
         <td data-label="Arrivée">${r.atStr}</td>
         <td data-label="Qté">${r.qty}</td>
-        <td data-label="Débit (L/min)">${flow}</td>
-        <td data-label="Émulseur (L)">${emul}</td>
+        <td data-label="Débit (L/min)">${Math.round(flowTotal)}</td>
+        <td data-label="Émulseur (L)">${Math.round(emulTotal)}</td>
         <td data-label="Action">
           <button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
         </td>
@@ -906,28 +841,35 @@ th, td {
     });
   };
 
-  // init selects
-  refreshEnginTypeSelect();
-  refreshEnginEditSelect();
-
-  // events "paramétrage engins"
-  $("enginEditSelect")?.addEventListener("change", fillEditFieldsFromSelection);
-  $("btnSaveEngin")?.addEventListener("click", saveSelectedEngin);
-  $("btnAddOther")?.addEventListener("click", addOtherEngin);
-
-  // Ajout engin dans la liste
   $("btnAdd").addEventListener("click", () => {
-    const type = $("enginType").value;
+    const type = selectType.value;
     const atStr = $("arrivee").value || "00:00";
     const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
 
-    const def = getEnginDef(type);
-    if (!def) return;
-
     if (!Number.isFinite(timeToMin(atStr))) { alert("Heure d’arrivée invalide."); return; }
 
-    rows.push({ type, atStr, qty });
-    rows.sort((a,b) => timeToMin(a.atStr) - timeToMin(b.atStr));
+    const flow = Math.max(0, n(flowInput.value));
+    const emul = Math.max(0, n(emulInput.value));
+    if (!Number.isFinite(flow) || !Number.isFinite(emul)) {
+      alert("Débit / Émulseur invalides.");
+      return;
+    }
+
+    // Label affiché
+    let label = type;
+    if (type === "AUTRE") {
+      const name = (otherNameInput.value || "").trim();
+      if (!name) { alert("Donne un nom à l’engin “Autre”."); return; }
+      label = name;
+      updateAutreLabel(); // renomme aussi l’option dans le select
+    }
+
+    // Mémorise ces valeurs pour ce "type" (FPT/CCRM/AUTRE…)
+    saveOverride(type, flow, emul);
+
+    // IMPORTANT : on stocke flow/emul DANS la ligne => si l’utilisateur modifie après, les lignes déjà ajoutées ne bougent pas
+    rows.push({ type, label, atStr, qty, flow, emul });
+    rows.sort((a, b) => timeToMin(a.atStr) - timeToMin(b.atStr));
     render();
   });
 
@@ -937,12 +879,10 @@ th, td {
     blocCourbe.style.display = "none";
   });
 
-  // ============================================================
-  // ===== Simulation =====
-  // ============================================================
+  // =========================
+  // SIMULATION
+  // =========================
   function simulate() {
-    ENGINS = buildEngins(); // important : prend en compte les modifs
-
     const Qext = params.Qext;
     const Qtempo = params.Qtempo;
     const tExt = params.tExt;
@@ -957,13 +897,11 @@ th, td {
     const addEmul = Array(HORIZON_MIN + 1).fill(0);
 
     rows.forEach(r => {
-      const def = ENGINS[r.type];
-      if (!def) return;
       const rel = arrivalRelMin(r.atStr, t0Abs);
       if (!Number.isFinite(rel)) return;
       const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
-      addFlow[m] += (def.flow || 0) * r.qty;
-      addEmul[m] += (def.emul || 0) * r.qty;
+      addFlow[m] += (r.flow || 0) * r.qty;
+      addEmul[m] += (r.emul || 0) * r.qty;
     });
 
     let flowAvail = 0;
@@ -1027,9 +965,9 @@ th, td {
     };
   }
 
-  // ============================================================
-  // ===== Dessin =====
-  // ============================================================
+  // =========================
+  // DESSIN COURBE (inchangé)
+  // =========================
   function drawChart(data) {
     const c = $("chart");
     const ctx = c.getContext("2d");
@@ -1053,6 +991,7 @@ th, td {
     const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
 
     const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
+    const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
 
     if (!ctx.roundRect) {
       ctx.roundRect = function (x0, y0, w, h, r) {
@@ -1121,7 +1060,6 @@ th, td {
       ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
     }
 
-    // NOIR : débit dispo
     ctx.strokeStyle = "#111";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1135,7 +1073,6 @@ th, td {
     }
     ctx.stroke();
 
-    // ROUGE : stock émulseur
     ctx.strokeStyle = "#ef4444";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1149,7 +1086,6 @@ th, td {
     }
     ctx.stroke();
 
-    // Qext (bleu)
     ctx.strokeStyle = "#2563eb";
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
@@ -1159,7 +1095,6 @@ th, td {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // besoin extinction (orange)
     ctx.strokeStyle = "#ff8800";
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
@@ -1184,7 +1119,6 @@ th, td {
     drawVLine(data.tExtStart, "#16a34a");
     drawVLine(data.tExtEnd, "#16a34a");
 
-    // Légende
     const legendX = mL + 10;
     const legendY = mT + 14;
 
@@ -1222,9 +1156,9 @@ th, td {
     legendItem(legendX + 620, legendY, "#ff8800", "Volume émulseur extinction (cible)", [6, 6]);
   }
 
-  // ============================================================
-  // ===== Tracer =====
-  // ============================================================
+  // =========================
+  // TRACER
+  // =========================
   $("btnTracer").addEventListener("click", () => {
     if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
 
@@ -1266,7 +1200,6 @@ th, td {
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  // init
   render();
 })();
 </script>

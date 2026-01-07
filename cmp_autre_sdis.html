@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <title>CMP – Courbe de montée en puissance (autre Sdis)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
     /* =========================
@@ -16,6 +16,7 @@
       color:#111;
       line-height:1.6;
     }
+
     main{ max-width:980px; margin:auto; padding:16px 12px 26px; }
 
     .card{
@@ -46,49 +47,54 @@
     .small{ font-size:12px; color:#555; margin-top:6px; }
     .warn{ background:#fff3cd; border:1px solid #ffeeba; padding:10px 12px; border-radius:12px; font-size:0.95rem; }
 
+    /* Heure en bleu */
     input[type="time"]{ color:#2563eb; font-weight:700; }
 
-  header{
-  background:#0b1220;
-  color:#fff;
-  padding:42px 16px;
-  text-align:center;
+    /* =========================
+       HEADER (IDENTIQUE pages index/calcul/cmp)
+       ========================= */
+    header{
+      background:#0b1220;
+      color:#fff;
+      padding:42px 16px;
+      text-align:center;
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-}
-  header img.logo{
-   width: min(220px, 60vw);
-   max-height: 140px;
-   height:auto;
-   object-fit: contain;
-   margin: 0;
-}
-/* ===== LOGO HEADER (aligné avec index) ===== */
-header img.Logo {
-  width: min(220px, 60vw);
-  max-height: 140px;
-  height: auto;
-  object-fit: contain;
-  margin: 0;
-}
-
-    .hero-title {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      margin: 0;
-      line-height: 1.2;
-      text-align: center;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
     }
 
-    .hero-title span { display: block; white-space: normal; }
+    /* IMPORTANT : même sélecteur que ta page “parfaite” */
+    header img.Logo{
+      width:min(220px, 60vw);
+      max-height:140px;
+      height:auto;
+      object-fit:contain;
+      margin:0;
+      display:block;
+    }
 
-    header a{
+    .hero-title{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      margin:0;
+      line-height:1.2;
+      text-align:center;
+    }
+    .hero-title span{ display:block; white-space:normal; }
+
+    header p{
+      margin:0;
+      opacity:.9;
+      font-size:clamp(0.95rem, 3.2vw, 1.1rem);
+      line-height:1.25;
+    }
+
+    header a.back-btn{
       color:#fff;
       text-decoration:none;
       font-weight:800;
@@ -96,6 +102,8 @@ header img.Logo {
       border-radius:10px;
       background:rgba(255,255,255,0.12);
       white-space:nowrap;
+      display:inline-block;
+    }
 
     /* =========================
        TABLE
@@ -231,17 +239,20 @@ header img.Logo {
 
 <body>
 <header>
-  <!-- ✅ LOGO RESTAURÉ -->
-  <img src="Logo.png" alt="Logo SDIS 27" class="logo">
+  <!-- ✅ EXACTEMENT comme page “parfaite” : class="Logo" -->
+  <img src="Logo.png" alt="Logo SDIS 27" class="Logo">
 
   <h1 class="hero-title">
     <span>Calcul LIF</span>
     <span>Outil opérationnel</span>
     <span>Feux de liquides&nbsp;inflammables</span>
-    <p>Sdis 27 – GGOC – Capitaine Florian PICO</p>
   </h1>
 
-  <a href="calcul.html">← Retour calcul</a>
+  <!-- ✅ Le sous-titre doit être hors du H1 (comme sur tes autres pages) -->
+  <p>SDIS 27 – GGOC – Capitaine Florian PICO</p>
+
+  <!-- ✅ Bouton centré (comme photo 1) -->
+  <a class="back-btn" href="calcul.html">← Retour calcul</a>
 </header>
 
 <main>

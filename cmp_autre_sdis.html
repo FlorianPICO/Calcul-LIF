@@ -727,6 +727,35 @@ th, td {
     ctx.stroke();
     ctx.setLineDash([]);
 
+// =========================
+// LIGNES VERTES EXTINCTION (verticales)
+// =========================
+function drawVLine(tMin, color) {
+  if (!Number.isFinite(tMin)) return;
+  const xx = x(tMin);
+  ctx.strokeStyle = color;
+  ctx.setLineDash([4, 4]);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(xx, mT);
+  ctx.lineTo(xx, mT + plotH);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+// (optionnel) bande verte pendant l’extinction
+if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
+  const x1 = x(data.tExtStart);
+  const x2 = x(Math.min(data.tExtEnd, HORIZON_MIN));
+  ctx.fillStyle = "rgba(34,197,94,0.10)";
+  ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
+}
+
+// lignes verticales vertes
+drawVLine(data.tExtStart, "#16a34a");
+drawVLine(data.tExtEnd, "#16a34a");
+
+    
     const legendX = mL + 10;
     const legendY = mT + 14;
 

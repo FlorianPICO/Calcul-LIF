@@ -809,7 +809,7 @@ drawVLine(data.tExtEnd, "#16a34a");
     const t0Str = minToHHMM(data.t0Abs);
 
     $("pillStockOK").textContent =
-      (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
+      (data.tStockOK === null) ? "Volume émulseur OK : —" : `Volume émulseur OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
     $("pillExtStart").textContent =
       (data.tExtStart === null) ? "Début extinction : —" : `Début extinction : ${addMinToHHMM(t0Str, data.tExtStart)}`;

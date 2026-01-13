@@ -48,6 +48,26 @@
       padding: 30px 20px;
     }
 
+.header-sub{
+  margin: 0;
+  display: flex;
+  flex-direction: column;   /* ✅ force 2 lignes */
+  gap: 18px;                 /* ✅ espace entre les lignes */
+  text-align: center;
+  line-height: 1.25;
+}
+  
+.header-mail{
+  color: #fff;           /* blanc lisible sur fond sombre */
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.header-mail:hover{
+  text-decoration: underline;
+ opacity: 0.9;
+}
+    
     @media (max-width: 520px) {
       section.page { padding: 14px 8px; }   /* ✅ moins de marge sur mobile */
       .card { padding: 12px; }             /* ✅ la carte prend plus de largeur */
@@ -297,8 +317,12 @@ a.lif-btn {
     <span>Outil opérationnel</span>
   </h1>
 
-  <p>SDIS 27 – GGOC – Capitaine Florian PICO</p>
-  <a class="backlink" href="index.html">← Retour à l’accueil</a>
+<p class="header-sub">
+  <span>SDIS 27 – GGOC – Capitaine Florian PICO</span>
+  <a href="mailto:florian.pico@sdis27.fr" class="header-mail">
+    florian.pico@sdis27.fr
+  </a>
+</p>
 </header>
 
 <section class="page">
@@ -897,6 +921,7 @@ btnCmp.addEventListener("click", (e) => {
  
 </body>
 </html>
+
 
 
 

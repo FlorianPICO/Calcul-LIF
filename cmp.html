@@ -978,7 +978,7 @@ function legendItem(x0, y0, color, label, dash = null) {
     const t0Str = minToHHMM(data.t0Abs);
 
     $("pillStockOK").textContent =
-      (data.tStockOK === null) ? "Volume émulseur OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
+      (data.tStockOK === null) ? "Volume émulseur OK : —" : `Volume émulseur OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
     // Pastilles DU HAUT (on les garde ou on les masque au choix)
     // Ici : on les garde visibles ET on les met à jour

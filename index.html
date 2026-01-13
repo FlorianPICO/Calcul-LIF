@@ -129,21 +129,23 @@
 .header-sub{
   margin: 0;
   display: flex;
-  flex-direction: column;
-  gap: 6px;              /* ✅ espace entre les 2 lignes */
+  flex-direction: column;   /* ✅ force 2 lignes */
+  gap: 8px;                 /* ✅ espace entre les lignes */
+  text-align: center;
   line-height: 1.25;
   opacity: 0.95;
 }
 
 .header-mail{
-  color: inherit;        /* garde la couleur blanche */
-  text-decoration: underline;
+  color: #60a5fa;           /* bleu lisible sur fond sombre */
+  text-decoration: none;
   font-weight: 700;
 }
 
 .header-mail:hover{
-  opacity: 0.85;
+  text-decoration: underline;
 }
+
 
   }
 </style>
@@ -161,8 +163,11 @@
 
 <p class="header-sub">
   <span>SDIS 27 – GGOC – Capitaine Florian PICO</span>
-  <a class="header-mail" href="mailto:florian.pico@sdis27.fr">florian.pico@sdis27.fr</a>
+  <a href="mailto:florian.pico@sdis27.fr" class="header-mail">
+    florian.pico@sdis27.fr
+  </a>
 </p>
+
 
 </header>
 

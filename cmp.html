@@ -472,7 +472,7 @@ th, td {
     </div>
 
     <div class="small">
-      <u>Logique :</u> Temporisation tant que débit dispo &lt; Q ext OU stock émulseur &lt; besoin extinction.<br>
+      <u>Logique :</u> Temporisation tant que débit dispo &lt; Q ext OU volume émulseur &lt; besoin extinction.<br>
       <u>Temporisation :</u> conso = Q tempo × 3%.<br>
       <u>Extinction :</u> conso = Q ext × 3% pendant Durée ext.
     </div>
@@ -487,7 +487,7 @@ th, td {
       <span class="pill" id="pilltExt">Durée ext. : —</span>
       <span class="pill" id="pillBesoin">Besoin en émulseur pour extinction : —</span>
       <span class="pill" id="pillT0">T0 : —</span>
-      <span class="pill" id="pillStockOK">Stock émulseur OK : —</span>
+      <span class="pill" id="pillStockOK">Volume émulseur OK : —</span>
 <span class="pill pill-ext" id="pillExtStart">Début extinction : —</span>
 <span class="pill pill-ext" id="pillExtEnd">Fin extinction : —</span>
     </div>
@@ -499,7 +499,7 @@ th, td {
     <div class="small">
       <u>Axe gauche :</u> Lire les valeurs Débit dispo et Débit cible (L/min).<br>
       <u>Axe droit :</u> Lire les valeurs Volume émulseur (L).<br>
-      <u>Marqueur vert :</u> Stock émulseur OK (volume émulseur ≥ besoin extinction)<br>
+      <u>Marqueur vert :</u> Volume émulseur OK (volume émulseur ≥ besoin extinction)<br>
       <u>Extinction :</u> Possible si débit dispo ≥ Q ext ET volume émulseur dispo ≥ volume émulseur extinction (cible).
     </div>
 
@@ -845,7 +845,7 @@ tr.innerHTML = `
       ctx.fillText(Math.round(v).toString(), mL + plotW + 10, yy + 4);
     }
     ctx.fillStyle = "#ef4444";
-    ctx.fillText("Stock émulseur (L)", mL + plotW - 118, mT - 16);
+    ctx.fillText("Volume émulseur (L)", mL + plotW - 118, mT - 16);
 
     // Bande extinction
     if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
@@ -978,7 +978,7 @@ function legendItem(x0, y0, color, label, dash = null) {
     const t0Str = minToHHMM(data.t0Abs);
 
     $("pillStockOK").textContent =
-      (data.tStockOK === null) ? "Stock OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
+      (data.tStockOK === null) ? "Volume émulseur OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
     // Pastilles DU HAUT (on les garde ou on les masque au choix)
     // Ici : on les garde visibles ET on les met à jour

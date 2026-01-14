@@ -106,6 +106,26 @@
       display:inline-block;
     }
 
+.header-sub{
+  margin: 0;
+  display: flex;
+  flex-direction: column;   /* ✅ force 2 lignes */
+  gap: 18px;                 /* ✅ espace entre les lignes */
+  text-align: center;
+  line-height: 1.25;
+}
+  
+.header-mail{
+  color: #fff;           /* blanc lisible sur fond sombre */
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.header-mail:hover{
+  text-decoration: underline;
+ opacity: 0.9;
+}
+    
     /* =========================
        TABLE
        ========================= */
@@ -258,7 +278,8 @@ th, td {
 
   <!-- ✅ Le sous-titre doit être hors du H1 (comme sur tes autres pages) -->
   <p>SDIS 27 – GGOC – Capitaine Florian PICO</p>
-
+  <a href="mailto:florian.pico@sdis27.fr" class="header-mail">
+    florian.pico@sdis27.fr </a>
   <!-- ✅ Bouton centré (comme photo 1) -->
   <a class="back-btn" href="calcul.html">← Retour calcul</a>
 </header>

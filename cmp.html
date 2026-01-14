@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="fr">
 <head>
@@ -390,25 +391,7 @@ th, td {
 }
 }
 
-.header-sub{
-  margin: 0;
-  display: flex;
-  flex-direction: column;   /* ✅ force 2 lignes */
-  gap: 18px;                 /* ✅ espace entre les lignes */
-  text-align: center;
-  line-height: 1.25;
-}
-  
-.header-mail{
-  color: #fff;           /* blanc lisible sur fond sombre */
-  text-decoration: none;
-  font-weight: 700;
-}
 
-.header-mail:hover{
-  text-decoration: underline;
- opacity: 0.9;
-}
 
 
   </style>
@@ -423,12 +406,8 @@ th, td {
     <span>Outil opérationnel</span>
   </h1>
 
-<p class="header-sub">
-  <span>SDIS 27 – GGOC – Capitaine Florian PICO</span>
-  <a href="mailto:florian.pico@sdis27.fr" class="header-mail">
-    florian.pico@sdis27.fr </a>
-   <a class="backlink" href="index.html">← Retour à l’accueil</a>
-  </p>
+  <p>Sdis 27 – GGOC – Capitaine Florian PICO</p>
+  <a href="calcul.html">← Retour calcul</a>
 </header>
 
 <main>
@@ -1000,7 +979,7 @@ function legendItem(x0, y0, color, label, dash = null) {
     const t0Str = minToHHMM(data.t0Abs);
 
     $("pillStockOK").textContent =
-      (data.tStockOK === null) ? "Volume émulseur OK : —" : `Volume émulseur OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
+      (data.tStockOK === null) ? "Volume émulseur OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
 
     // Pastilles DU HAUT (on les garde ou on les masque au choix)
     // Ici : on les garde visibles ET on les met à jour

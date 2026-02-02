@@ -460,7 +460,8 @@ a.lif-btn {
             <div class="lif-row"><span>Q ext (L/min) :</span><span id="oQext">—</span></div>
             <div class="lif-row"><span>V émulseur (L) :</span><span id="oVemul">—</span></div>
             <div class="lif-row">
-              <span>V émulseur pour entretien du tapis de mousse (L) :</span>
+              <span>V émulseur pour entretien du tapis de mousse sur 4h (L) :</span>
+              <span>Q entretien du tapis de mousse sur 4h (L) :</span>
               <span id="oEntExt">—</span>
             </div>
           </div>
@@ -682,7 +683,11 @@ function compute() {
      débit solution entretien = S * 0.2 (L/min)
      volume émulseur entretien = débit_solution * durée_ext * concentration
   */
-  const VemulEntretien = (S * 0.2) * tExt * conc;
+  const VemulEntretien = Vemul;
+  $("oEntExt").textContent = String(Math.round(VemulEntretien));
+
+   */
+  const QemulEntretien = Qext/6;
   $("oEntExt").textContent = String(Math.round(VemulEntretien));
 
   /* ================== V TEMPO ================== */
@@ -921,6 +926,7 @@ btnCmp.addEventListener("click", (e) => {
  
 </body>
 </html>
+
 
 
 

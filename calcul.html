@@ -460,12 +460,14 @@ a.lif-btn {
             <div class="lif-row"><span>Q ext (L/min) :</span><span id="oQext">—</span></div>
             <div class="lif-row"><span>V émulseur (L) :</span><span id="oVemul">—</span></div>
             <div class="lif-row">
-              <span>V émulseur pour entretien du tapis de mousse sur 4h (L) :</span>
-              <span id="oEntExt">—</span>
-            </div>
-            <div class="lif-row"><span>Q entretien du tapis (L/min) :</span>
-              <span id="oQentretien">—</span>
-            </div>
+           <div class="lif-row">
+            <span>V émulseur pour entretien du tapis (4h) (L) :</span>
+            <span id="oVentretien">—</span>
+          </div>
+          <div class="lif-row">
+            <span>Q entretien du tapis (L/min) :</span>
+            <span id="oQentretien">—</span>
+          </div>
           </div>
 
           <div class="lif-panel">
@@ -511,7 +513,10 @@ a.lif-btn {
   </div>
 </div>
 
-          <div class="lif-panel lif-panel-muted" id="blocTapisPreventif" ...>
+<div class="lif-panel lif-panel-muted" id="blocTapisPreventif" style="display:none;margin-top:12px;">
+  ...
+</div>
+
 
             <div class="lif-row"><span>Volume émulseur (L)</span><span id="oVtapis">—</span></div>
           <div class="lif-row"><span>Débit entretien (L/min)</span><span id="oDentretien">—</span></div>
@@ -931,6 +936,7 @@ btnCmp.addEventListener("click", (e) => {
  
 </body>
 </html>
+
 
 
 

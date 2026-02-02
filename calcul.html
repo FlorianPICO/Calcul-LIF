@@ -461,8 +461,10 @@ a.lif-btn {
             <div class="lif-row"><span>V émulseur (L) :</span><span id="oVemul">—</span></div>
             <div class="lif-row">
               <span>V émulseur pour entretien du tapis de mousse sur 4h (L) :</span>
-              <span>Q entretien du tapis de mousse sur 4h (L) :</span>
               <span id="oEntExt">—</span>
+            </div>
+            <div class="lif-row"><span>Q entretien du tapis (L/min) :</span>
+              <span id="oQentretien">—</span>
             </div>
           </div>
 
@@ -679,16 +681,19 @@ function compute() {
   const Vemul = Qext * tExt * conc;
   $("oVemul").textContent = String(Math.round(Vemul));
 
-  /* ================== ENTRETIEN TAPIS MOUSSE (V ÉMULSEUR en L) ==================
-     débit solution entretien = S * 0.2 (L/min)
-     volume émulseur entretien = débit_solution * durée_ext * concentration
-  */
-  const VemulEntretien = Vemul;
-  $("oEntExt").textContent = String(Math.round(VemulEntretien));
+/* ================== ENTRETIEN TAPIS MOUSSE ==================
+   Hypothèse simple (à adapter si tu as une doctrine précise) :
+   - Q entretien = Qext / 6
+   - Durée entretien = 4 h = 240 min
+   - Volume émulseur entretien = Q entretien * durée * concentration
+*/
+const Qentretien = Qext / 6;
+const tEntretien = 240; // minutes (4h)
+const VemulEntretien = Vemul;
 
-   */
-  const QemulEntretien = Qext/6;
-  $("oEntExt").textContent = String(Math.round(VemulEntretien));
+$("oQentretien").textContent = String(Math.round(Qentretien));
+$("oVentretien").textContent = String(Math.round(VemulEntretien));
+
 
   /* ================== V TEMPO ================== */
   const finRenseignee = !!$("tempoFin").value;
@@ -826,7 +831,7 @@ const updateResume = (vTapisPreventif = 0) => {
     $("vTotal").value = "";
     $("tReel").value = "";
 
-    ["oTex","oT","oQext","oVemul","oQtempo","oVtempo","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oDebord","oVtapis","oDentretien"]
+    ["oTex","oT","oQext","oVemul","oQtempo","oVtempo","oVentretien","oQentretien","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oDebord","oVtapis","oDentretien"]
       .forEach(id => { const e = $(id); if (e) e.textContent = "—"; });
 
     $("oConc").textContent = "3 %";
@@ -926,6 +931,7 @@ btnCmp.addEventListener("click", (e) => {
  
 </body>
 </html>
+
 
 
 

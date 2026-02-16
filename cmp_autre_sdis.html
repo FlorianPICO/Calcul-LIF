@@ -173,6 +173,17 @@ th, td {
     .canvas-wrap{ width:100%; overflow:auto; border:1px dashed #cbd5e1; border-radius:12px; padding:10px; background:#fff; }
     canvas{ width:100%; height:auto; }
 
+  .pillBesoin {
+  border-color:#f7ba5c !important;
+  background:rgba(234,88,12,0.10) !important;
+  color:#7c2d12 !important;
+}
+  .pillQext {
+  border-color:#2563eb !important;
+  background:rgba(37,99,235,0.10) !important;
+  color:#1e3a8a !important;
+}
+    
     .lif-signature{
       margin-top:18px;
       padding-top:10px;
@@ -360,10 +371,10 @@ th, td {
     <h2>6) Courbe de montée en puissance</h2>
 
     <div class="row" style="align-items:center;">
-      <span class="pill" id="pillQext">Q ext : —</span>
+      <span class="pill pillQext" id="pillQext">Q ext : —</span>
       <span class="pill" id="pillQtempo">Q tempo : —</span>
       <span class="pill" id="pilltExt">Durée ext. : —</span>
-      <span class="pill" id="pillBesoin">Besoin en émulseur pour extinction : —</span>
+      <span class="pill pillBesoin" id="pillBesoin">Besoin en émulseur pour extinction : —</span>
       <span class="pill" id="pillT0">T0 : —</span>
       <span class="pill" id="pillStockOK">Volume émulseur OK : —</span>
       <span class="pill pill-ext" id="pillExtStart">Début extinction : —</span>

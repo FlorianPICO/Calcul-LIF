@@ -449,7 +449,7 @@ a.lif-btn {
         <div class="lif-card-title">3) Résultats</div>
 
         <div class="lif-badges">
-          <div class="lif-badge"><div>Tex</div><div id="oTex">—</div></div>
+          <div class="lif-badge"><div>Tapp</div><div id="oTapp">—</div></div>
           <div class="lif-badge"><div>Durée ext.</div><div id="oT">—</div></div>
           <div class="lif-badge"><div>Concentration</div><div id="oConc">3 %</div></div>
         </div>
@@ -670,7 +670,7 @@ function compute() {
   const Qtempo = S * (Tex / 2);
 
   /* ================== AFFICHAGE DE BASE ================== */
-  $("oTex").textContent    = Tex.toFixed(2);
+  $("oTapp").textContent    = Tex.toFixed(2);
   $("oT").textContent      = String(Math.round(tExt));
   $("oQext").textContent   = String(Math.round(Qext));
   $("oQtempo").textContent = String(Math.round(Qtempo));
@@ -725,7 +725,7 @@ const updateResume = (vTapisPreventif = 0) => {
 
   $("resumeCmd").innerHTML =
     line("Surface estimée", `${Math.round(S)} m²`) +
-    line("Tex retenu", `${Tex.toFixed(1)} L/min/m²`) +
+    line("Tapp retenu", `${Tex.toFixed(1)} L/min/m²`) +
     line("Concentration retenue", `${Number.isFinite(concPct) ? concPct : 3} %`) +
     line("Débit extinction", `${Math.round(Qext)} L/min`) +
     line(
@@ -829,14 +829,14 @@ const updateResume = (vTapisPreventif = 0) => {
     $("vTotal").value = "";
     $("tReel").value = "";
 
-    ["oTex","oT","oQext","oVemul","oQtempo","oVtempo","oVentretien","oQentretien","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oDebord","oVtapis","oDentretien"]
+    ["oTapp","oT","oQext","oVemul","oQtempo","oVtempo","oVentretien","oQentretien","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oDebord","oVtapis","oDentretien"]
       .forEach(id => { const e = $(id); if (e) e.textContent = "—"; });
 
     $("oConc").textContent = "3 %";
 
     $("resumeCmd").textContent =
 `Surface estimée : —
-Tex retenu : —
+Tapp retenu : —
 Concentration retenue : —
 Débit extinction : —
 Volume émulseur total : —`;
@@ -929,6 +929,7 @@ btnCmp.addEventListener("click", (e) => {
  
 </body>
 </html>
+
 
 
 

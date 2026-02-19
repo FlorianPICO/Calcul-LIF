@@ -337,7 +337,7 @@ a.lif-btn {
           <div class="lif-field">
             <label>Mode :</label>
             <select id="modeSdis">
-              <option value="lock" selected>SDIS 27 (taux d'extinction verrouillés et taux de concentration fixé à 3%)</option>
+              <option value="lock" selected>SDIS 27 (taux d'application verrouillés et taux de concentration fixé à 3%)</option>
               <option value="custom">Autre SDIS (personnalisable)</option>
             </select>
             <small class="lif-help">
@@ -421,7 +421,7 @@ a.lif-btn {
           </div>
 
           <div class="lif-field" id="blocTexPoi" style="display:none;">
-            <label>Taux d'extinction défini dans POI (L/min/m²) :</label>
+            <label>Taux d'application défini dans POI (L/min/m²) :</label>
             <input id="texPoi" type="number" min="0" step="0.1" placeholder="Ex : 8">
             <small class="lif-help">Visible uniquement si “Réfléchi (POI)”</small>
           </div>
@@ -929,6 +929,7 @@ btnCmp.addEventListener("click", (e) => {
  
 </body>
 </html>
+
 
 
 

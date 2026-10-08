@@ -564,7 +564,19 @@ a.lif-btn {
 
 (() => {
   const $ = (id) => document.getElementById(id);
+// Affichage français : espaces entre milliers et millions.
+function fmt(valeur, decimales = 0) {
+  if (!Number.isFinite(valeur)) return "—";
 
+  // Conserver l'arrondi à l'unité utilisé par les calculs actuels.
+  const nombre = decimales === 0 ? Math.round(valeur) : valeur;
+
+  return new Intl.NumberFormat("fr-FR", {
+    useGrouping: true,
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales
+  }).format(nombre);
+}
   const n = (v) => {
     if (v === null || v === undefined) return NaN;
     const s = String(v).replace(",", ".").trim();
@@ -645,7 +657,7 @@ function compute() {
   // Paramètres (lisibles même si disabled)
   const concPct = n($("concentrationPct").value);
   const conc = (Number.isFinite(concPct) && concPct >= 0) ? (concPct / 100) : 0.03;
-  $("oConc").textContent = (Number.isFinite(concPct) ? `${concPct} %` : "3 %");
+  $("oConc").textContent = Number.isFinite(concPct) ? `${fmt(concPct, 1)} %` : "3 %";
 
   const texIndNonMisc = n($("texIndNonMisc").value);
   const texDirNonMisc = n($("texDirNonMisc").value);
@@ -670,14 +682,14 @@ function compute() {
   const Qtempo = S * (Tex / 2);
 
   /* ================== AFFICHAGE DE BASE ================== */
-  $("oTapp").textContent    = Tex.toFixed(2);
-  $("oT").textContent      = String(Math.round(tExt));
-  $("oQext").textContent   = String(Math.round(Qext));
-  $("oQtempo").textContent = String(Math.round(Qtempo));
+$("oTapp").textContent   = fmt(Tex, 2);
+$("oT").textContent     = fmt(tExt);
+$("oQext").textContent  = fmt(Qext);
+$("oQtempo").textContent = fmt(Qtempo);
 
   /* ================== V ÉMULSEUR EXTINCTION ================== */
   const Vemul = Qext * tExt * conc;
-  $("oVemul").textContent = String(Math.round(Vemul));
+  $("oVemul").textContent = fmt(Vemul);
 
 /* ================== ENTRETIEN TAPIS MOUSSE ==================
    Hypothèse simple (à adapter si tu as une doctrine précise) :
@@ -689,8 +701,8 @@ const Qentretien = Qext / 6;
 const tEntretien = 240; // minutes (4h)
 const VemulEntretien = Vemul;
 
-$("oQentretien").textContent = String(Math.round(Qentretien));
-$("oVentretien").textContent = String(Math.round(VemulEntretien));
+$("oQentretien").textContent = fmt(Qentretien);
+$("oVentretien").textContent = fmt(VemulEntretien);
 
 
   /* ================== V TEMPO ================== */
@@ -700,11 +712,11 @@ $("oVentretien").textContent = String(Math.round(VemulEntretien));
 
   if (!finRenseignee) {
     VtempoAff = Vemul / 2;
-    $("oVtempo").textContent = String(Math.round(VtempoAff));
+    $("oVtempo").textContent = fmt(VtempoAff);
   } else {
     if (Number.isFinite(tTempoMin)) {
       VtempoAff = Qtempo * tTempoMin * conc;
-      $("oVtempo").textContent = String(Math.round(VtempoAff));
+      $("oVtempo").textContent = fmt(VtempoAff);
     } else {
       $("oVtempo").textContent = "—";
       VtempoAff = 0;
@@ -723,14 +735,14 @@ const updateResume = (vTapisPreventif = 0) => {
   const line = (label, value) =>
     `<div><strong>${label} :</strong> ${value}</div>`;
 
-  $("resumeCmd").innerHTML =
-    line("Surface estimée", `${Math.round(S)} m²`) +
-    line("Tapp retenu", `${Tex.toFixed(1)} L/min/m²`) +
-    line("Concentration retenue", `${Number.isFinite(concPct) ? concPct : 3} %`) +
-    line("Débit extinction", `${Math.round(Qext)} L/min`) +
+    $("resumeCmd").innerHTML =
+    line("Surface estimée", `${fmt(S)} m²`) +
+    line("Tapp retenu", `${fmt(Tex, 1)} L/min/m²`) +
+    line("Concentration retenue", `${fmt(Number.isFinite(concPct) ? concPct : 3, 1)} %`) +
+    line("Débit extinction", `${fmt(Qext)} L/min`) +
     line(
       "Volume émulseur total",
-      `${vTotal} L <span style="font-size:0.9em;color:#475569">(Ext ${vExt} L / Tempo ${vTempo} L / Entretien ${vEntretien} L / Tapis ${vTapis} L)</span>`
+      `${fmt(vTotal)} L <span style="font-size:0.9em;color:#475569">(Ext ${fmt(vExt)} L / Tempo ${fmt(vTempo)} L / Entretien ${fmt(vEntretien)} L / Tapis ${fmt(vTapis)} L)</span>`
     );
 };
 
@@ -766,9 +778,9 @@ const updateResume = (vTapisPreventif = 0) => {
   const Vext   = Qext * 40;
   const marge  = Vt - (Vp + Vtempo + Vext);
 
-  $("oAjTempo").textContent = String(Math.round(Vtempo));
-  $("oAjExt").textContent   = String(Math.round(Vext));
-  $("oMarge").textContent   = String(Math.round(marge));
+  $("oAjTempo").textContent = fmt(Vtempo);
+  $("oAjExt").textContent   = fmt(Vext);
+  $("oMarge").textContent   = fmt(marge);
 
   let deb = false;
   let msg = "Pas de débordement";
@@ -780,13 +792,13 @@ const updateResume = (vTapisPreventif = 0) => {
     const margeInit = Vt - Vp;
     if (Qtempo * tr >= margeInit) {
       deb = true;
-      msg = `Débordement pendant temporisation (~${(margeInit / Qtempo).toFixed(1)} min)`;
+      msg = `Débordement pendant temporisation (~${fmt(margeInit / Qtempo, 1)} min)`;
     } else {
       const reste = margeInit - Qtempo * tr;
       const tDebExt = reste / Qext;
       if (tDebExt <= 40) {
         deb = true;
-        msg = `Débordement pendant extinction (~${(tr + tDebExt).toFixed(1)} min)`;
+        msg = `Débordement pendant extinction (~${fmt(tr + tDebExt, 1)} min)`;
       }
     }
   }
@@ -803,8 +815,8 @@ const updateResume = (vTapisPreventif = 0) => {
     const Sc = n($("surfaceCuvette").value);
     const vTapis = Number.isFinite(Sc) ? (Sc * 0.15 * 3) : NaN;
 
-    $("oVtapis").textContent = Number.isFinite(Sc) ? String(Math.round(vTapis)) : "—";
-    $("oDentretien").textContent = Number.isFinite(Sc) ? String(Math.round(Sc * 0.2)) : "—";
+    $("oVtapis").textContent = fmt(vTapis);
+    $("oDentretien").textContent = Number.isFinite(Sc) ? fmt(Sc * 0.2) : "—";
 
     updateResume(Number.isFinite(vTapis) ? vTapis : 0);
   } else {
@@ -920,7 +932,7 @@ btnCmp.addEventListener("click", (e) => {
 
 sauvegarderCalcul();
 window.location.href = target;
-
+});
 
 
   // ================== MÉMOIRE DE LA PAGE CALCUL ==================

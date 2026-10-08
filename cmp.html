@@ -549,7 +549,12 @@ th, td {
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
+// Séparer les milliers et millions dans les résultats affichés.
+function fmt(valeur) {
+  if (!Number.isFinite(valeur)) return "—";
 
+  return Math.round(valeur).toLocaleString("fr-FR");
+}
   // ===== Paramètres CMP =====
   const STEP_MIN = 20;
   const HORIZON_H = 5;
@@ -642,11 +647,11 @@ th, td {
 
   status.innerHTML =
     `✅ Paramètres reçus :<br>
-     - Q ext = <b>${Math.round(params.Qext)}</b> L/min<br>
-     - Q tempo = <b>${Math.round(params.Qtempo)}</b> L/min<br>
-     - Durée ext. = <b>${Math.round(params.tExt)}</b> min<br>
+         - Q ext = <b>${fmt(params.Qext)}</b> L/min<br>
+     - Q tempo = <b>${fmt(params.Qtempo)}</b> L/min<br>
+     - Durée ext. = <b>${fmt(params.tExt)}</b> min<br>
      - Concentration = <b>${params.concPct}%</b><br>
-     - Besoin extinction = <b>${Math.round(params.besoinExt)}</b> L émulseur`;
+     - Besoin extinction = <b>${fmt(params.besoinExt)}</b> L émulseur`;
   blocSaisie.style.display = "block";
 
   // ===== Liste engins =====
@@ -665,9 +670,9 @@ th, td {
 tr.innerHTML = `
   <td data-label="Type"><b>${r.type}</b></td>
   <td data-label="Arrivée">${r.atStr}</td>
-  <td data-label="Qté">${r.qty}</td>
-  <td data-label="Débit (L/min)">${flow}</td>
-  <td data-label="Émulseur (L)">${emul}</td>
+ <td data-label="Qté">${fmt(r.qty)}</td>
+<td data-label="Débit (L/min)">${fmt(flow)}</td>
+<td data-label="Émulseur (L)">${fmt(emul)}</td>
   <td data-label="Action">
     <button type="button" data-edit="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Modifier</button>
     <button type="button" data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
@@ -941,7 +946,10 @@ tr.innerHTML = `
       ctx.stroke();
 
       ctx.fillStyle = "#111";
-      ctx.fillText(Math.round(v).toString(), mL - 38, yy + 4);
+    ctx.save();
+ctx.textAlign = "right";
+ctx.fillText(fmt(v), mL - 10, yy + 4);
+ctx.restore();
     }
 
     // Axe Y droit (rouge)
@@ -950,7 +958,7 @@ tr.innerHTML = `
       const v = (yEmulMax * i / 5);
       const yy = yEmul(v);
       ctx.fillStyle = "#ef4444";
-      ctx.fillText(Math.round(v).toString(), mL + plotW + 10, yy + 4);
+    ctx.fillText(fmt(v), mL + plotW + 10, yy + 4);
     }
     ctx.fillStyle = "#ef4444";
     ctx.fillText("Volume émulseur (L)", mL + plotW - 118, mT - 16);
@@ -1077,10 +1085,10 @@ function legendItem(x0, y0, color, label, dash = null) {
     try { data = simulate(); }
     catch (e) { alert(e.message || "Erreur simulation."); return; }
 
-    $("pillQext").textContent = `Q ext : ${Math.round(data.Qext)} L/min`;
-    $("pillQtempo").textContent = `Q tempo : ${Math.round(data.Qtempo)} L/min`;
-    $("pilltExt").textContent = `Durée ext. : ${Math.round(data.tExt)} min`;
-    $("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${Math.round(data.needExtTotal)} L`;
+$("pillQext").textContent = `Q ext : ${fmt(data.Qext)} L/min`;
+$("pillQtempo").textContent = `Q tempo : ${fmt(data.Qtempo)} L/min`;
+$("pilltExt").textContent = `Durée ext. : ${fmt(data.tExt)} min`;
+$("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${fmt(data.needExtTotal)} L`;
     $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
 
     const t0Str = minToHHMM(data.t0Abs);

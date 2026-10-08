@@ -923,7 +923,68 @@ btnCmp.addEventListener("click", (e) => {
 
 
 
+  // ================== MÉMOIRE DE LA PAGE CALCUL ==================
+  const CLE_CALCUL = "LIF_CALCUL_SESSION";
+
+  const champsCalcul = Array.from(
+    document.querySelectorAll("input[id], select[id], textarea[id]")
+  );
+
+  function sauvegarderCalcul() {
+    const donnees = {};
+
+    champsCalcul.forEach(champ => {
+      donnees[champ.id] = champ.value;
+    });
+
+    try {
+      sessionStorage.setItem(CLE_CALCUL, JSON.stringify(donnees));
+    } catch (erreur) {
+      console.warn("Sauvegarde du calcul impossible :", erreur);
+    }
+  }
+
+  function restaurerCalcul() {
+    try {
+      const sauvegarde = sessionStorage.getItem(CLE_CALCUL);
+      if (!sauvegarde) return;
+
+      const donnees = JSON.parse(sauvegarde);
+      if (!donnees || typeof donnees !== "object") return;
+
+      // Restaurer les valeurs saisies.
+      champsCalcul.forEach(champ => {
+        if (typeof donnees[champ.id] === "string") {
+          champ.value = donnees[champ.id];
+        }
+      });
+
+      // Restaurer les champs visibles, les verrouillages et les résultats.
+      updateUI();
+      updateLockUI();
+      compute();
+    } catch (erreur) {
+      console.warn("Restauration du calcul impossible :", erreur);
+    }
+  }
+
+  // Initialiser la page, puis récupérer la saisie précédente.
   resetAll();
+  restaurerCalcul();
+
+  // Sauvegarder après chaque modification.
+  champsCalcul.forEach(champ => {
+    champ.addEventListener("input", sauvegarderCalcul);
+    champ.addEventListener("change", sauvegarderCalcul);
+  });
+
+  // Sauvegarder également quand on quitte la page.
+  window.addEventListener("pagehide", sauvegarderCalcul);
+
+  // Le bouton Réinitialiser enregistre aussi les champs remis à zéro.
+  // Son gestionnaire resetAll, déjà présent plus haut, est exécuté avant.
+  $("btnReset").addEventListener("click", sauvegarderCalcul);
+
 })();
 </script>
  

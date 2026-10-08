@@ -651,6 +651,7 @@ th, td {
 
   // ===== Liste engins =====
   const rows = [];
+  let indexModification = null;
   const tbody = $("liste");
 
   const render = () => {
@@ -668,7 +669,8 @@ tr.innerHTML = `
   <td data-label="Débit (L/min)">${flow}</td>
   <td data-label="Émulseur (L)">${emul}</td>
   <td data-label="Action">
-    <button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
+    <button type="button" data-edit="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Modifier</button>
+    <button type="button" data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
   </td>
 `;
 
@@ -704,30 +706,72 @@ tr.innerHTML = `
     `;
 
     tbody.appendChild(ligneTotal);
+    tbody.querySelectorAll("button[data-edit]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        indexModification = Number(btn.dataset.edit);
+        const ligne = rows[indexModification];
+
+        $("enginType").value = ligne.type;
+        $("arrivee").value = ligne.atStr;
+        $("qty").value = ligne.qty;
+
+        $("btnAdd").textContent = "Enregistrer";
+
+        $("enginType").scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+        $("enginType").focus({ preventScroll: true });
+      });
+    });
+
     tbody.querySelectorAll("button[data-i]").forEach(btn => {
       btn.addEventListener("click", () => {
-        const i = Number(btn.getAttribute("data-i"));
+        const i = Number(btn.dataset.i);
+
+        if (indexModification === i) {
+          indexModification = null;
+          $("btnAdd").textContent = "Ajouter";
+        } else if (indexModification !== null && i < indexModification) {
+          indexModification--;
+        }
+
         rows.splice(i, 1);
         render();
+        blocCourbe.style.display = "none";
       });
     });
   };
 
-  $("btnAdd").addEventListener("click", () => {
+    $("btnAdd").addEventListener("click", () => {
     const type = $("enginType").value;
     const atStr = $("arrivee").value || "00:00";
     const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
 
     if (!ENGINS[type]) return;
-    if (!Number.isFinite(timeToMin(atStr))) { alert("Heure d’arrivée invalide."); return; }
 
-    rows.push({ type, atStr, qty });
-    rows.sort((a,b) => timeToMin(a.atStr) - timeToMin(b.atStr));
+    if (!Number.isFinite(timeToMin(atStr))) {
+      alert("Heure d’arrivée invalide.");
+      return;
+    }
+
+    if (indexModification !== null) {
+      rows[indexModification] = { type, atStr, qty };
+      indexModification = null;
+      $("btnAdd").textContent = "Ajouter";
+    } else {
+      rows.push({ type, atStr, qty });
+    }
+
+    rows.sort((a, b) => timeToMin(a.atStr) - timeToMin(b.atStr));
     render();
+    blocCourbe.style.display = "none";
   });
 
   $("btnReset").addEventListener("click", () => {
     rows.length = 0;
+    indexModification = null;
+    $("btnAdd").textContent = "Ajouter";
     render();
     blocCourbe.style.display = "none";
   });

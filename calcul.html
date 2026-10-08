@@ -577,14 +577,56 @@ function fmt(valeur, decimales = 0) {
     maximumFractionDigits: decimales
   }).format(nombre);
 }
-  const n = (v) => {
-    if (v === null || v === undefined) return NaN;
-    const s = String(v).replace(",", ".").trim();
-    if (!s) return NaN;
-    const x = Number(s);
-    return Number.isFinite(x) ? x : NaN;
-  };
+const n = (v) => {
+  if (v === null || v === undefined) return NaN;
 
+  const s = String(v)
+    .replace(/\s/g, "") // Retirer les espaces entre les milliers.
+    .replace(",", ".")
+    .trim();
+
+  if (!s) return NaN;
+
+  const x = Number(s);
+  return Number.isFinite(x) ? x : NaN;
+};
+// ================== FORMATAGE DES CHAMPS DE SAISIE ==================
+const champsNumeriques = Array.from(
+  document.querySelectorAll('input[type="number"]')
+);
+
+function formaterSaisie(champ) {
+  const texte = champ.value.replace(/\s/g, "");
+
+  // Ne pas modifier une case vide ou une saisie incomplète.
+  if (!/^-?\d+(?:[.,]\d+)?$/.test(texte)) return;
+
+  const [entier, decimales] = texte.replace(",", ".").split(".");
+
+  // Ajouter un espace insécable tous les trois chiffres.
+  const entierFormate = entier.replace(
+    /\B(?=(\d{3})+(?!\d))/g,
+    "\u202f"
+  );
+
+  // Conserver toutes les décimales saisies, sans arrondir.
+  champ.value =
+    entierFormate +
+    (decimales !== undefined ? "," + decimales : "");
+}
+
+champsNumeriques.forEach(champ => {
+  // Les champs texte permettent d'afficher les espaces.
+  champ.type = "text";
+  champ.inputMode = "decimal";
+
+  // Formater lorsque l'utilisateur quitte la case.
+  champ.addEventListener("blur", () => {
+    formaterSaisie(champ);
+    compute();
+    sauvegarderCalcul();
+  });
+});
   function getTempoMinutes() {
     const d = $("tempoDebut").value;
     const f = $("tempoFin").value;
@@ -983,7 +1025,8 @@ window.location.href = target;
   // Initialiser la page, puis récupérer la saisie précédente.
   resetAll();
   restaurerCalcul();
-
+  champsNumeriques.forEach(formaterSaisie);
+  
   // Sauvegarder après chaque modification.
   champsCalcul.forEach(champ => {
     champ.addEventListener("input", sauvegarderCalcul);

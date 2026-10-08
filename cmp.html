@@ -674,7 +674,36 @@ tr.innerHTML = `
 
       tbody.appendChild(tr);
     });
+    // ===== TOTAL DES MOYENS INSCRITS AU TABLEAU =====
+    let totalDebit = 0;
+    let totalEmulseur = 0;
 
+    rows.forEach(r => {
+      const def = ENGINS[r.type];
+
+      totalDebit += def.flow * r.qty;
+      totalEmulseur += def.emul * r.qty;
+    });
+
+    const ligneTotal = document.createElement("tr");
+
+    ligneTotal.style.background = "#f1f5f9";
+    ligneTotal.style.fontWeight = "800";
+
+    ligneTotal.innerHTML = `
+      <td data-label="Type">TOTAL</td>
+      <td></td>
+      <td></td>
+      <td data-label="Débit (L/min)">
+        ${totalDebit.toLocaleString("fr-FR")}
+      </td>
+      <td data-label="Émulseur (L)">
+        ${totalEmulseur.toLocaleString("fr-FR")}
+      </td>
+      <td></td>
+    `;
+
+    tbody.appendChild(ligneTotal);
     tbody.querySelectorAll("button[data-i]").forEach(btn => {
       btn.addEventListener("click", () => {
         const i = Number(btn.getAttribute("data-i"));

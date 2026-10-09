@@ -905,12 +905,17 @@ $("oMargeM3").textContent = fmt(marge / 1000, 2);
       deb = true;
       msg = `Débordement pendant temporisation (~${fmt(margeInit / Qtempo, 1)} min)`;
     } else {
-      const reste = margeInit - Qtempo * tr;
+            const reste = margeInit - Qtempo * tr;
       const tDebExt = reste / Qext;
-      if (tDebExt <= 40) {
-        deb = true;
-        msg = `Débordement pendant extinction (~${fmt(tr + tDebExt, 1)} min)`;
-      }
+      const tDebTotal = tr + tDebExt;
+
+      // Le risque reste évalué sur les 40 minutes d’extinction.
+      deb = tDebExt <= 40;
+
+      // Afficher le délai même au-delà des 40 minutes prévues.
+      msg = tDebExt <= 40
+        ? `~${fmt(tDebTotal, 1)} min depuis le début de temporisation`
+        : `~${fmt(tDebTotal, 1)} min depuis le début de temporisation, si le débit d’extinction est maintenu au-delà de 40 min`;
     }
   }
 

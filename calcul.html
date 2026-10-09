@@ -462,6 +462,9 @@ a.lif-btn {
    <span id="oQextM3h">—</span> m³/h
 </small>
             <div class="lif-row"><span>V émulseur ext (L) :</span><span id="oVemul">—</span></div>
+            <small class="lif-help" style="margin-top: -4px; text-align: right;">
+  soit <span id="oVemulM3">—</span> m³
+</small>
             <div class="lif-row"><span>Q entretien du tapis sur 4h (L/min) :</span><span id="oQentretien">—</span></div>
             <small class="lif-help" style="margin-top: -4px; text-align: right;">
    <span id="oQentretienM3h">—</span> m³/h
@@ -470,6 +473,9 @@ a.lif-btn {
  égal à 1/6ème de Q ext soit 10 min/h pendant 4h
 </small>
             <div class="lif-row"><span>V émulseur pour entretien du tapis sur 4h (L) :</span><span id="oVentretien">—</span></div>
+            <small class="lif-help" style="margin-top: -4px; text-align: right;">
+  soit <span id="oVentretienM3">—</span> m³
+</small>
           </div>
 
           <div class="lif-panel">
@@ -482,6 +488,9 @@ a.lif-btn {
  Q tempo = Q ext / 2
 </small>
             <div class="lif-row"><span>V émulseur tempo (L) :</span><span id="oVtempo">—</span></div>
+            <small class="lif-help" style="margin-top: -4px; text-align: right;">
+  soit <span id="oVtempoM3">—</span> m³
+</small>
            <small class="lif-help" style="margin-top: -4px;">
   Si heure de fin de temporisation estimée non renseignée alors V émulseur tempo = V émulseur ext / 2
 </small>
@@ -794,6 +803,7 @@ $("oQtempo").textContent = fmt(Qtempo);
   /* ================== V ÉMULSEUR EXTINCTION ================== */
   const Vemul = Qext * tExt * conc;
   $("oVemul").textContent = fmt(Vemul);
+  $("oVemulM3").textContent = fmt(Vemul / 1000, 2);
 
 /* ================== ENTRETIEN TAPIS MOUSSE ==================
    Hypothèse simple (à adapter si tu as une doctrine précise) :
@@ -808,6 +818,7 @@ const VemulEntretien = Vemul;
 $("oQentretien").textContent = fmt(Qentretien);
   $("oQentretienM3h").textContent = fmt(Qentretien * 0.06, 1);
 $("oVentretien").textContent = fmt(VemulEntretien);
+  $("oVentretienM3").textContent = fmt(VemulEntretien / 1000, 2);
 
 
   /* ================== V TEMPO ================== */
@@ -818,12 +829,15 @@ $("oVentretien").textContent = fmt(VemulEntretien);
   if (!finRenseignee) {
     VtempoAff = Vemul / 2;
     $("oVtempo").textContent = fmt(VtempoAff);
+    $("oVtempoM3").textContent = fmt(VtempoAff / 1000, 2);
   } else {
     if (Number.isFinite(tTempoMin)) {
       VtempoAff = Qtempo * tTempoMin * conc;
       $("oVtempo").textContent = fmt(VtempoAff);
+      $("oVtempoM3").textContent = fmt(VtempoAff / 1000, 2);
     } else {
       $("oVtempo").textContent = "—";
+      $("oVtempoM3").textContent = "—";
       VtempoAff = 0;
     }
   }
@@ -979,7 +993,7 @@ $("oDentretienM3h").textContent =
     $("vTotal").value = "";
     $("tReel").value = "";
 
-    ["oTapp","oT","oQext","oVemul","oQtempo","oVtempo","oVentretien","oQentretien","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oTempsHM","oDebord","oVtapis","oDentretien"]
+    ["oTapp","oT","oQext","oVemul","oVemulM3","oQtempo","oVtempo","oVtempoM3","oVentretien","oVentretienM3","oQentretien","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oTempsHM","oDebord","oVtapis","oDentretien"]
       .forEach(id => { const e = $(id); if (e) e.textContent = "—"; });
 $("oQextM3h").textContent = "—";
     $("oQentretienM3h").textContent = "—";

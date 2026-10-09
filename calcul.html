@@ -493,7 +493,7 @@ a.lif-btn {
 
           <div class="lif-grid">
             <div class="lif-field">
-              <label>Volume déjà présent dans le bac, avant notre arrivée (L) :</label>
+              <label>Volume déjà présent dans le bac / rétention, au début du sinistre (avant notre arrivée) (L) :</label>
               <input id="vPresent" type="number" min="0">
             </div>
             <div class="lif-field">
@@ -503,11 +503,14 @@ a.lif-btn {
             <div class="lif-field">
               <label>Durée réelle temporisation (min) :</label>
               <input id="tReel" type="number" min="0" step="0.1">
+              <small class="lif-help" style="margin-top: 6px;">
+  Entre groupe horaire du début de temporisation et le top mousse
+</small>
             </div>
           </div>
 
-          <div class="lif-row"><span>Ajout temporisation (L)</span><span id="oAjTempo">—</span></div>
-          <div class="lif-row"><span>Ajout extinction (40 min) (L)</span><span id="oAjExt">—</span></div>
+          <div class="lif-row"><span>Volume ajouté pendant temporisation (L)</span><span id="oAjTempo">—</span></div>
+          <div class="lif-row"><span>Volume ajouté pendant extinction (40 min) (L)</span><span id="oAjExt">—</span></div>
           <div class="lif-row"><span>Marge avant débordement (L)</span><span id="oMarge">—</span></div>
           <div class="lif-row"><span>Temps avant débordement</span><span id="oTemps">—</span></div>
 

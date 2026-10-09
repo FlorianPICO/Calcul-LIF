@@ -914,8 +914,8 @@ $("oMargeM3").textContent = fmt(marge / 1000, 2);
 
       // Afficher le délai même au-delà des 40 minutes prévues.
       msg = tDebExt <= 40
-        ? `~${fmt(tDebTotal, 1)} min depuis le début de temporisation`
-        : `~${fmt(tDebTotal, 1)} min depuis le début de temporisation, si le débit d’extinction est maintenu au-delà de 40 min`;
+        ? `~${fmt(tDebTotal, 1)} min `
+        : `~${fmt(tDebTotal, 1)} min `;
     }
   }
 

@@ -1101,9 +1101,9 @@ $("pillBesoin").textContent = `Besoin en émulseur pour extinction : ${fmt(data.
     $("pillExtStart").style.display = "";
     $("pillExtEnd").style.display = "";
     $("pillExtStart").textContent =
-      (data.tExtStart === null) ? "Début extinction : —" : `Début extinction : ${addMinToHHMM(t0Str, data.tExtStart)}`;
+      (data.tExtStart === null) ? "Début extinction possible à : —" : `Début extinction possible à : ${addMinToHHMM(t0Str, data.tExtStart)}`;
     $("pillExtEnd").textContent =
-      (data.tExtEnd === null) ? "Fin extinction : —" : `Fin extinction : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
+      (data.tExtEnd === null) ? "Fin extinction possible à : —" : `Fin extinction possible à : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
 
     // Indicateurs visuels sous l’axe X (FIXES, sans superposition)
     const extIndStart = $("extIndStart");

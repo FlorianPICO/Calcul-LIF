@@ -533,7 +533,9 @@ a.lif-btn {
    <span id="oMargeM3">—</span> m³
 </small>
           <div class="lif-row"><span>Avec ces débits, débordement au bout de :</span><span id="oTemps">—</span></div>
-
+<small class="lif-help" style="margin-top: -4px; text-align: right;">
+  <span id="oTempsHM">—</span>
+</small>
           <div class="lif-debord" id="oDebord">—</div>
         </div>
 
@@ -877,6 +879,7 @@ const updateResume = (vTapisPreventif = 0) => {
 $("oAjExtM3").textContent = "—";
 $("oMargeM3").textContent = "—";
     $("oTemps").textContent   = "—";
+    $("oTempsHM").textContent = "—";
     $("oDebord").textContent  = "—";
     setDebordUI(false);
     return; // résumé déjà affiché
@@ -920,6 +923,22 @@ $("oMargeM3").textContent = fmt(marge / 1000, 2);
   }
 
   $("oTemps").textContent = msg;
+  // Délai depuis le début de temporisation.
+const delaiMinutes =
+  Vp >= Vt
+    ? 0
+    : Qtempo * tr >= Vt - Vp
+      ? (Vt - Vp) / Qtempo
+      : tr + (Vt - Vp - Qtempo * tr) / Qext;
+
+// Conversion arrondie à la minute.
+const minutesTotales = Math.round(delaiMinutes);
+const heures = Math.floor(minutesTotales / 60);
+const minutes = minutesTotales % 60;
+
+$("oTempsHM").textContent =
+  `soit ${fmt(heures)} ${heures > 1 ? "heures" : "heure"} et ` +
+  `${minutes} ${minutes > 1 ? "minutes" : "minute"}`;
   $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
   $("oDebord").style.background  = deb ? "#fee2e2" : "#dcfce7";
   $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
@@ -960,7 +979,7 @@ $("oDentretienM3h").textContent =
     $("vTotal").value = "";
     $("tReel").value = "";
 
-    ["oTapp","oT","oQext","oVemul","oQtempo","oVtempo","oVentretien","oQentretien","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oDebord","oVtapis","oDentretien"]
+    ["oTapp","oT","oQext","oVemul","oQtempo","oVtempo","oVentretien","oQentretien","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oTempsHM","oDebord","oVtapis","oDentretien"]
       .forEach(id => { const e = $(id); if (e) e.textContent = "—"; });
 $("oQextM3h").textContent = "—";
     $("oQentretienM3h").textContent = "—";

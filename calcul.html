@@ -463,6 +463,9 @@ a.lif-btn {
 </small>
             <div class="lif-row"><span>V émulseur ext (L) :</span><span id="oVemul">—</span></div>
             <div class="lif-row"><span>Q entretien du tapis sur 4h (L/min) :</span><span id="oQentretien">—</span></div>
+            <small class="lif-help" style="margin-top: -4px; text-align: right;">
+  soit <span id="oQentretienM3h">—</span> m³/h
+</small>
                 <small class="lif-help" style="margin-top: -4px;">
  égal à 1/6ème de Q ext soit 10 min/h pendant 4h
 </small>
@@ -760,6 +763,7 @@ const tEntretien = 240; // minutes (4h)
 const VemulEntretien = Vemul;
 
 $("oQentretien").textContent = fmt(Qentretien);
+  $("oQentretienM3h").textContent = fmt(Qentretien * 0.06, 1);
 $("oVentretien").textContent = fmt(VemulEntretien);
 
 
@@ -902,6 +906,7 @@ const updateResume = (vTapisPreventif = 0) => {
     ["oTapp","oT","oQext","oVemul","oQtempo","oVtempo","oVentretien","oQentretien","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oDebord","oVtapis","oDentretien"]
       .forEach(id => { const e = $(id); if (e) e.textContent = "—"; });
 $("oQextM3h").textContent = "—";
+    $("oQentretienM3h").textContent = "—";
     $("oConc").textContent = "3 %";
 
     $("resumeCmd").textContent =

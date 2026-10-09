@@ -509,9 +509,29 @@ a.lif-btn {
             </div>
           </div>
 
-          <div class="lif-row"><span>Volume ajouté pendant temporisation (L)</span><span id="oAjTempo">—</span></div>
-          <div class="lif-row"><span>Volume ajouté pendant extinction (40 min) (L)</span><span id="oAjExt">—</span></div>
-          <div class="lif-row"><span>Marge avant débordement (L)</span><span id="oMarge">—</span></div>
+          <div class="lif-row">
+  <span>Volume ajouté pendant temporisation (L)</span>
+  <span id="oAjTempo">—</span>
+</div>
+<small class="lif-help" style="margin-top: -4px; text-align: right;">
+   <span id="oAjTempoM3">—</span> m³
+</small>
+
+<div class="lif-row">
+  <span>Volume ajouté pendant extinction (40 min) (L)</span>
+  <span id="oAjExt">—</span>
+</div>
+<small class="lif-help" style="margin-top: -4px; text-align: right;">
+   <span id="oAjExtM3">—</span> m³
+</small>
+
+<div class="lif-row">
+  <span>Marge avant débordement (L)</span>
+  <span id="oMarge">—</span>
+</div>
+<small class="lif-help" style="margin-top: -4px; text-align: right;">
+   <span id="oMargeM3">—</span> m³
+</small>
           <div class="lif-row"><span>Avec ces débits, débordement au bout de :</span><span id="oTemps">—</span></div>
 
           <div class="lif-debord" id="oDebord">—</div>
@@ -838,6 +858,9 @@ const updateResume = (vTapisPreventif = 0) => {
     $("oAjTempo").textContent = "—";
     $("oAjExt").textContent   = "—";
     $("oMarge").textContent   = "—";
+    $("oAjTempoM3").textContent = "—";
+$("oAjExtM3").textContent = "—";
+$("oMargeM3").textContent = "—";
     $("oTemps").textContent   = "—";
     $("oDebord").textContent  = "—";
     setDebordUI(false);
@@ -851,6 +874,9 @@ const updateResume = (vTapisPreventif = 0) => {
   $("oAjTempo").textContent = fmt(Vtempo);
   $("oAjExt").textContent   = fmt(Vext);
   $("oMarge").textContent   = fmt(marge);
+  $("oAjTempoM3").textContent = fmt(Vtempo / 1000, 2);
+$("oAjExtM3").textContent = fmt(Vext / 1000, 2);
+$("oMargeM3").textContent = fmt(marge / 1000, 2);
 
   let deb = false;
   let msg = "Pas de débordement";
@@ -916,6 +942,9 @@ const updateResume = (vTapisPreventif = 0) => {
 $("oQextM3h").textContent = "—";
     $("oQentretienM3h").textContent = "—";
     $("oQtempoM3h").textContent = "—";
+    $("oAjTempoM3").textContent = "—";
+$("oAjExtM3").textContent = "—";
+$("oMargeM3").textContent = "—";
     $("oConc").textContent = "3 %";
 
     $("resumeCmd").textContent =

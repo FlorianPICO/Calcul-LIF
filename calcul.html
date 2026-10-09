@@ -556,8 +556,21 @@ a.lif-btn {
 </div>
 
 
-            <div class="lif-row"><span>Volume émulseur (L)</span><span id="oVtapis">—</span></div>
-          <div class="lif-row"><span>Débit entretien (L/min)</span><span id="oDentretien">—</span></div>
+           <div class="lif-row">
+  <span>Volume émulseur (L)</span>
+  <span id="oVtapis">—</span>
+</div>
+<small class="lif-help" style="margin-top: -4px; text-align: right;">
+  soit <span id="oVtapisM3">—</span> m³
+</small>
+
+<div class="lif-row">
+  <span>Débit entretien (L/min)</span>
+  <span id="oDentretien">—</span>
+</div>
+<small class="lif-help" style="margin-top: -4px; text-align: right;">
+  soit <span id="oDentretienM3h">—</span> m³/h
+</small>
         </div>
       </section>
 
@@ -913,7 +926,10 @@ $("oMargeM3").textContent = fmt(marge / 1000, 2);
 
     $("oVtapis").textContent = fmt(vTapis);
     $("oDentretien").textContent = Number.isFinite(Sc) ? fmt(Sc * 0.2) : "—";
+$("oVtapisM3").textContent = fmt(vTapis / 1000, 2);
 
+$("oDentretienM3h").textContent =
+  Number.isFinite(Sc) ? fmt(Sc * 0.2 * 0.06, 1) : "—";
     updateResume(Number.isFinite(vTapis) ? vTapis : 0);
   } else {
     updateResume(0);
@@ -945,6 +961,8 @@ $("oQextM3h").textContent = "—";
     $("oAjTempoM3").textContent = "—";
 $("oAjExtM3").textContent = "—";
 $("oMargeM3").textContent = "—";
+    $("oVtapisM3").textContent = "—";
+$("oDentretienM3h").textContent = "—";
     $("oConc").textContent = "3 %";
 
     $("resumeCmd").textContent =

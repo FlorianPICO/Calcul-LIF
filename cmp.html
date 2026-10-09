@@ -645,13 +645,15 @@ function fmt(valeur) {
     return;
   }
 
-  status.innerHTML =
+    status.innerHTML =
     `✅ Paramètres reçus :<br>
-         - Q ext = <b>${fmt(params.Qext)}</b> L/min<br>
+     - Q ext = <b>${fmt(params.Qext)}</b> L/min<br>
      - Q tempo = <b>${fmt(params.Qtempo)}</b> L/min<br>
      - Durée ext. = <b>${fmt(params.tExt)}</b> min<br>
      - Concentration = <b>${params.concPct}%</b><br>
-     - Besoin extinction = <b>${fmt(params.besoinExt)}</b> L émulseur`;
+     - Besoin extinction = <b>${fmt(params.besoinExt)}</b> L émulseur<br>
+     - Q entretien du tapis sur 4h = <b>${fmt(params.Qentretien)}</b> L/min<br>
+     - V émulseur pour entretien du tapis sur 4h = <b>${fmt(params.VemulEntretien)}</b> L`;
   blocSaisie.style.display = "block";
 
   // ===== Liste engins =====

@@ -650,17 +650,31 @@ function fmt(valeur) {
     params.VemulEntretien +
     params.VemulTempo;
 
-  status.innerHTML =
-    `✅ Paramètres reçus :<br>
-     - Q ext = <b>${fmt(params.Qext)}</b> L/min<br>
-     - Q tempo = <b>${fmt(params.Qtempo)}</b> L/min<br>
-     - Durée extinction = <b>${fmt(params.tExt)}</b> min<br>
-     - Concentration = <b>${params.concPct}%</b><br>
-     - V émulseur extinction = <b>${fmt(params.besoinExt)}</b> L<br>
-     - Q entretien du tapis sur 4h = <b>${fmt(params.Qentretien)}</b> L/min<br>
-     - V émulseur pour entretien du tapis sur 4h = <b>${fmt(params.VemulEntretien)}</b> L<br>
-     - V émulseur tempo = <b>${fmt(params.VemulTempo)}</b> L<br>
-     - <strong>V émulseur total = ${fmt(VemulTotal)} L</strong>`;
+    status.innerHTML = `
+    <div>
+      <strong>Phase extinction :</strong><br>
+      - Q ext = <b>${fmt(params.Qext)}</b> L/min<br>
+      - V émulseur extinction = <b>${fmt(params.besoinExt)}</b> L<br>
+      - Durée extinction = <b>${fmt(params.tExt)}</b> min<br>
+      - Concentration = <b>${params.concPct}</b> %
+    </div>
+
+    <div style="margin-top: 14px;">
+      <strong>Phase temporisation :</strong><br>
+      - Q tempo = <b>${fmt(params.Qtempo)}</b> L/min<br>
+      - V émulseur tempo = <b>${fmt(params.VemulTempo)}</b> L
+    </div>
+
+    <div style="margin-top: 14px;">
+      <strong>Phase entretien du tapis :</strong><br>
+      - Q entretien du tapis sur 4h = <b>${fmt(params.Qentretien)}</b> L/min<br>
+      - V émulseur pour entretien du tapis sur 4h = <b>${fmt(params.VemulEntretien)}</b> L
+    </div>
+
+    <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #cbd5e1;">
+      <strong>V émulseur total = ${fmt(VemulTotal)} L</strong>
+    </div>
+  `;
   blocSaisie.style.display = "block";
 
   // ===== Liste engins =====

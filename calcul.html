@@ -475,6 +475,9 @@ a.lif-btn {
           <div class="lif-panel">
             <div class="lif-panel-title">TEMPORISATION</div>
             <div class="lif-row"><span>Q tempo (L/min) :</span><span id="oQtempo">—</span></div>
+            <small class="lif-help" style="margin-top: -4px; text-align: right;">
+   <span id="oQtempoM3h">—</span> m³/h
+</small>
              <small class="lif-help" style="margin-top: -4px;">
  Q tempo = Q ext / 2
 </small>
@@ -747,6 +750,7 @@ $("oT").textContent     = fmt(tExt);
 $("oQext").textContent  = fmt(Qext);
   $("oQextM3h").textContent = fmt(Qext * 0.06, 1);
 $("oQtempo").textContent = fmt(Qtempo);
+  $("oQtempoM3h").textContent = fmt(Qtempo * 0.06, 1);
 
   /* ================== V ÉMULSEUR EXTINCTION ================== */
   const Vemul = Qext * tExt * conc;
@@ -907,6 +911,7 @@ const updateResume = (vTapisPreventif = 0) => {
       .forEach(id => { const e = $(id); if (e) e.textContent = "—"; });
 $("oQextM3h").textContent = "—";
     $("oQentretienM3h").textContent = "—";
+    $("oQtempoM3h").textContent = "—";
     $("oConc").textContent = "3 %";
 
     $("resumeCmd").textContent =

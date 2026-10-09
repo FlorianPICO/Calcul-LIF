@@ -903,7 +903,7 @@ $("oMargeM3").textContent = fmt(marge / 1000, 2);
     const margeInit = Vt - Vp;
     if (Qtempo * tr >= margeInit) {
       deb = true;
-      msg = `Débordement pendant temporisation (~${fmt(margeInit / Qtempo, 1)} min)`;
+      msg = `(~${fmt(margeInit / Qtempo, 1)} min)`;
     } else {
             const reste = margeInit - Qtempo * tr;
       const tDebExt = reste / Qext;

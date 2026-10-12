@@ -856,7 +856,8 @@ tr.innerHTML = `
 
     const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0);
     const emulSerie = Array(HORIZON_MIN + 1).fill(0);
-
+const entretienStockInsuffisant = [false, false, false, false];
+    
     for (let t = 0; t <= HORIZON_MIN; t++) {
       flowAvail += addFlow[t];
       emulStock += addEmul[t];
@@ -896,7 +897,13 @@ tr.innerHTML = `
 
         if (entretienEnCours) {
           // Consommation par minute au débit d’entretien du tapis.
-emulCons = params.Qentretien * conc;
+          emulCons = params.Qentretien * conc;
+
+          // Signaler toute minute d’entretien insuffisamment alimentée.
+          if (emulCons > emulStock + 0.000001) {
+            const numeroPlage = Math.floor(depuisFinExtinction / 60);
+            entretienStockInsuffisant[numeroPlage] = true;
+          }
         }
       }
 
@@ -920,7 +927,8 @@ emulCons = params.Qentretien * conc;
       tExtStart,
       tExtEnd,
       flowAvailSerie,
-      emulSerie
+           emulSerie,
+      entretienStockInsuffisant
     };
   }
 
@@ -1028,22 +1036,45 @@ ctx.restore();
       ctx.fillStyle = "rgba(34,197,94,0.10)";
       ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
     }
-    // Entretien du tapis : 10 min par heure pendant 4 heures.
+       // Entretien : vert si stock suffisant, rouge sinon.
     if (Number.isFinite(data.tExtEnd)) {
       ctx.save();
-      ctx.fillStyle = "rgba(34,197,94,0.10)";
 
       for (let heure = 0; heure < 4; heure++) {
         const debut = data.tExtEnd + heure * 60 + 50;
         const fin = debut + 10;
 
-        // Afficher seulement la portion comprise dans le graphique.
         if (debut >= HORIZON_MIN) continue;
 
         const x1 = x(debut);
         const x2 = x(Math.min(fin, HORIZON_MIN));
+        const largeur = Math.max(0, x2 - x1);
+        const manqueStock = data.entretienStockInsuffisant[heure];
 
-        ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
+        ctx.fillStyle = manqueStock
+          ? "rgba(239,68,68,0.18)"
+          : "rgba(34,197,94,0.10)";
+
+        ctx.fillRect(x1, mT, largeur, plotH);
+
+        if (manqueStock && largeur > 0) {
+          ctx.save();
+
+          // Garder le message à l’intérieur de la plage.
+          ctx.beginPath();
+          ctx.rect(x1, mT, largeur, plotH);
+          ctx.clip();
+
+          ctx.translate(x1 + largeur / 2, mT + plotH / 2);
+          ctx.rotate(-Math.PI / 2);
+          ctx.fillStyle = "#991b1b";
+          ctx.font = "bold 12px system-ui, Arial";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("Attention au stock d’émulseur", 0, 0);
+
+          ctx.restore();
+        }
       }
 
       ctx.restore();

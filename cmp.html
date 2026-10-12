@@ -883,9 +883,8 @@ tr.innerHTML = `
           depuisFinExtinction % 60 >= 50;
 
         if (entretienEnCours) {
-          // Répartir le volume d’entretien importé
-          // sur 4 créneaux de 10 min, soit 40 min au total.
-          emulCons = params.VemulEntretien / 40;
+          // Consommation par minute au débit d’entretien du tapis.
+emulCons = params.Qentretien * conc;
         }
       }
 

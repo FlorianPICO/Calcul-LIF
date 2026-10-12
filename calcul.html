@@ -696,6 +696,34 @@ champsNumeriques.forEach(champ => {
     sauvegarderCalcul();
   });
 });
+    function proposerFinTempo() {
+    const debut = $("tempoDebut").value;
+
+    if (!debut) {
+      $("tempoFin").value = "";
+      return;
+    }
+
+    const [heures, minutes] = debut.split(":").map(Number);
+
+    // Ajouter 20 minutes, y compris lors du passage à minuit.
+    const total = (heures * 60 + minutes + 20) % 1440;
+
+    const heureFin = String(Math.floor(total / 60)).padStart(2, "0");
+    const minuteFin = String(total % 60).padStart(2, "0");
+
+    $("tempoFin").value = `${heureFin}:${minuteFin}`;
+  }
+
+  function initialiserHorairesTempo() {
+    const maintenant = new Date();
+
+    const heures = String(maintenant.getHours()).padStart(2, "0");
+    const minutes = String(maintenant.getMinutes()).padStart(2, "0");
+
+    $("tempoDebut").value = `${heures}:${minutes}`;
+    proposerFinTempo();
+  }
   function getTempoMinutes() {
     const d = $("tempoDebut").value;
     const f = $("tempoFin").value;
@@ -985,8 +1013,7 @@ $("oDentretienM3h").textContent =
     $("produit").value = "non_miscible";
     $("reflexe").value = "reflexe";
     $("texPoi").value = "";
-    $("tempoDebut").value = "";
-    $("tempoFin").value = "";
+initialiserHorairesTempo();
     $("surfaceCuvette").value = "";
 
     $("vPresent").value = "";
@@ -1145,6 +1172,21 @@ window.location.href = target;
   // Initialiser la page, puis récupérer la saisie précédente.
   resetAll();
   restaurerCalcul();
+    // Proposer les horaires si aucune valeur n’a été restaurée.
+  if (!$("tempoDebut").value) {
+    initialiserHorairesTempo();
+  } else if (!$("tempoFin").value) {
+    proposerFinTempo();
+  }
+
+  compute();
+
+  // Chaque modification du début propose une fin 20 min plus tard.
+  $("tempoDebut").addEventListener("change", () => {
+    proposerFinTempo();
+    compute();
+    sauvegarderCalcul();
+  });
   champsNumeriques.forEach(formaterSaisie);
   
   // Sauvegarder après chaque modification.

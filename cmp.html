@@ -455,6 +455,25 @@ th, td {
 
 
 
+/* Champs propres aux moyens industriels : grille indépendante. */
+.industrial-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.industrial-fields[hidden] { display: none; }
+.industrial-cell { min-width: 0; }
+.industrial-cell label { display: block; margin-bottom: 6px; }
+.industrial-cell .field { height: 56px; border-radius: 18px; }
+@media (max-width: 520px) {
+  .industrial-fields { grid-template-columns: 1fr; }
+}
+
   </style>
 </head>
 
@@ -498,6 +517,7 @@ th, td {
           <option value="CEDEM">CEDEM</option>
           <option value="CDHR">CDHR</option>
           <option value="CEEM">CEEM (émulseur)</option>
+          <option value="INDUSTRIEL">Moyens industriels</option>
         </select>
         <div class="small">Débit + volume émulseur propre au Sdis 27.</div>
       </div>
@@ -515,6 +535,21 @@ th, td {
 
      <div class="cell cell-add">
         <button id="btnAdd" class="btn btn-primary field-btn" type="button">Ajouter</button>
+      </div>
+    </div>
+
+    <div id="industrialParams" class="industrial-fields" hidden>
+      <div class="industrial-cell">
+        <label for="industrialFlow">Débit par moyen (L/min) :</label>
+        <input id="industrialFlow" class="field" type="number" min="0" step="any"
+               inputmode="decimal" placeholder="Ex : 2 500" disabled>
+        <div class="small">Débit disponible pour chaque moyen industriel.</div>
+      </div>
+      <div class="industrial-cell">
+        <label for="industrialEmul">Volume émulseur par moyen (L) :</label>
+        <input id="industrialEmul" class="field" type="number" min="0" step="any"
+               inputmode="decimal" placeholder="Ex : 1 000" disabled>
+        <div class="small">Stock d’émulseur par moyen, multiplié par la quantité.</div>
       </div>
     </div>
 
@@ -674,6 +709,23 @@ function fmt(valeur) {
     CEEM:  { flow: 0,    emul: 6000 }
   };
 
+  // Chaque ligne industrielle conserve ses propres capacités unitaires.
+  function getEnginCapacites(ligne) {
+    return ligne.type === "INDUSTRIEL"
+      ? { flow: ligne.customFlow, emul: ligne.customEmul }
+      : ENGINS[ligne.type];
+  }
+
+  function updateIndustrialUI() {
+    const industriel = $("enginType").value === "INDUSTRIEL";
+    $("industrialParams").hidden = !industriel;
+    $("industrialFlow").disabled = !industriel;
+    $("industrialEmul").disabled = !industriel;
+  }
+
+  $("enginType").addEventListener("change", updateIndustrialUI);
+  updateIndustrialUI();
+
   // ===== Charge params =====
   let params = null;
   try { params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null"); }
@@ -740,13 +792,13 @@ function fmt(valeur) {
   const render = () => {
     tbody.innerHTML = "";
     rows.forEach((r, idx) => {
-      const def = ENGINS[r.type];
+      const def = getEnginCapacites(r);
       const flow = def.flow * r.qty;
       const emul = def.emul * r.qty;
 
       const tr = document.createElement("tr");
 tr.innerHTML = `
-  <td data-label="Type"><b>${r.type}</b></td>
+  <td data-label="Type"><b>${r.type === "INDUSTRIEL" ? "Moyens industriels" : r.type}</b></td>
   <td data-label="Arrivée">${r.atStr}</td>
  <td data-label="Qté">${fmt(r.qty)}</td>
 <td data-label="Débit (L/min)">${fmt(flow)}</td>
@@ -764,7 +816,7 @@ tr.innerHTML = `
     let totalEmulseur = 0;
 
     rows.forEach(r => {
-      const def = ENGINS[r.type];
+      const def = getEnginCapacites(r);
 
       totalDebit += def.flow * r.qty;
       totalEmulseur += def.emul * r.qty;
@@ -797,6 +849,9 @@ tr.innerHTML = `
         $("enginType").value = ligne.type;
         $("arrivee").value = ligne.atStr;
         $("qty").value = ligne.qty;
+        $("industrialFlow").value = ligne.type === "INDUSTRIEL" ? ligne.customFlow : "";
+        $("industrialEmul").value = ligne.type === "INDUSTRIEL" ? ligne.customEmul : "";
+        updateIndustrialUI();
 
         $("btnAdd").textContent = "Enregistrer";
 
@@ -831,7 +886,26 @@ tr.innerHTML = `
     const atStr = $("arrivee").value || "00:00";
     const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
 
-    if (!ENGINS[type]) return;
+    const ligne = { type, atStr, qty };
+
+    if (type === "INDUSTRIEL") {
+      const customFlow = n($("industrialFlow").value);
+      const customEmul = n($("industrialEmul").value);
+
+      if (![customFlow, customEmul].every(Number.isFinite) ||
+          customFlow < 0 || customEmul < 0) {
+        alert("Renseigne un débit et un volume d’émulseur valides, supérieurs ou égaux à zéro.");
+        return;
+      }
+      if (customFlow === 0 && customEmul === 0) {
+        alert("Renseigne au moins un débit ou un volume d’émulseur supérieur à zéro.");
+        return;
+      }
+      ligne.customFlow = customFlow;
+      ligne.customEmul = customEmul;
+    } else if (!ENGINS[type]) {
+      return;
+    }
 
     if (!Number.isFinite(timeToMin(atStr))) {
       alert("Heure d’arrivée invalide.");
@@ -839,11 +913,11 @@ tr.innerHTML = `
     }
 
     if (indexModification !== null) {
-      rows[indexModification] = { type, atStr, qty };
+      rows[indexModification] = ligne;
       indexModification = null;
       $("btnAdd").textContent = "Ajouter";
     } else {
-      rows.push({ type, atStr, qty });
+      rows.push(ligne);
     }
 
     rows.sort((a, b) => timeToMin(a.atStr) - timeToMin(b.atStr));
@@ -853,6 +927,9 @@ tr.innerHTML = `
 
   $("btnReset").addEventListener("click", () => {
     rows.length = 0;
+    $("industrialFlow").value = "";
+    $("industrialEmul").value = "";
+    updateIndustrialUI();
     indexModification = null;
     $("btnAdd").textContent = "Ajouter";
     render();
@@ -875,7 +952,7 @@ tr.innerHTML = `
     const addEmul = Array(HORIZON_MIN + 1).fill(0);
 
     rows.forEach(r => {
-      const def = ENGINS[r.type];
+      const def = getEnginCapacites(r);
       const rel = arrivalRelMin(r.atStr, t0Abs);
       if (!Number.isFinite(rel)) return;
       const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));

@@ -272,6 +272,11 @@ th, td {
   background:rgba(37,99,235,0.10) !important;
   color:#1e3a8a !important;
 }
+    .pillQtempo {
+  border-color: #d946ef !important;
+  background: rgba(217, 70, 239, 0.10) !important;
+  color: #86198f !important;
+}
 
 /* ===== Desktop : aligner le bouton avec les champs (pas les titres) ===== */
 @media (min-width: 769px){
@@ -518,7 +523,7 @@ th, td {
 
     <div class="row" style="align-items:center;">
       <span class="pill pillQext" id="pillQext">Q ext : —</span>
-      <span class="pill" id="pillQtempo">Q tempo : —</span>
+      <span class="pill pillQtempo" id="pillQtempo">Q tempo : —</span>
       <span class="pill" id="pilltExt">Durée ext. : —</span>
       <span class="pill pillBesoin" id="pillBesoin">Besoin en émulseur pour extinction : —</span>
       <span class="pill" id="pillT0">T0 : —</span>
@@ -1031,7 +1036,15 @@ ctx.restore();
     ctx.lineTo(mL + plotW, yFlow(data.Qext));
     ctx.stroke();
     ctx.setLineDash([]);
-
+    // Débit de temporisation Qtempo (rose fuchsia)
+    ctx.strokeStyle = "#d946ef";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(mL, yFlow(data.Qtempo));
+    ctx.lineTo(mL + plotW, yFlow(data.Qtempo));
+    ctx.stroke();
+    ctx.setLineDash([]);
     // Volume émulseur extinction (orange)
     ctx.strokeStyle = "#ff8800";
     ctx.setLineDash([6, 6]);
@@ -1083,7 +1096,7 @@ function legendItem(x0, y0, color, label, dash = null) {
 
 
     const boxW = 860;
-    const boxH = 24;
+   const boxH = 44;
     ctx.fillStyle = "rgba(255,255,255,0.85)";
     ctx.strokeStyle = "#e5e7eb";
     ctx.lineWidth = 1;
@@ -1095,7 +1108,13 @@ function legendItem(x0, y0, color, label, dash = null) {
     legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
     legendItem(legendX + 440, legendY, "#ff0303", "Volume émulseur dispo");
     legendItem(legendX + 620, legendY, "#ff8800", "Volume émulseur extinction (cible)", [6, 6]);
-
+legendItem(
+  legendX,
+  legendY + 20,
+  "#d946ef",
+  "Débit temporisation (Q tempo)",
+  [6, 6]
+);
     // IMPORTANT : les “pastilles” visuelles sont gérées en HTML (extIndStart/extIndEnd),
     // donc on ne dessine PAS de pastilles dans le canvas => aucun doublon.
   }

@@ -563,6 +563,11 @@ th, td {
   <span class="pill" id="pillEntretien2">Entretien tapis n°2 à —</span>
   <span class="pill" id="pillEntretien3">Entretien tapis n°3 à —</span>
   <span class="pill" id="pillEntretien4">Entretien tapis n°4 à —</span>
+  <span class="pill entretien-impossible"
+      id="pillEmulseurManquant"
+      style="display:none;">
+  V émulseur manquant : —
+</span>
 </div>
     
     <div class="canvas-wrap" style="margin-top:10px;">
@@ -890,6 +895,7 @@ tr.innerHTML = `
     const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0);
     const emulSerie = Array(HORIZON_MIN + 1).fill(0);
 const entretienStockInsuffisant = [false, false, false, false];
+let emulseurManquantEntretien = 0;
     
     for (let t = 0; t <= HORIZON_MIN; t++) {
       flowAvail += addFlow[t];
@@ -936,6 +942,7 @@ const entretienStockInsuffisant = [false, false, false, false];
           if (emulCons > emulStock + 0.000001) {
             const numeroPlage = Math.floor(depuisFinExtinction / 60);
             entretienStockInsuffisant[numeroPlage] = true;
+            emulseurManquantEntretien += emulCons - emulStock;
           }
         }
       }
@@ -961,7 +968,8 @@ const entretienStockInsuffisant = [false, false, false, false];
       tExtEnd,
       flowAvailSerie,
            emulSerie,
-      entretienStockInsuffisant
+     entretienStockInsuffisant,
+emulseurManquantEntretien
     };
   }
 
@@ -1303,7 +1311,14 @@ $("pillBesoin").textContent = `V émulseur extinction : ${fmt(data.needExtTotal)
         bulle.title = "Créneau non entièrement évalué par la simulation";
       }
     }
-    
+        const bulleManque = $("pillEmulseurManquant");
+    const volumeManquant = data.emulseurManquantEntretien;
+
+    bulleManque.style.display =
+      volumeManquant > 0.000001 ? "" : "none";
+
+    bulleManque.textContent =
+      `V émulseur manquant : ${fmt(Math.ceil(volumeManquant))} L`;
     blocCourbe.style.display = "block";
     drawChart(data);
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });

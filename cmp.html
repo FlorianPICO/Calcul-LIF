@@ -272,6 +272,21 @@ th, td {
   background:rgba(37,99,235,0.10) !important;
   color:#1e3a8a !important;
 }
+    .pillVtotal {
+  border-color: transparent !important;
+  background:
+    linear-gradient(
+      110deg,
+      #fecaca,
+      #fed7aa,
+      #fef08a,
+      #bbf7d0,
+      #bfdbfe,
+      #ddd6fe,
+      #f5d0fe
+    ) !important;
+  color: #0f172a !important;
+}
     .pillQtempo {
   border-color: #d946ef !important;
   background: rgba(217, 70, 239, 0.10) !important;
@@ -526,6 +541,7 @@ th, td {
       <span class="pill pillQtempo" id="pillQtempo">Q tempo : —</span>
       <span class="pill" id="pilltExt">Durée ext. : —</span>
       <span class="pill pillBesoin" id="pillBesoin">V émulseur extinction : —</span>
+      <span class="pill pillVtotal" id="pillVtotal">V émulseur total : —</span>
       <span class="pill" id="pillT0">T0 : —</span>
       <span class="pill" id="pillStockOK">Volume émulseur OK : —</span>
 <span class="pill pill-ext" id="pillExtStart">Début extinction possible à : —</span>
@@ -1211,6 +1227,8 @@ $("pillQext").textContent = `Q ext : ${fmt(data.Qext)} L/min`;
 $("pillQtempo").textContent = `Q tempo : ${fmt(data.Qtempo)} L/min`;
 $("pilltExt").textContent = `Durée ext. : ${fmt(data.tExt)} min`;
 $("pillBesoin").textContent = `V émulseur extinction : ${fmt(data.needExtTotal)} L`;
+    $("pillVtotal").textContent =
+  `V émulseur total : ${fmt(VemulTotal)} L`;
     $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
 
     const t0Str = minToHHMM(data.t0Abs);

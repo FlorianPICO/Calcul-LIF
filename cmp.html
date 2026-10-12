@@ -253,7 +253,18 @@ th, td {
 
 
     .pill{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:0.85rem; border:1px solid #ddd; background:#f8fafc; }
+.pill.entretien-ok {
+  background: rgba(34,197,94,0.10);
+  border-color: #22c55e;
+  color: #166534;
+}
 
+.pill.entretien-impossible {
+  background: rgba(239,68,68,0.18);
+  border-color: #ef4444;
+  color: #991b1b;
+}
+    
     .canvas-wrap{ width:100%; overflow:auto; border:1px dashed #cbd5e1; border-radius:12px; padding:10px; background:#fff; }
     canvas{ width:100%; height:auto; }
     
@@ -547,6 +558,12 @@ th, td {
 <span class="pill pill-ext" id="pillExtStart">Début extinction possible à : —</span>
 <span class="pill pill-ext" id="pillExtEnd">Fin extinction possible à : —</span>
     </div>
+<div class="row" style="align-items:center; margin-top:10px;">
+  <span class="pill" id="pillEntretien1">Entretien tapis n°1 à —</span>
+  <span class="pill" id="pillEntretien2">Entretien tapis n°2 à —</span>
+  <span class="pill" id="pillEntretien3">Entretien tapis n°3 à —</span>
+  <span class="pill" id="pillEntretien4">Entretien tapis n°4 à —</span>
+</div>
     
     <div class="canvas-wrap" style="margin-top:10px;">
       <canvas id="chart" width="1100" height="520"></canvas>
@@ -1256,7 +1273,37 @@ $("pillBesoin").textContent = `V émulseur extinction : ${fmt(data.needExtTotal)
       extIndEnd.textContent =
         (data.tExtEnd === null) ? "Fin ext. : —" : `Fin ext. : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
     }
+    // Bulles des quatre créneaux d’entretien.
+    for (let numero = 0; numero < 4; numero++) {
+      const bulle = $(`pillEntretien${numero + 1}`);
 
+      bulle.classList.remove("entretien-ok", "entretien-impossible");
+
+      if (!Number.isFinite(data.tExtEnd)) {
+        bulle.textContent = `Entretien tapis n°${numero + 1} à —`;
+        bulle.title = "Extinction non déclenchée";
+        continue;
+      }
+
+      const debut = data.tExtEnd + numero * 60 + 50;
+      const horaire = addMinToHHMM(t0Str, debut);
+      const manqueStock = data.entretienStockInsuffisant[numero];
+
+      bulle.textContent =
+        `Entretien tapis n°${numero + 1} à ${horaire}`;
+
+      if (manqueStock) {
+        bulle.classList.add("entretien-impossible");
+        bulle.title = "Stock d’émulseur insuffisant pour réaliser les 10 minutes";
+      } else if (debut + 10 <= HORIZON_MIN) {
+        bulle.classList.add("entretien-ok");
+        bulle.title = "Stock d’émulseur suffisant pour les 10 minutes";
+      } else {
+        bulle.textContent += " — hors horizon";
+        bulle.title = "Créneau non entièrement évalué par la simulation";
+      }
+    }
+    
     blocCourbe.style.display = "block";
     drawChart(data);
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });

@@ -478,7 +478,7 @@ th, td {
 
        <div class="cell cell-time">
         <label>Heure d’arrivée :</label>
-        <input id="arrivee" class="field" type="time" value="00:00">
+        <input id="arrivee" class="field" type="time">
         <div class="small">Heure à laquelle l'engin commence à projeter de la mousse.</div>
       </div>
 
@@ -685,6 +685,18 @@ function fmt(valeur) {
   // ===== Liste engins =====
   const rows = [];
   let indexModification = null;
+  $("arrivee").addEventListener("focus", () => {
+  const champ = $("arrivee");
+
+  // Conserver une heure déjà saisie ou chargée pour modification.
+  if (champ.value || indexModification !== null) return;
+
+  const maintenant = new Date();
+  const heures = String(maintenant.getHours()).padStart(2, "0");
+  const minutes = String(maintenant.getMinutes()).padStart(2, "0");
+
+  champ.value = `${heures}:${minutes}`;
+});
   const tbody = $("liste");
 
   const render = () => {

@@ -642,7 +642,7 @@ function fmt(valeur, decimales = 0) {
 
   return new Intl.NumberFormat("fr-FR", {
     useGrouping: true,
-    minimumFractionDigits: decimales,
+    minimumFractionDigits: 0,
     maximumFractionDigits: decimales
   }).format(nombre);
 }

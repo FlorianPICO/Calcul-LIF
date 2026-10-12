@@ -813,7 +813,7 @@ $("oQtempo").textContent = fmt(Qtempo);
 */
 const Qentretien = Qext / 6;
 const tEntretien = 240; // minutes (4h)
-const VemulEntretien = Vemul;
+const VemulEntretien = Qentretien * 40 * conc;
 
 $("oQentretien").textContent = fmt(Qentretien);
   $("oQentretienM3h").textContent = fmt(Qentretien * 0.06, 1);

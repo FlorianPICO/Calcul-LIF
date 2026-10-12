@@ -998,7 +998,26 @@ ctx.restore();
       ctx.fillStyle = "rgba(34,197,94,0.10)";
       ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
     }
+    // Entretien du tapis : 10 min par heure pendant 4 heures.
+    if (Number.isFinite(data.tExtEnd)) {
+      ctx.save();
+      ctx.fillStyle = "rgba(34,197,94,0.10)";
 
+      for (let heure = 0; heure < 4; heure++) {
+        const debut = data.tExtEnd + heure * 60 + 50;
+        const fin = debut + 10;
+
+        // Afficher seulement la portion comprise dans le graphique.
+        if (debut >= HORIZON_MIN) continue;
+
+        const x1 = x(debut);
+        const x2 = x(Math.min(fin, HORIZON_MIN));
+
+        ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
+      }
+
+      ctx.restore();
+    }
     // NOIR : débit dispo (escaliers)
     ctx.strokeStyle = "#111";
     ctx.lineWidth = 2;
@@ -1104,7 +1123,7 @@ function legendItem(x0, y0, color, label, dash = null) {
     ctx.fill();
     ctx.stroke();
 
-    legendItem(legendX + 0,   legendY, "#111",    "Débit dispo (somme engins)");
+    legendItem(legendX + 0,   legendY, "#111",    "Débit cumulé dispo (somme engins)");
     legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
     legendItem(legendX + 440, legendY, "#ff0303", "Volume émulseur dispo");
     legendItem(legendX + 620, legendY, "#ff8800", "Volume émulseur extinction (cible)", [6, 6]);

@@ -862,12 +862,31 @@ tr.innerHTML = `
 
       let emulCons = 0;
 
-      if (!startedExt) {
+       if (!startedExt) {
         const flowUsedTempo = Math.min(flowAvail, Qtempo);
         emulCons = flowUsedTempo * conc;
+
       } else if (extRemaining > 0) {
         emulCons = Qext * conc;
         extRemaining -= 1;
+
+      } else {
+        // Entretien après la fin d’extinction.
+        const finExtinction = tExtStart + tExt;
+        const depuisFinExtinction = t - finExtinction;
+
+        // Mêmes créneaux que les quatre petites plages vertes :
+        // +50 à +60, +110 à +120, +170 à +180, +230 à +240 min.
+        const entretienEnCours =
+          depuisFinExtinction >= 0 &&
+          depuisFinExtinction < 240 &&
+          depuisFinExtinction % 60 >= 50;
+
+        if (entretienEnCours) {
+          // Répartir le volume d’entretien importé
+          // sur 4 créneaux de 10 min, soit 40 min au total.
+          emulCons = params.VemulEntretien / 40;
+        }
       }
 
       if (emulCons > emulStock) emulCons = emulStock;

@@ -681,8 +681,8 @@ a.lif-btn {
 
 <div id="resumeCmd" class="lif-resume">
   Surface estimée : —<br>
-  Tapp retenu : —<br>
-  Concentration retenue : —<br>
+  Taux d'application : —<br>
+  Concentration : —<br>
   Débit extinction : —<br>
   Volume émulseur total : —
 </div>
@@ -974,8 +974,8 @@ const updateResume = (vTapisPreventif = 0) => {
 
     $("resumeCmd").innerHTML =
     line("Surface estimée", `${fmt(S)} m²`) +
-    line("Tapp retenu", `${fmt(Tex, 1)} L/min/m²`) +
-    line("Concentration retenue", `${fmt(Number.isFinite(concPct) ? concPct : 3, 1)} %`) +
+        line("Taux d'application", `${fmt(Tex, 1)} L/min/m²`) +
+    line("Concentration", `${fmt(Number.isFinite(concPct) ? concPct : 3, 1)} %`) +
        line(
   "Débit extinction",
   `${fmt(Qext)} L/min <span style="font-size:0.9em; color:#475569;">soit ${fmt(Qext * 0.06, 1)} m³/h</span>`
@@ -1125,8 +1125,8 @@ $("oDentretienM3h").textContent = "—";
 
     $("resumeCmd").textContent =
 `Surface estimée : —
-Tapp retenu : —
-Concentration retenue : —
+Taux d'application : —
+Concentration : —
 Débit extinction : —
 Volume émulseur total : —`;
 

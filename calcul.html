@@ -973,10 +973,12 @@ const updateResume = (vTapisPreventif = 0) => {
   "Débit extinction",
   `${fmt(Qext)} L/min <span style="font-size:0.9em; color:#475569;">soit ${fmt(Qext * 0.06, 1)} m³/h</span>`
 ) +
-   line(
-  "Volume émulseur total",
-  `${fmt(vTotal)} L <span style="font-size:0.9em;color:#475569;">soit ${fmt(vTotal / 1000, 2)} m³ (Ext ${fmt(vExt)} L / Tempo ${fmt(vTempo)} L / Entretien ${fmt(vEntretien)} L / Tapis ${fmt(vTapis)} L)</span>`
-);
+    line(
+      "Volume émulseur total",
+      `${fmt(vTotal)} L <span style="font-size:0.9em;color:#475569">(Ext ${fmt(vExt)} L / Tempo ${fmt(vTempo)} L / Entretien ${fmt(vEntretien)} L / Tapis ${fmt(vTapis)} L)</span>`
+    ) +
+    `<small class="lif-help" style="margin-top: -4px;">soit ${fmt(vTotal / 1000, 2)} m³</small>`;
+};
 
 
 
@@ -1290,59 +1292,4 @@ window.location.href = target;
  
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

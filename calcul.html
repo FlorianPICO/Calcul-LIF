@@ -218,6 +218,36 @@ header img.Logo {
     .lif-split { display:grid; grid-template-columns:1fr 1fr; gap:12px }
     .lif-panel { border:1px solid #ddd; border-radius:12px; padding:12px }
     .lif-panel-title { font-weight:900; margin-bottom:8px }
+    /* Uniquement les cases extinction et temporisation */
+.lif-panel.lif-phase-ext {
+  border: 2px solid #2563eb;
+}
+
+.lif-panel.lif-phase-tempo {
+  border: 2px solid #d946ef;
+}
+
+/* Uniquement leurs titres */
+.lif-phase-ext > .lif-panel-title,
+.lif-phase-tempo > .lif-panel-title {
+  display: table;
+  max-width: 100%;
+  padding-bottom: 8px;
+  color: #172a46;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: 1px;
+  line-height: 1.4;
+  border-bottom: 3px solid;
+}
+
+.lif-phase-ext > .lif-panel-title {
+  border-bottom-color: #2563eb;
+}
+
+.lif-phase-tempo > .lif-panel-title {
+  border-bottom-color: #d946ef;
+}
     .lif-panel-muted { background:#fafafa }
     .lif-row { display:flex; justify-content:space-between; padding:6px 0; font-weight:700; gap:10px }
     .lif-debord { margin-top:10px; padding:12px; border-radius:12px; text-align:center; font-weight:900; border:1px solid #ddd; background:#fff }
@@ -505,7 +535,7 @@ a.lif-btn {
         </div>
 
         <div class="lif-split">
-          <div class="lif-panel">
+         <div class="lif-panel lif-phase-ext">
             <div class="lif-panel-title">EXTINCTION</div>
             <div class="lif-row"><span>Q ext (L/min) :</span><span id="oQext">—</span></div>
             <small class="lif-help" style="margin-top: -4px; text-align: right;">
@@ -528,7 +558,7 @@ a.lif-btn {
 </small>
           </div>
 
-          <div class="lif-panel">
+         <div class="lif-panel lif-phase-tempo">
             <div class="lif-panel-title">TEMPORISATION</div>
             <div class="lif-row"><span>Q tempo (L/min) :</span><span id="oQtempo">—</span></div>
             <small class="lif-help" style="margin-top: -4px; text-align: right;">

@@ -126,7 +126,50 @@ header img.Logo {
     header a.back-btn{ color:#fff; text-decoration:none; font-weight:800; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.12); white-space:nowrap; display:inline-block; }
     main{ max-width:980px; margin:auto; padding:16px 12px 26px; }
     .card{ background:#fff; border:1px solid #ddd; border-radius:14px; padding:14px; margin-top:12px; }
-    .card h2{ margin:0 0 10px 0; font-size:1.1rem; font-weight:900; }
+ /* Bandeaux des grands titres */
+.card h2.lif-card-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 18px 20px;
+  margin: -14px -14px 16px;
+
+  background: linear-gradient(105deg, #0b1220, #172a46);
+  border-left: 4px solid #60a5fa;
+  border-radius: 13px 13px 0 0;
+
+  color: #fff;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: 0.1px;
+}
+
+.lif-title-number {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+
+  width: 38px;
+  height: 38px;
+
+  background: rgba(96, 165, 250, 0.14);
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  border-radius: 10px;
+
+  color: #bfdbfe;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  .card h2.lif-card-title {
+    padding: 15px 14px;
+    gap: 11px;
+    font-size: 16px;
+  }
+}
     .grid{ display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:start; }
 /* ===================================== */
 /* ALIGNEMENT PARFAIT DES 4 CASES (DESKTOP) */
@@ -496,13 +539,20 @@ th, td {
 
 <main>
   <div class="card" id="blocStatus">
-    <h2>Paramètres importés depuis le calcul</h2>
+  <h2 class="lif-card-title">
+  <span>Paramètres importés depuis le calcul</span>
+</h2>
     <div id="status" class="warn">Chargement…</div>
     <div class="small">CMP mode Sdis 27.</div>
   </div>
 
   <div class="card" id="blocSaisie" style="display:none;">
-    <h2>5) Saisir les engins (arrivée échelonnée)</h2>
+   <h2 class="lif-card-title">
+  <span class="lif-title-number">5</span>
+  <span>Saisir les engins
+    <span style="font-weight:400; color:#cbd5e1;">(arrivée échelonnée)</span>
+  </span>
+</h2>
 
     <div class="grid">
    <div class="cell cell-type">
@@ -580,7 +630,10 @@ th, td {
   </div>
 
   <div class="card" id="blocCourbe" style="display:none;">
-    <h2>6) Courbe de montée en puissance</h2>
+    <h2 class="lif-card-title">
+  <span class="lif-title-number">6</span>
+  <span>Courbe de montée en puissance</span>
+</h2>
 
     <div class="row" style="align-items:center;">
       <span class="pill pillQext" id="pillQext">Q ext : —</span>

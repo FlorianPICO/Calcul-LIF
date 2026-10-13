@@ -969,14 +969,14 @@ const updateResume = (vTapisPreventif = 0) => {
     line("Surface estimée", `${fmt(S)} m²`) +
     line("Tapp retenu", `${fmt(Tex, 1)} L/min/m²`) +
     line("Concentration retenue", `${fmt(Number.isFinite(concPct) ? concPct : 3, 1)} %`) +
-       line("Débit extinction", `${fmt(Qext)} L/min`) +
-    `<small class="lif-help" style="margin-top: -4px;">soit ${fmt(Qext * 0.06, 1)} m³/h</small>` +
-    line(
-      "Volume émulseur total",
-      `${fmt(vTotal)} L <span style="font-size:0.9em;color:#475569">(Ext ${fmt(vExt)} L / Tempo ${fmt(vTempo)} L / Entretien ${fmt(vEntretien)} L / Tapis ${fmt(vTapis)} L)</span>`
-    ) +
-    `<small class="lif-help" style="margin-top: -4px;">soit ${fmt(vTotal / 1000, 2)} m³</small>`;
-};
+       line(
+  "Débit extinction",
+  `${fmt(Qext)} L/min <span style="font-size:0.9em; color:#475569;">soit ${fmt(Qext * 0.06, 1)} m³/h</span>`
+) +
+   line(
+  "Volume émulseur total",
+  `${fmt(vTotal)} L <span style="font-size:0.9em;color:#475569;">soit ${fmt(vTotal / 1000, 2)} m³ (Ext ${fmt(vExt)} L / Tempo ${fmt(vTempo)} L / Entretien ${fmt(vEntretien)} L / Tapis ${fmt(vTapis)} L)</span>`
+);
 
 
 

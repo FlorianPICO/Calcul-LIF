@@ -137,11 +137,52 @@ header img.Logo {
     .lif-container { max-width:760px; margin:auto; padding:12px }
     .lif-card { background:#fff; border-radius:14px; padding:14px; margin-top:12px; border:1px solid #ddd }
 
-    .lif-card-title {
-      font-size: 1.4rem;
-      font-weight: 900;
-      margin-bottom: 14px;
-    }
+   /* Bandeaux des grands titres */
+.lif-card-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 18px 20px;
+  margin: -14px -14px 16px;
+
+  background: linear-gradient(105deg, #0b1220, #172a46);
+  border-left: 4px solid #60a5fa;
+  border-radius: 13px 13px 0 0;
+
+  color: #fff;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: 0.1px;
+}
+
+.lif-title-number {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+
+  width: 38px;
+  height: 38px;
+
+  background: rgba(96, 165, 250, 0.14);
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  border-radius: 10px;
+
+  color: #bfdbfe;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Adaptation aux cartes sur mobile */
+@media (max-width: 520px) {
+  .lif-card-title {
+    margin: -12px -12px 14px;
+    padding: 15px 14px;
+    gap: 11px;
+    font-size: 16px;
+  }
+}
 
     .lif-grid { display:grid; grid-template-columns:1fr; gap:10px }
 
@@ -331,7 +372,10 @@ a.lif-btn {
 
       <!-- ================== PARAMÈTRES INTER-SDIS ================== -->
       <section class="lif-card">
-        <div class="lif-card-title">1) Paramètres</div>
+       <div class="lif-card-title">
+  <span class="lif-title-number">1</span>
+  <span>Paramètres</span>
+</div>
 
         <div class="lif-grid">
           <div class="lif-field">
@@ -379,7 +423,10 @@ a.lif-btn {
 
       <!-- ================== SAISIE ================== -->
       <section class="lif-card">
-        <div class="lif-card-title">2) Saisie</div>
+        <div class="lif-card-title">
+  <span class="lif-title-number">2</span>
+  <span>Saisie</span>
+</div>
 
         <div class="lif-grid">
           <div class="lif-field">
@@ -446,7 +493,10 @@ a.lif-btn {
 
       <!-- ================== RESULTATS ================== -->
       <section class="lif-card">
-        <div class="lif-card-title">3) Résultats</div>
+        <div class="lif-card-title">
+  <span class="lif-title-number">3</span>
+  <span>Résultats</span>
+</div>
 
         <div class="lif-badges">
           <div class="lif-badge"><div>Tapp</div><div id="oTapp">—</div></div>
@@ -587,7 +637,10 @@ a.lif-btn {
 
       <!-- ================== RÉSUMÉ COMMANDEMENT ================== -->
       <section class="lif-card" id="blocResumeCmd">
-        <div class="lif-card-title">4) Résumé </div>
+        <div class="lif-card-title">
+  <span class="lif-title-number">4</span>
+  <span>Résumé</span>
+</div>
 
 <div id="resumeCmd" class="lif-resume">
   Surface estimée : —<br>

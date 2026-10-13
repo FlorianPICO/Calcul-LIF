@@ -1044,19 +1044,15 @@ ctx.restore();
     ctx.lineTo(mL + plotW, yFlow(data.Qtempo));
     ctx.stroke();
     ctx.setLineDash([]);
-       // Volume émulseur extinction (orange)
+    // Volume émulseur extinction (orange)
     ctx.strokeStyle = "#ff8800";
     ctx.setLineDash([6, 6]);
-    ctx.lineDashOffset = 6;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(mL, yEmul(data.needExtTotal));
     ctx.lineTo(mL + plotW, yEmul(data.needExtTotal));
     ctx.stroke();
-
-    // Rétablir les réglages pour les tracés suivants.
     ctx.setLineDash([]);
-    ctx.lineDashOffset = 0;
 
     // Lignes verticales extinction
     function drawVLine(tMin, color) {

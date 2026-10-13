@@ -502,6 +502,14 @@ th, td {
   function fmt(valeur) {
     return Number.isFinite(valeur) ? Math.round(valeur).toLocaleString("fr-FR") : "—";
   }
+  function fmtConversion(valeur) {
+  if (!Number.isFinite(valeur)) return "—";
+
+  return valeur.toLocaleString("fr-FR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  });
+}
 
   const escapeHtml = valeur => String(valeur).replace(/[&<>"']/g, caractere => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -590,29 +598,36 @@ th, td {
     params.VemulEntretien +
     params.VemulTempo;
 
-    status.innerHTML = `
+       status.innerHTML = `
     <div>
       <strong>Phase extinction :</strong><br>
-      - Q ext = <b>${fmt(params.Qext)}</b> L/min<br>
-      - V émulseur extinction = <b>${fmt(params.besoinExt)}</b> L<br>
+      - Q ext = <b>${fmt(params.Qext)}</b> L/min
+      <span style="color:#475569;">soit ${fmtConversion(params.Qext * 0.06)} m³/h</span><br>
+      - V émulseur extinction = <b>${fmt(params.besoinExt)}</b> L
+      <span style="color:#475569;">soit ${fmtConversion(params.besoinExt / 1000)} m³</span><br>
       - Durée extinction = <b>${fmt(params.tExt)}</b> min<br>
       - Concentration = <b>${params.concPct}</b> %
     </div>
 
-    <div style="margin-top: 14px;">
+    <div style="margin-top:14px;">
       <strong>Phase temporisation :</strong><br>
-      - Q tempo = <b>${fmt(params.Qtempo)}</b> L/min<br>
+      - Q tempo = <b>${fmt(params.Qtempo)}</b> L/min
+      <span style="color:#475569;">soit ${fmtConversion(params.Qtempo * 0.06)} m³/h</span><br>
       - V émulseur tempo = <b>${fmt(params.VemulTempo)}</b> L
+      <span style="color:#475569;">soit ${fmtConversion(params.VemulTempo / 1000)} m³</span>
     </div>
 
-    <div style="margin-top: 14px;">
+    <div style="margin-top:14px;">
       <strong>Phase entretien du tapis :</strong><br>
-      - Q entretien du tapis sur 4h = <b>${fmt(params.Qentretien)}</b> L/min<br>
+      - Q entretien du tapis sur 4h = <b>${fmt(params.Qentretien)}</b> L/min
+      <span style="color:#475569;">soit ${fmtConversion(params.Qentretien * 0.06)} m³/h</span><br>
       - V émulseur pour entretien du tapis sur 4h = <b>${fmt(params.VemulEntretien)}</b> L
+      <span style="color:#475569;">soit ${fmtConversion(params.VemulEntretien / 1000)} m³</span>
     </div>
 
-    <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #cbd5e1;">
+    <div style="margin-top:14px; padding-top:10px; border-top:1px solid #cbd5e1;">
       <strong>V émulseur total = ${fmt(VemulTotal)} L</strong>
+      <span style="color:#475569;">soit ${fmtConversion(VemulTotal / 1000)} m³</span>
     </div>
   `;
   blocSaisie.style.display = "block";

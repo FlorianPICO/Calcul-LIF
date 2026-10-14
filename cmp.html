@@ -1527,45 +1527,65 @@ function legendItem(x0, y0, color, label, dash = null) {
 }
 
 
+       // Fond de la légende.
     const boxW = 860;
-     const boxH = 64;
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    const boxH = 94;
+
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
     ctx.strokeStyle = "#e5e7eb";
     ctx.lineWidth = 1;
-    ctx.roundRect(legendX - 8, legendY - 14, boxW, boxH, 10);
+    ctx.roundRect(
+      legendX - 8, legendY - 14,
+      boxW, boxH, 10
+    );
     ctx.fill();
     ctx.stroke();
 
-       legendItem(
-      legendX, legendY,
+    // Titres des deux colonnes.
+    ctx.fillStyle = "#172a46";
+    ctx.font = "bold 12px system-ui, Arial";
+    ctx.fillText("DÉBITS (L/min)", legendX, legendY);
+    ctx.fillText("VOLUMES (L)", legendX + 440, legendY);
+
+    // Séparation verticale.
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.beginPath();
+    ctx.moveTo(legendX + 420, legendY - 6);
+    ctx.lineTo(legendX + 420, legendY + 68);
+    ctx.stroke();
+
+    // Colonne gauche : débits.
+    legendItem(
+      legendX, legendY + 22,
       "#111",
       "Q ext réel (sommes débits engins)"
     );
 
     legendItem(
-      legendX + 440, legendY,
+      legendX, legendY + 42,
       "#2563eb",
       "Débit extinction théorique (Q ext théorique)",
       [6, 6]
     );
 
     legendItem(
-      legendX, legendY + 20,
+      legendX, legendY + 62,
+      "#d946ef",
+      "Débit temporisation réel (Q tempo réel)",
+      [6, 6]
+    );
+
+    // Colonne droite : volumes.
+    legendItem(
+      legendX + 440, legendY + 22,
       "#ff0303",
       "Volume émulseur disponible"
     );
 
     legendItem(
-      legendX + 440, legendY + 20,
+      legendX + 440, legendY + 42,
       "#ff8800",
       "Volume émulseur extinction réel",
-      [6, 6]
-    );
-
-    legendItem(
-      legendX, legendY + 40,
-      "#d946ef",
-      "Débit temporisation réel (Q tempo réel)",
       [6, 6]
     );
     // IMPORTANT : les “pastilles” visuelles sont gérées en HTML (extIndStart/extIndEnd),

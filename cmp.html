@@ -1293,7 +1293,12 @@ emulseurManquantEntretien
 
     const xMax = HORIZON_MIN;
 
-    const maxFlow = Math.max(data.Qext, ...data.flowAvailSerie) || 1000;
+       const maxFlow = Math.max(
+      params.Qext,
+      data.Qext,
+      data.Qtempo,
+      ...data.flowAvailSerie
+    ) || 1000;
     const yFlowMax = maxFlow * 1.15;
 
     const maxEmul = Math.max(...data.emulSerie, data.needExtTotal, 1);
@@ -1459,8 +1464,8 @@ ctx.restore();
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(mL, yFlow(data.Qext));
-    ctx.lineTo(mL + plotW, yFlow(data.Qext));
+       ctx.moveTo(mL, yFlow(params.Qext));
+    ctx.lineTo(mL + plotW, yFlow(params.Qext));
     ctx.stroke();
     ctx.setLineDash([]);
     // Débit de temporisation Qtempo (rose fuchsia)
@@ -1523,7 +1528,7 @@ function legendItem(x0, y0, color, label, dash = null) {
 
 
     const boxW = 860;
-   const boxH = 44;
+     const boxH = 64;
     ctx.fillStyle = "rgba(255,255,255,0.85)";
     ctx.strokeStyle = "#e5e7eb";
     ctx.lineWidth = 1;
@@ -1531,17 +1536,38 @@ function legendItem(x0, y0, color, label, dash = null) {
     ctx.fill();
     ctx.stroke();
 
-    legendItem(legendX + 0,   legendY, "#111",    "Débit cumulé dispo (somme engins)");
-    legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
-    legendItem(legendX + 440, legendY, "#ff0303", "Volume émulseur dispo");
-    legendItem(legendX + 620, legendY, "#ff8800", "Volume émulseur extinction (cible)", [6, 6]);
-legendItem(
-  legendX,
-  legendY + 20,
-  "#d946ef",
-  "Débit temporisation (Q tempo)",
-  [6, 6]
-);
+       legendItem(
+      legendX, legendY,
+      "#111",
+      "Q ext réel (sommes débits engins)"
+    );
+
+    legendItem(
+      legendX + 440, legendY,
+      "#2563eb",
+      "Débit extinction théorique (Q ext théorique)",
+      [6, 6]
+    );
+
+    legendItem(
+      legendX, legendY + 20,
+      "#ff0303",
+      "Volume émulseur disponible"
+    );
+
+    legendItem(
+      legendX + 440, legendY + 20,
+      "#ff8800",
+      "Volume émulseur extinction réel",
+      [6, 6]
+    );
+
+    legendItem(
+      legendX, legendY + 40,
+      "#d946ef",
+      "Débit temporisation réel (Q tempo réel)",
+      [6, 6]
+    );
     // IMPORTANT : les “pastilles” visuelles sont gérées en HTML (extIndStart/extIndEnd),
     // donc on ne dessine PAS de pastilles dans le canvas => aucun doublon.
   }

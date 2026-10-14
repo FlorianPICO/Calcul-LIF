@@ -517,6 +517,23 @@ th, td {
   .industrial-fields { grid-template-columns: 1fr; }
 }
 
+  .cmp-pills-title {
+  margin: 14px 0 6px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #172a46;
+}
+
+.cmp-pills-divider {
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+  margin: 18px 0;
+}
+
+.pill sub {
+  font-size: 0.7em;
+  vertical-align: sub;
+}
   </style>
 </head>
 
@@ -635,17 +652,57 @@ th, td {
   <span>Courbe de montée en puissance</span>
 </h2>
 
-    <div class="row" style="align-items:center;">
-      <span class="pill pillQext" id="pillQext">Q ext : —</span>
-      <span class="pill pillQtempo" id="pillQtempo">Q tempo : —</span>
-      <span class="pill" id="pilltExt">Durée ext. : —</span>
-      <span class="pill pillBesoin" id="pillBesoin">V émulseur extinction : —</span>
-      <span class="pill pillVtotal" id="pillVtotal">V émulseur total : —</span>
-      <span class="pill" id="pillT0">T0 : —</span>
-      <span class="pill" id="pillStockOK">Volume émulseur OK : —</span>
-<span class="pill pill-ext" id="pillExtStart">Début extinction possible à : —</span>
-<span class="pill pill-ext" id="pillExtEnd">Fin extinction possible à : —</span>
-    </div>
+   <h3 class="cmp-pills-title">Théorique :</h3>
+
+<div class="row" style="align-items:center;">
+  <span class="pill pillQext" id="pillQext">
+    Q ext <sub>théorique</sub> : —
+  </span>
+  <span class="pill pillQtempo" id="pillQtempo">
+    Q tempo <sub>théorique</sub> : —
+  </span>
+  <span class="pill" id="pilltExt">
+    Durée extinction <sub>théorique</sub> : —
+  </span>
+  <span class="pill pillBesoin" id="pillBesoin">
+    V émulseur extinction <sub>théorique</sub> : —
+  </span>
+  <span class="pill pillVtotal" id="pillVtotal">
+    V émulseur total <sub>théorique</sub> : —
+  </span>
+</div>
+
+<hr class="cmp-pills-divider">
+
+<h3 class="cmp-pills-title">Réel :</h3>
+
+<div class="row" style="align-items:center;">
+  <span class="pill pillQext" id="pillQextReel">
+    Q ext <sub>réel</sub> : —
+  </span>
+  <span class="pill pillQtempo" id="pillQtempoReel">
+    Q tempo <sub>réel</sub> : —
+  </span>
+  <span class="pill" id="pilltExtReel">
+    Durée extinction <sub>réelle</sub> : —
+  </span>
+  <span class="pill pillBesoin" id="pillBesoinReel">
+    V émulseur extinction <sub>réel</sub> : —
+  </span>
+  <span class="pill pillVtotal" id="pillVtotalReel">
+    V émulseur total <sub>réel</sub> : —
+  </span>
+</div>
+
+<div class="row" style="align-items:center; margin-top:14px;">
+  <span class="pill" id="pillT0">T0 : —</span>
+  <span class="pill pill-ext" id="pillExtStart">
+    Début extinction possible à : —
+  </span>
+  <span class="pill pill-ext" id="pillExtEnd">
+    Fin extinction possible à : —
+  </span>
+</div>
 <div class="row" style="align-items:center; margin-top:10px;">
   <span class="pill" id="pillEntretien1">Entretien tapis n°1 à —</span>
   <span class="pill" id="pillEntretien2">Entretien tapis n°2 à —</span>
@@ -1436,20 +1493,65 @@ legendItem(
     try { data = simulate(); }
     catch (e) { alert(e.message || "Erreur simulation."); return; }
 
-$("pillQext").textContent = `Q ext : ${fmt(data.Qext)} L/min`;
-$("pillQtempo").textContent = `Q tempo : ${fmt(data.Qtempo)} L/min`;
-$("pilltExt").textContent = `Durée ext. : ${fmt(data.tExt)} min`;
-$("pillBesoin").textContent = `V émulseur extinction : ${fmt(data.needExtTotal)} L`;
-    $("pillVtotal").textContent =
-  `V émulseur total : ${fmt(VemulTotal)} L`;
+    // Valeurs théoriques importées du calcul.
+    $("pillQext").innerHTML =
+      `Q ext <sub>théorique</sub> : ${fmt(data.Qext)} L/min`;
+
+    $("pillQtempo").innerHTML =
+      `Q tempo <sub>théorique</sub> : ${fmt(data.Qtempo)} L/min`;
+
+    $("pilltExt").innerHTML =
+      `Durée extinction <sub>théorique</sub> : ${fmt(data.tExt)} min`;
+
+    $("pillBesoin").innerHTML =
+      `V émulseur extinction <sub>théorique</sub> : ${fmt(data.needExtTotal)} L`;
+
+    $("pillVtotal").innerHTML =
+      `V émulseur total <sub>théorique</sub> : ${fmt(VemulTotal)} L`;
+
+    // Débit total des engins, quantités comprises.
+    const QextReel = rows.reduce((total, ligne) => {
+      const capacites = getEnginCapacites(ligne);
+      return total + capacites.flow * ligne.qty;
+    }, 0);
+
+    const QtempoReel = QextReel / 2;
+    const dureeExtReelle = data.tExt;
+    const concentration = data.concPct / 100;
+
+    const VextReel =
+      QextReel * dureeExtReelle * concentration;
+
+    // Même durée de temporisation et mêmes hypothèses d’entretien
+    // que dans le calcul importé, adaptées au débit réel.
+    const rapportDebit =
+      data.Qext > 0 ? QextReel / data.Qext : NaN;
+
+    const VtempoReel = params.VemulTempo * rapportDebit;
+    const VentretienReel = params.VemulEntretien * rapportDebit;
+
+    const VtotalReel =
+      VextReel + VtempoReel + VentretienReel;
+
+    $("pillQextReel").innerHTML =
+      `Q ext <sub>réel</sub> : ${fmt(QextReel)} L/min`;
+
+    $("pillQtempoReel").innerHTML =
+      `Q tempo <sub>réel</sub> : ${fmt(QtempoReel)} L/min`;
+
+    $("pilltExtReel").innerHTML =
+      `Durée extinction <sub>réelle</sub> : ${fmt(dureeExtReelle)} min`;
+
+    $("pillBesoinReel").innerHTML =
+      `V émulseur extinction <sub>réel</sub> : ${fmt(VextReel)} L`;
+
+    $("pillVtotalReel").innerHTML =
+      `V émulseur total <sub>réel</sub> : ${fmt(VtotalReel)} L`;
     $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
 
     const t0Str = minToHHMM(data.t0Abs);
 
-    $("pillStockOK").textContent =
-      (data.tStockOK === null) ? "Volume émulseur OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
-
-    // Pastilles DU HAUT (on les garde ou on les masque au choix)
+       // Pastilles DU HAUT (on les garde ou on les masque au choix)
     // Ici : on les garde visibles ET on les met à jour
     $("pillExtStart").style.display = "";
     $("pillExtEnd").style.display = "";

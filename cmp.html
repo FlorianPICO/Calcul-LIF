@@ -843,6 +843,48 @@ function fmt(valeur) {
   // ===== Liste engins =====
   const rows = [];
   let indexModification = null;
+    // Sauvegarde propre à la CMP SDIS 27.
+  const CLE_ENGINS_CMP = "LIF_CMP_SDIS27_ENGINS";
+
+  function sauvegarderEngins() {
+    try {
+      sessionStorage.setItem(CLE_ENGINS_CMP, JSON.stringify(rows));
+    } catch (erreur) {
+      console.warn("Sauvegarde des engins impossible.", erreur);
+    }
+  }
+
+  function restaurerEngins() {
+    try {
+      const sauvegarde = JSON.parse(
+        sessionStorage.getItem(CLE_ENGINS_CMP) || "[]"
+      );
+
+      if (!Array.isArray(sauvegarde)) return;
+
+      const lignesValides = sauvegarde.filter(ligne => {
+        if (!ligne || !Number.isFinite(timeToMin(ligne.atStr))) {
+          return false;
+        }
+
+        if (!Number.isInteger(ligne.qty) || ligne.qty < 1) {
+          return false;
+        }
+
+        const capacites = getEnginCapacites(ligne);
+
+        return capacites &&
+          Number.isFinite(capacites.flow) &&
+          Number.isFinite(capacites.emul) &&
+          capacites.flow >= 0 &&
+          capacites.emul >= 0;
+      });
+
+      rows.push(...lignesValides);
+    } catch (erreur) {
+      console.warn("Restauration des engins impossible.", erreur);
+    }
+  }
   $("arrivee").addEventListener("focus", () => {
   const champ = $("arrivee");
 
@@ -858,6 +900,7 @@ function fmt(valeur) {
   const tbody = $("liste");
 
   const render = () => {
+        sauvegarderEngins();
     tbody.innerHTML = "";
     rows.forEach((r, idx) => {
       const def = getEnginCapacites(r);
@@ -1469,6 +1512,7 @@ $("pillBesoin").textContent = `V émulseur extinction : ${fmt(data.needExtTotal)
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
+  restaurerEngins();
   render();
 })();
 </script>

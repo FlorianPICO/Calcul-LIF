@@ -1106,11 +1106,31 @@ tr.innerHTML = `
 
   // ===== Simulation =====
   function simulate() {
-    const Qext = params.Qext;
-    const Qtempo = params.Qtempo;
-    const tExt = params.tExt;
-    const conc = (params.concPct / 100);
+        // Débit total du tableau, quantités comprises.
+    const Qext = rows.reduce((total, ligne) => {
+      const capacites = getEnginCapacites(ligne);
+      return total + capacites.flow * ligne.qty;
+    }, 0);
 
+    if (!Number.isFinite(Qext) || Qext <= 0) {
+      throw new Error(
+        "Renseigne au moins un moyen avec un débit supérieur à zéro."
+      );
+    }
+
+    if (!Number.isFinite(params.Qext) || params.Qext <= 0) {
+      throw new Error("Débit théorique importé invalide.");
+    }
+
+    const Qtempo = Qext / 2;
+    const tExt = params.tExt;
+    const conc = params.concPct / 100;
+
+    // Adapter l’entretien dans la même proportion que les bulles réelles.
+    const rapportDebit = Qext / params.Qext;
+    const Qentretien = params.Qentretien * rapportDebit;
+
+    // Stock nécessaire pour réaliser toute l’extinction.
     const needExtTotal = Qext * tExt * conc;
 
     const t0Abs = getFirstArrivalMin(rows);
@@ -1181,7 +1201,7 @@ let emulseurManquantEntretien = 0;
 
         if (entretienEnCours) {
           // Consommation par minute au débit d’entretien du tapis.
-          emulCons = params.Qentretien * conc;
+                emulCons = Qentretien * conc;
 
           // Signaler toute minute d’entretien insuffisamment alimentée.
           if (emulCons > emulStock + 0.000001) {
@@ -1495,16 +1515,15 @@ legendItem(
 
     // Valeurs théoriques importées du calcul.
     $("pillQext").innerHTML =
-      `Q ext <sub>théorique</sub> : ${fmt(data.Qext)} L/min`;
+          `Q ext <sub>théorique</sub> : ${fmt(params.Qext)} L/min`;
 
     $("pillQtempo").innerHTML =
-      `Q tempo <sub>théorique</sub> : ${fmt(data.Qtempo)} L/min`;
-
+        `Q tempo <sub>théorique</sub> : ${fmt(params.Qtempo)} L/min`;
     $("pilltExt").innerHTML =
       `Durée extinction <sub>théorique</sub> : ${fmt(data.tExt)} min`;
 
     $("pillBesoin").innerHTML =
-      `V émulseur extinction <sub>théorique</sub> : ${fmt(data.needExtTotal)} L`;
+       `V émulseur extinction <sub>théorique</sub> : ${fmt(params.besoinExt)} L`;
 
     $("pillVtotal").innerHTML =
       `V émulseur total <sub>théorique</sub> : ${fmt(VemulTotal)} L`;
@@ -1524,8 +1543,8 @@ legendItem(
 
     // Même durée de temporisation et mêmes hypothèses d’entretien
     // que dans le calcul importé, adaptées au débit réel.
-    const rapportDebit =
-      data.Qext > 0 ? QextReel / data.Qext : NaN;
+      const rapportDebit =
+      params.Qext > 0 ? QextReel / params.Qext : NaN;
 
     const VtempoReel = params.VemulTempo * rapportDebit;
     const VentretienReel = params.VemulEntretien * rapportDebit;

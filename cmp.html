@@ -848,7 +848,7 @@ function fmt(valeur) {
 
   function sauvegarderEngins() {
     try {
-      sessionStorage.setItem(CLE_ENGINS_CMP, JSON.stringify(rows));
+      localStorage.setItem(CLE_ENGINS_CMP, JSON.stringify(rows));
     } catch (erreur) {
       console.warn("Sauvegarde des engins impossible.", erreur);
     }
@@ -857,7 +857,7 @@ function fmt(valeur) {
   function restaurerEngins() {
     try {
       const sauvegarde = JSON.parse(
-        sessionStorage.getItem(CLE_ENGINS_CMP) || "[]"
+        localStorage.getItem(CLE_ENGINS_CMP) || "[]"
       );
 
       if (!Array.isArray(sauvegarde)) return;

@@ -635,6 +635,42 @@ th, td {
   // Tous les moyens restent saisis librement, y compris les industriels.
   const rows = [];
   let indexModification = null;
+    const CLE_ENGINS_CMP = "LIF_CMP_AUTRE_SDIS_ENGINS";
+
+  function sauvegarderEngins() {
+    try {
+      localStorage.setItem(CLE_ENGINS_CMP, JSON.stringify(rows));
+    } catch (erreur) {
+      console.warn("Sauvegarde des engins impossible.", erreur);
+    }
+  }
+
+  function restaurerEngins() {
+    try {
+      const sauvegarde = JSON.parse(
+        localStorage.getItem(CLE_ENGINS_CMP) || "[]"
+      );
+
+      if (!Array.isArray(sauvegarde)) return;
+
+      const lignesValides = sauvegarde.filter(ligne =>
+        ligne &&
+        typeof ligne.label === "string" &&
+        ligne.label.trim() !== "" &&
+        Number.isFinite(timeToMin(ligne.atStr)) &&
+        Number.isInteger(ligne.qty) &&
+        ligne.qty >= 1 &&
+        Number.isFinite(ligne.flow) &&
+        ligne.flow >= 0 &&
+        Number.isFinite(ligne.emul) &&
+        ligne.emul >= 0
+      );
+
+      rows.push(...lignesValides);
+    } catch (erreur) {
+      console.warn("Restauration des engins impossible.", erreur);
+    }
+  }
   const tbody = $("liste");
 
   $("arrivee").addEventListener("focus", () => {
@@ -644,6 +680,7 @@ th, td {
   });
 
   const render = () => {
+        sauvegarderEngins();
     tbody.innerHTML = "";
     rows.forEach((r, idx) => {
       const tr = document.createElement("tr");
@@ -1202,6 +1239,7 @@ $("pillBesoin").textContent = `V émulseur extinction : ${fmt(data.needExtTotal)
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
+  restaurerEngins();
   render();
 })();
 </script>

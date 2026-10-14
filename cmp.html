@@ -730,7 +730,7 @@ th, td {
 </div>
     
     <div class="canvas-wrap" style="margin-top:10px;">
-      <canvas id="chart" width="1100" height="520"></canvas>
+<canvas id="chart" width="1100" height="622"></canvas>
     </div>
 
     <div class="small">
@@ -1287,7 +1287,7 @@ emulseurManquantEntretien
     ctx.clearRect(0, 0, W, H);
 
     // Marges (réduit l’espace sous l’axe X)
-    const mL = 88, mR = 92, mT = 58, mB = 60;
+    const mL = 88, mR = 92, mT = 160, mB = 60;
     const plotW = W - mL - mR;
     const plotH = H - mT - mB;
 
@@ -1505,7 +1505,7 @@ ctx.restore();
 
     // LÉGENDE (ordre demandé)
     const legendX = mL + 10;
-    const legendY = mT + 14;
+    const legendY = 26;
 
 function legendItem(x0, y0, color, label, dash = null) {
   ctx.strokeStyle = color;

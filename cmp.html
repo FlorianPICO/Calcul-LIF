@@ -1145,9 +1145,8 @@ tr.innerHTML = `
     const tExt = params.tExt;
     const conc = params.concPct / 100;
 
-    // Adapter l’entretien dans la même proportion que les bulles réelles.
-    const rapportDebit = Qext / params.Qext;
-    const Qentretien = params.Qentretien * rapportDebit;
+       // Entretien fondé sur le besoin théorique, indépendant des engins.
+    const Qentretien = params.Qentretien;
 
     // Stock nécessaire pour réaliser toute l’extinction.
     const needExtTotal = Qext * tExt * conc;
@@ -1459,7 +1458,7 @@ ctx.restore();
       const prev = data.emulSerie[t - 1] || 0;
       const cur = data.emulSerie[t] || 0;
       const xx = x(t);
-      ctx.lineTo(xx, yEmul(prev));
+    const VentretienReel = params.VemulEntretien;
       if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
     }
     ctx.stroke();
@@ -1633,8 +1632,8 @@ function legendItem(x0, y0, color, label, dash = null) {
     const VextReel =
       QextReel * dureeExtReelle * concentration;
 
-    // Même durée de temporisation et mêmes hypothèses d’entretien
-    // que dans le calcul importé, adaptées au débit réel.
+       // Temporisation adaptée au débit réel.
+    // Entretien conservé selon le besoin théorique importé.
       const rapportDebit =
       params.Qext > 0 ? QextReel / params.Qext : NaN;
 

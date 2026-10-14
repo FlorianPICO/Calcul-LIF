@@ -308,8 +308,22 @@ th, td {
   color: #991b1b;
 }
     
-    .canvas-wrap{ width:100%; overflow:auto; border:1px dashed #cbd5e1; border-radius:12px; padding:10px; background:#fff; }
-    canvas{ width:100%; height:auto; }
+    .canvas-wrap {
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+#chart {
+  display: block;
+  height: auto;
+  max-width: none;
+}
     
 .pill-ext {
   border-color:#16a34a !important;
@@ -754,7 +768,7 @@ function fmt(valeur) {
   // ===== Paramètres CMP =====
   const STEP_MIN = 20;
   const HORIZON_H = 5;
-  const HORIZON_MIN = HORIZON_H * 60;
+    let HORIZON_MIN = HORIZON_H * 60;
 
   const pad2 = (x) => String(x).padStart(2, "0");
 
@@ -1135,7 +1149,21 @@ tr.innerHTML = `
 
     const t0Abs = getFirstArrivalMin(rows);
     if (!Number.isFinite(t0Abs)) throw new Error("Impossible : aucune arrivée valide.");
+    // Dernière arrivée, relativement à la première.
+    const derniereArrivee = Math.max(
+      0,
+      ...rows.map(ligne => arrivalRelMin(ligne.atStr, t0Abs))
+        .filter(Number.isFinite)
+    );
 
+    // Couvrir la dernière arrivée, l’extinction et les 4 h d’entretien.
+    const dureeNecessaire = derniereArrivee + tExt + 240;
+
+    HORIZON_MIN = Math.max(
+      HORIZON_H * 60,
+      Math.ceil(dureeNecessaire / STEP_MIN) * STEP_MIN
+    );
+    
     const addFlow = Array(HORIZON_MIN + 1).fill(0);
     const addEmul = Array(HORIZON_MIN + 1).fill(0);
 
@@ -1241,6 +1269,19 @@ emulseurManquantEntretien
   // ===== Dessin =====
   function drawChart(data) {
     const c = $("chart");
+        // Largeur visible du graphique.
+    const conteneur = c.parentElement;
+    const largeurVisible = Math.max(280, conteneur.clientWidth - 22);
+
+    // Garder la même lisibilité lorsque la simulation dépasse 5 h.
+    const facteur = HORIZON_MIN / (HORIZON_H * 60);
+
+    c.width = Math.round(1100 * facteur);
+    c.style.width = `${Math.round(largeurVisible * facteur)}px`;
+    c.style.maxWidth = "none";
+
+    // Revenir au début à chaque nouveau tracé.
+    conteneur.scrollLeft = 0;
     const ctx = c.getContext("2d");
     const W = c.width, H = c.height;
     ctx.clearRect(0, 0, W, H);

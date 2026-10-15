@@ -420,6 +420,51 @@ a.lif-btn {
             </small>
           </div>
 
+<div id="fixedParams27" style="display:none;">
+  <div class="lif-help" style="margin:6px 0 10px;">
+    SDIS 27 — Concentration fixe : <strong>3 %</strong>.
+    Taux réflexes en L/min/m² :
+  </div>
+
+  <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">
+          Scénario / Attaque
+        </th>
+        <th style="padding:6px;border-bottom:1px solid #ddd;">
+          Non miscible
+        </th>
+        <th style="padding:6px;border-bottom:1px solid #ddd;">
+          Miscible
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px;">Nappe / Direct</td>
+        <td style="text-align:center;">10</td>
+        <td style="text-align:center;">20</td>
+      </tr>
+      <tr>
+        <td style="padding:6px;">Nappe / Indirect</td>
+        <td style="text-align:center;">5</td>
+        <td style="text-align:center;">10</td>
+      </tr>
+      <tr>
+        <td style="padding:6px;">Bac / Rétention / Direct</td>
+        <td style="text-align:center;">10</td>
+        <td style="text-align:center;">20</td>
+      </tr>
+      <tr>
+        <td style="padding:6px;">Bac / Rétention / Indirect</td>
+        <td style="text-align:center;">5</td>
+        <td style="text-align:center;">10</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+          
           <div id="fixedParams33" style="display:none;">
             <div class="lif-help" style="margin:6px 0 10px;">SDIS 33 — Concentration fixe : <strong>3 %</strong>. Taux réflexes en L/min/m² :</div>
             <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
@@ -868,6 +913,8 @@ champsNumeriques.forEach(champ => {
   function updateLockUI() {
     const custom = isCustomMode();
     $("fixedParams33").style.display = $("modeSdis").value === "sdis33" ? "block" : "none";
+        $("fixedParams27").style.display =
+      $("modeSdis").value === "lock" ? "block" : "none";
     $("customParams").style.display = custom ? "block" : "none";
 
     const ids = [

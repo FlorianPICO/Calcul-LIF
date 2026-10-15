@@ -728,10 +728,17 @@ th, td {
   </span>
 </div>
 
-<div class="small" style="margin-top:10px;">
-  Les bulles « Réel » décrivent tous les moyens du tableau.
-  La simulation utilise seulement les moyens arrivés ; le débit d’extinction
-  est fixé au démarrage, et les renforts suivants restent en réserve de débit.
+<div class="small" style="margin-top:10px; line-height:1.6;">
+  Les bulles « Réel » affichent les capacités de tous les engins
+  inscrits dans le tableau, y compris ceux qui ne sont pas encore arrivés.
+  <br><br>
+  Dans le graphique, chaque engin est pris en compte à l’heure d’arrivée
+  renseignée. L’extinction commence dès que les moyens présents disposent
+  d’un débit et d’un stock d’émulseur suffisants.
+  Le débit utilisé est alors conservé jusqu’à la fin de l’extinction.
+  <br><br>
+  Les engins arrivant ensuite augmentent le stock d’émulseur disponible,
+  mais n’augmentent pas automatiquement le débit utilisé pour l’extinction.
 </div>
 <div class="row" style="align-items:center; margin-top:10px;">
   <span class="pill pillQextReel" id="pillDebitRetenu">Débit extinction retenu : —</span>

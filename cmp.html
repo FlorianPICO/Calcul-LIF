@@ -1335,7 +1335,15 @@ let emulseurManquantEntretien = 0;
 
       if (tStockOK === null && emulStock >= needExtTotal) tStockOK = t;
 
-      const canFlow = flowAvail >= Qext;
+            // Le débit total prévu couvre le besoin théorique.
+      const debitSuffisant = Qext >= params.Qext;
+
+      // Les moyens nécessaires au débit d’extinction simulé sont arrivés.
+      const debitPresent = flowAvail >= Qext;
+
+      const canFlow = debitSuffisant && debitPresent;
+
+      // Le stock restant permet de réaliser toute l’extinction.
       const canEmul = emulStock >= needExtTotal;
 
       if (!startedExt && canFlow && canEmul) {

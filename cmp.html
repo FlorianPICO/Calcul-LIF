@@ -99,9 +99,9 @@
     }
 
 /* ===== LOGO HEADER (aligné avec index) ===== */
-header img.logo {
-  width: auto;
-  max-width: 100%;
+header img.Logo {
+  width: min(220px, 60vw);
+  max-height: 140px;
   height: auto;
   object-fit: contain;
   margin: 0;
@@ -568,23 +568,6 @@ th, td {
 #liste .capacite-editable.capacite-modifiee {
   color: #2563eb;
 }
-
-/* Compléments communs : champs, messages et tableau. */
-.cmp-feedback { margin: 10px 0; padding: 10px 12px; border-radius: 9px; background: #fff7ed; color: #7c2d12; font-size: 0.9rem; line-height: 1.5; }
-.cmp-feedback[hidden] { display: none; }
-.grid .cell { min-width: 0; }
-.grid .cell-day { display: grid; grid-template-rows: 2.6em 56px 3.2em; row-gap: 6px; }
-.cell-day select { width: 100%; }
-.small { line-height: 1.5; }
-#liste .capacite-editable { min-width: 0; font-size: 16px; font-variant-numeric: tabular-nums; }
-#liste .capacite-editable.capacite-modifiee { color: #2563eb; }
-table th { overflow-wrap: anywhere; }
-#blocSaisie input, #blocSaisie select { font-size: 16px; }
-.canvas-wrap { max-width: 100%; min-width: 0; }
-@media (max-width: 768px) {
-  .grid .cell-day { display: flex; flex-direction: column; gap: 4px; }
-  #liste td[data-label="Action"] { gap: 6px; }
-}
   </style>
 </head>
 
@@ -611,7 +594,7 @@ table th { overflow-wrap: anywhere; }
   <span>Paramètres importés depuis le calcul</span>
 </h2>
     <div id="status" class="warn">Chargement…</div>
-    <div class="small">CMP mode SDIS 27.</div>
+    <div class="small">CMP mode Sdis 27.</div>
   </div>
 
   <div class="card" id="blocSaisie" style="display:none;">
@@ -622,10 +605,9 @@ table th { overflow-wrap: anywhere; }
   </span>
 </h2>
 
-    <div id="cmpMessage" class="cmp-feedback" role="status" aria-live="polite" hidden></div>
     <div class="grid">
    <div class="cell cell-type">
-        <label for="enginType">Type d’engin / groupe :</label>
+        <label>Type d’engin :</label>
         <select id="enginType" class="field">
           <option value="FPT">FPT</option>
           <option value="CCRM">CCRM</option>
@@ -638,25 +620,17 @@ table th { overflow-wrap: anywhere; }
           <option value="CEEM">CEEM (émulseur)</option>
           <option value="INDUSTRIEL">Moyens industriels</option>
         </select>
-        <div class="small">Débit + volume émulseur propre au SDIS 27.</div>
+        <div class="small">Débit + volume émulseur propre au Sdis 27.</div>
       </div>
 
        <div class="cell cell-time">
-        <label for="arrivee">Heure d’arrivée :</label>
+        <label>Heure d’arrivée :</label>
         <input id="arrivee" class="field" type="time">
         <div class="small">Heure à laquelle l'engin commence à projeter de la mousse.</div>
       </div>
 
-      <div class="cell cell-day">
-        <label for="arrivalDay">Jour d’arrivée :</label>
-        <select id="arrivalDay" class="field">
-          <option value="0">Jour J</option>
-          <option value="1">J+1 — lendemain</option>
-        </select>
-        <div class="small">Après minuit, choisir J+1 si l’engin arrive le lendemain.</div>
-      </div>
       <div class="cell cell-qty">
-        <label for="qty">Quantité :</label>
+        <label>Quantité :</label>
         <input id="qty" class="field" type="number" min="1" step="1" value="1">
       </div>
 
@@ -686,8 +660,8 @@ table th { overflow-wrap: anywhere; }
           <th>Type</th>
           <th>Heure</th>
           <th>Qté</th>
-          <th>Débit (L/min)</th>
-          <th>Émulseur (L)</th>
+          <th>Débit</th>
+          <th>Émulseur</th>
           <th></th>
         </tr>
       </thead>
@@ -792,8 +766,6 @@ table th { overflow-wrap: anywhere; }
 </span>
 </div>
     
-    <div class="small" id="simulationBilan" aria-live="polite"></div>
-    <div class="small">Les volumes des bulles « Réel » sont prévisionnels pour tous les moyens du tableau. Les consommations du scénario sont indiquées ci-dessous après le tracé.</div>
     <div class="canvas-wrap" style="margin-top:10px;">
 <canvas id="chart" width="1100" height="622"></canvas>
     </div>
@@ -820,7 +792,7 @@ table th { overflow-wrap: anywhere; }
 function fmt(valeur) {
   if (!Number.isFinite(valeur)) return "—";
 
-  return valeur.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+  return Math.round(valeur).toLocaleString("fr-FR");
 }
   function fmtConversion(valeur) {
   if (!Number.isFinite(valeur)) return "—";
@@ -846,7 +818,7 @@ function fmt(valeur) {
 
   const n = (v) => {
     if (v === null || v === undefined) return NaN;
-    const s = String(v).replace(/\s/g, "").replace(",", ".").trim();
+    const s = String(v).replace(",", ".").trim();
     if (!s) return NaN;
     const x = Number(s);
     return Number.isFinite(x) ? x : NaN;
@@ -869,25 +841,27 @@ function fmt(valeur) {
     return `${pad2(h)}:${pad2(m)}`;
   };
 
-  const arriveeAbsolue = ligne => timeToMin(ligne.atStr) + (ligne.dayOffset || 0) * 1440;
-  const getFirstArrivalMin = lignes => lignes.length
-    ? Math.min(...lignes.map(arriveeAbsolue)) : NaN;
-
-  const arrivalRelMin = (hhmm, t0, dayOffset = 0) => {
-    const minute = timeToMin(hhmm);
-    return Number.isFinite(minute) && Number.isFinite(t0)
-      ? minute + dayOffset * 1440 - t0 : NaN;
+  const getFirstArrivalMin = (rows) => {
+    let best = Infinity;
+    rows.forEach(r => {
+      const m = timeToMin(r.atStr);
+      if (Number.isFinite(m)) best = Math.min(best, m);
+    });
+    return best === Infinity ? NaN : best;
   };
 
-  const horaireScenario = (t0, delai = 0) => {
-    const total = t0 + delai;
-    const jour = Math.floor(total / 1440);
-    return `${minToHHMM(total)}${jour > 0 ? ` (J+${jour})` : ""}`;
+  const arrivalRelMin = (hhmm, t0) => {
+    const m = timeToMin(hhmm);
+    if (!Number.isFinite(m) || !Number.isFinite(t0)) return NaN;
+    let rel = m - t0;
+    if (rel < 0) rel += 24 * 60;
+    return rel;
   };
 
-  const buildTimeLabels = t0 => {
+  const buildTimeLabels = (t0MinAbs) => {
+    const t0 = `${pad2(Math.floor(t0MinAbs / 60))}:${pad2(t0MinAbs % 60)}`;
     const labels = [];
-    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) labels.push(minToHHMM(t0 + t));
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) labels.push(addMinToHHMM(t0, t));
     return labels;
   };
 
@@ -910,8 +884,7 @@ function fmt(valeur) {
       ? { flow: ligne.customFlow, emul: ligne.customEmul }
       : ENGINS[ligne.type];
 
-    if (!reference || (ligne.type !== "INDUSTRIEL" &&
-        !Object.prototype.hasOwnProperty.call(ENGINS, ligne.type))) return null;
+    if (!reference) return null;
 
     return {
       flow: Number.isFinite(ligne.flowOverride)
@@ -948,22 +921,6 @@ function fmt(valeur) {
     return;
   }
 
-  const champsParametres = ["Qext", "Qtempo", "tExt", "concPct", "besoinExt",
-    "Qentretien", "VemulEntretien", "VemulTempo"];
-  const parametresValides = champsParametres.every(cle => Number.isFinite(params[cle]) && params[cle] >= 0) &&
-    params.Qext > 0 && params.Qtempo > 0 && [20, 40].includes(params.tExt) &&
-    Math.abs(params.concPct - 3) < 0.000001 &&
-    champsParametres.every(cle => params[cle] <= Number.MAX_SAFE_INTEGER);
-  const proche = (recu, attendu) => Math.abs(recu - attendu) <= Math.max(1, Math.abs(attendu) * 1e-9);
-  if (!parametresValides ||
-      !proche(params.besoinExt, params.Qext * params.tExt * params.concPct / 100) ||
-      !proche(params.Qtempo, params.Qext / 2) ||
-      !proche(params.VemulEntretien, params.Qentretien * 40 * params.concPct / 100) ||
-      !Number.isFinite(params.besoinExt + params.VemulEntretien + params.VemulTempo)) {
-    status.textContent = "Paramètres SDIS 27 absents, invalides ou incohérents. Revenez au calcul, recalculez puis ouvrez à nouveau la CMP.";
-    return;
-  }
-
      const VemulTotal =
     params.besoinExt +
     params.VemulEntretien +
@@ -990,9 +947,9 @@ function fmt(valeur) {
 
     <div style="margin-top:14px;">
       <strong>Phase entretien du tapis :</strong><br>
-      - Q entretien du tapis sur 4 h = <b>${fmt(params.Qentretien)}</b> L/min
+      - Q entretien du tapis sur 4h = <b>${fmt(params.Qentretien)}</b> L/min
       <span style="color:#475569;">soit ${fmtConversion(params.Qentretien * 0.06)} m³/h</span><br>
-      - V émulseur pour entretien du tapis sur 4 h = <b>${fmt(params.VemulEntretien)}</b> L
+      - V émulseur pour entretien du tapis sur 4h = <b>${fmt(params.VemulEntretien)}</b> L
       <span style="color:#475569;">soit ${fmtConversion(params.VemulEntretien / 1000)} m³</span>
     </div>
 
@@ -1003,248 +960,322 @@ function fmt(valeur) {
   `;
   blocSaisie.style.display = "block";
 
-  // ===== Tableau, saisie et sauvegarde =====
+  // ===== Liste engins =====
   const rows = [];
   let indexModification = null;
-  let parametresObsoletes = false;
+    // Sauvegarde propre à la CMP SDIS 27.
   const CLE_ENGINS_CMP = "LIF_CMP_SDIS27_ENGINS";
-  const tbody = $("liste");
-  const formatSaisie = v => v.toLocaleString("fr-FR", { maximumFractionDigits: 10 });
-  const escapeHtml = v => String(v).replace(/[&<>"']/g, c => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-  })[c]);
-  const nombreCapacite = v => Number.isFinite(v) && v >= 0 && v <= Number.MAX_SAFE_INTEGER;
 
-  function afficherMessage(texte = "") {
-    $("cmpMessage").textContent = texte;
-    $("cmpMessage").hidden = !texte;
-  }
-  function invaliderSimulation() {
-    blocCourbe.style.display = "none";
-    $("simulationBilan").textContent = "";
-  }
-  function normaliserLigne(ligne) {
-    if (!ligne || typeof ligne !== "object" || Array.isArray(ligne) ||
-        typeof ligne.type !== "string" ||
-        (ligne.type !== "INDUSTRIEL" && !Object.prototype.hasOwnProperty.call(ENGINS, ligne.type)) ||
-        !Number.isFinite(timeToMin(ligne.atStr)) ||
-        !Number.isSafeInteger(ligne.qty) || ligne.qty < 1) return null;
-    const dayOffset = ligne.dayOffset === undefined ? 0 : ligne.dayOffset;
-    if (![0, 1].includes(dayOffset)) return null;
-    const copie = { type: ligne.type, atStr: ligne.atStr, qty: ligne.qty, dayOffset };
-    if (copie.type === "INDUSTRIEL") {
-      if (!nombreCapacite(ligne.customFlow) || !nombreCapacite(ligne.customEmul)) return null;
-      copie.customFlow = ligne.customFlow; copie.customEmul = ligne.customEmul;
-    }
-    for (const cle of ["flowOverride", "emulOverride"]) {
-      if (ligne[cle] !== undefined) {
-        if (!nombreCapacite(ligne[cle])) return null;
-        copie[cle] = ligne[cle];
-      }
-    }
-    const capacites = getEnginCapacites(copie);
-    return capacites && nombreCapacite(capacites.flow * copie.qty) &&
-      nombreCapacite(capacites.emul * copie.qty) ? copie : null;
-  }
-  function totaux(lignes = rows) {
-    let flow = 0, emul = 0;
-    lignes.forEach(ligne => {
-      const capacites = getEnginCapacites(ligne);
-      flow += capacites.flow * ligne.qty; emul += capacites.emul * ligne.qty;
-    });
-    if (!nombreCapacite(flow) || !nombreCapacite(emul)) throw new Error("Les totaux des moyens sont trop élevés.");
-    const besoinExt = flow * params.tExt * params.concPct / 100;
-    const besoinTotal = besoinExt + params.VemulTempo * (flow / params.Qext) + params.VemulEntretien;
-    if (!nombreCapacite(besoinExt) || !nombreCapacite(besoinTotal)) throw new Error("Les besoins calculés dépassent les limites numériques. Vérifiez les paramètres et les capacités.");
-    return { flow, emul };
-  }
   function sauvegarderEngins() {
-    try { localStorage.setItem(CLE_ENGINS_CMP, JSON.stringify(rows)); return true; }
-    catch (erreur) {
-      afficherMessage("Les modifications sont prises en compte, mais le navigateur ne permet pas leur sauvegarde. Elles risquent d’être perdues en quittant la page.");
-      return false;
+    try {
+      localStorage.setItem(CLE_ENGINS_CMP, JSON.stringify(rows));
+    } catch (erreur) {
+      console.warn("Sauvegarde des engins impossible.", erreur);
     }
   }
+
   function restaurerEngins() {
     try {
-      const texte = localStorage.getItem(CLE_ENGINS_CMP);
-      if (!texte) return;
-      const sauvegarde = JSON.parse(texte);
-      if (!Array.isArray(sauvegarde)) throw new Error("Format invalide");
-      let ignorees = 0;
-      sauvegarde.forEach(ligne => {
-        const valide = normaliserLigne(ligne);
-        if (valide) {
-          try { totaux([...rows, valide]); rows.push(valide); }
-          catch { ignorees++; }
-        } else ignorees++;
+      const sauvegarde = JSON.parse(
+        localStorage.getItem(CLE_ENGINS_CMP) || "[]"
+      );
+
+      if (!Array.isArray(sauvegarde)) return;
+
+      const lignesValides = sauvegarde.filter(ligne => {
+        if (!ligne || !Number.isFinite(timeToMin(ligne.atStr))) {
+          return false;
+        }
+
+        if (!Number.isInteger(ligne.qty) || ligne.qty < 1) {
+          return false;
+        }
+
+        const capacites = getEnginCapacites(ligne);
+
+        return capacites &&
+          Number.isFinite(capacites.flow) &&
+          Number.isFinite(capacites.emul) &&
+          capacites.flow >= 0 &&
+          capacites.emul >= 0;
       });
-      rows.sort((a, b) => arriveeAbsolue(a) - arriveeAbsolue(b));
-      if (ignorees) afficherMessage(`${ignorees} ligne(s) sauvegardée(s) invalide(s) n’ont pas été chargées. Vérifiez le tableau avant de tracer.`);
+
+      rows.push(...lignesValides);
     } catch (erreur) {
-      afficherMessage("Le tableau sauvegardé ne peut pas être lu. Vous pouvez saisir de nouveaux moyens ; la sauvegarde précédente n’a pas été remplacée.");
+      console.warn("Restauration des engins impossible.", erreur);
     }
   }
-  function actualiserTotaux() {
-    const total = totaux();
-    if ($("totalDebit")) $("totalDebit").textContent = `${fmt(total.flow)} L/min`;
-    if ($("totalEmulseur")) $("totalEmulseur").textContent = `${fmt(total.emul)} L`;
-    const QextReel = total.flow;
-    const rapport = QextReel / params.Qext;
-    const vext = QextReel * params.tExt * params.concPct / 100;
-    const vtotal = vext + params.VemulTempo * rapport + params.VemulEntretien;
-    $("pillQextReel").innerHTML = `Q ext <sub>réel</sub> : ${fmt(QextReel)} L/min`;
-    $("pillQtempoReel").innerHTML = `Q tempo <sub>réel</sub> : ${fmt(QextReel / 2)} L/min`;
-    $("pilltExtReel").innerHTML = `Durée extinction <sub>réelle</sub> : ${fmt(params.tExt)} min`;
-    $("pillBesoinReel").innerHTML = `V émulseur extinction <sub>réel</sub> : ${fmt(vext)} L`;
-    $("pillVtotalReel").innerHTML = `V émulseur total <sub>réel</sub> : ${fmt(vtotal)} L`;
-    return total;
-  }
-  $("industrialFlow").type = "text";
-  $("industrialEmul").type = "text";
   $("arrivee").addEventListener("focus", () => {
-    if ($("arrivee").value || indexModification !== null) return;
-    const maintenant = new Date();
-    $("arrivee").value = `${pad2(maintenant.getHours())}:${pad2(maintenant.getMinutes())}`;
-  });
+  const champ = $("arrivee");
+
+  // Conserver une heure déjà saisie ou chargée pour modification.
+  if (champ.value || indexModification !== null) return;
+
+  const maintenant = new Date();
+  const heures = String(maintenant.getHours()).padStart(2, "0");
+  const minutes = String(maintenant.getMinutes()).padStart(2, "0");
+
+  champ.value = `${heures}:${minutes}`;
+});
+  const tbody = $("liste");
 
   const render = () => {
+        sauvegarderEngins();
     tbody.innerHTML = "";
     rows.forEach((r, idx) => {
-      const capacites = getEnginCapacites(r);
+      const def = getEnginCapacites(r);
+      const flow = def.flow * r.qty;
+      const emul = def.emul * r.qty;
+
       const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td data-label="Type"><b>${escapeHtml(r.type === "INDUSTRIEL" ? "Moyens industriels" : r.type)}</b></td>
-        <td data-label="Arrivée">${escapeHtml(r.atStr)}${r.dayOffset ? " (J+1)" : ""}</td>
-        <td data-label="Qté">${fmt(r.qty)}</td>
-        <td data-label="Débit (L/min)"><input type="text" inputmode="decimal"
-          class="capacite-editable ${Number.isFinite(r.flowOverride) ? "capacite-modifiee" : ""}"
-          data-index="${idx}" data-capacite="flowOverride"
-          value="${formatSaisie(capacites.flow * r.qty)}" aria-label="Débit total de la ligne ${idx + 1} en L/min"></td>
-        <td data-label="Émulseur (L)"><input type="text" inputmode="decimal"
-          class="capacite-editable ${Number.isFinite(r.emulOverride) ? "capacite-modifiee" : ""}"
-          data-index="${idx}" data-capacite="emulOverride"
-          value="${formatSaisie(capacites.emul * r.qty)}" aria-label="Volume émulseur total de la ligne ${idx + 1} en litres"></td>
-        <td data-label="Action"><button type="button" data-edit="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Modifier</button>
-          <button type="button" data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button></td>`;
+tr.innerHTML = `
+  <td data-label="Type"><b>${r.type === "INDUSTRIEL" ? "Moyens industriels" : r.type}</b></td>
+  <td data-label="Arrivée">${r.atStr}</td>
+ <td data-label="Qté">${fmt(r.qty)}</td>
+<td data-label="Débit (L/min)">
+  <input
+    type="text"
+    inputmode="decimal"
+    class="capacite-editable ${Number.isFinite(r.flowOverride) ? 'capacite-modifiee' : ''}"
+    data-index="${idx}"
+    data-capacite="flowOverride"
+    value="${flow.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
+    aria-label="Débit total de la ligne ${idx + 1} en L/min">
+</td>
+
+<td data-label="Émulseur (L)">
+  <input
+    type="text"
+    inputmode="decimal"
+    class="capacite-editable ${Number.isFinite(r.emulOverride) ? 'capacite-modifiee' : ''}"
+    data-index="${idx}"
+    data-capacite="emulOverride"
+    value="${emul.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
+    aria-label="Volume total d’émulseur de la ligne ${idx + 1} en litres">
+</td>
+  <td data-label="Action">
+    <button type="button" data-edit="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Modifier</button>
+    <button type="button" data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
+  </td>
+`;
+
       tbody.appendChild(tr);
     });
-    const ligneTotal = document.createElement("tr");
-    ligneTotal.style.background = "#f1f5f9"; ligneTotal.style.fontWeight = "800";
-    ligneTotal.innerHTML = `<td data-label="Type">TOTAL</td><td></td><td></td>
-      <td data-label="Débit (L/min)" id="totalDebit"></td>
-      <td data-label="Émulseur (L)" id="totalEmulseur"></td><td></td>`;
-    tbody.appendChild(ligneTotal);
-    actualiserTotaux();
+    // ===== TOTAL DES MOYENS INSCRITS AU TABLEAU =====
+    let totalDebit = 0;
+    let totalEmulseur = 0;
 
-    tbody.querySelectorAll("input[data-capacite]").forEach(champ => {
+    rows.forEach(r => {
+      const def = getEnginCapacites(r);
+
+      totalDebit += def.flow * r.qty;
+      totalEmulseur += def.emul * r.qty;
+    });
+
+    const ligneTotal = document.createElement("tr");
+
+    ligneTotal.style.background = "#f1f5f9";
+    ligneTotal.style.fontWeight = "800";
+
+    ligneTotal.innerHTML = `
+      <td data-label="Type">TOTAL</td>
+      <td></td>
+      <td></td>
+      <td data-label="Débit (L/min)">
+        ${totalDebit.toLocaleString("fr-FR")} L/min
+      </td>
+      <td data-label="Émulseur (L)">
+        ${totalEmulseur.toLocaleString("fr-FR")} L
+      </td>
+      <td></td>
+    `;
+
+    tbody.appendChild(ligneTotal);
+        tbody.querySelectorAll("input[data-capacite]").forEach(champ => {
       champ.addEventListener("keydown", evenement => {
-        if (evenement.key === "Enter") { evenement.preventDefault(); champ.blur(); }
+        if (evenement.key === "Enter") {
+          evenement.preventDefault();
+          champ.blur();
+        }
       });
+
       champ.addEventListener("change", () => {
-        const ligne = rows[Number(champ.dataset.index)];
+        const index = Number(champ.dataset.index);
         const propriete = champ.dataset.capacite;
-        if (!ligne || !["flowOverride", "emulOverride"].includes(propriete)) return;
+        const ligne = rows[index];
+
+        const saisie = champ.value
+          .replace(/\s/g, "")
+          .replace(",", ".")
+          .trim();
+
+        const valeur = saisie === "" ? NaN : Number(saisie);
+
+                if (!Number.isFinite(valeur) || valeur < 0) {
+          const capacites = getEnginCapacites(ligne);
+          const ancienneValeur = propriete === "flowOverride"
+            ? capacites.flow * ligne.qty
+            : capacites.emul * ligne.qty;
+
+          champ.value = ancienneValeur.toLocaleString("fr-FR");
+          alert("Saisis une valeur supérieure ou égale à zéro.");
+          return;
+        }
+
         const capacites = getEnginCapacites(ligne);
-        const ancienTotal = (propriete === "flowOverride" ? capacites.flow : capacites.emul) * ligne.qty;
-        const valeur = n(champ.value);
-        const ancienneSurcharge = ligne[propriete];
-        if (!nombreCapacite(valeur)) {
-          champ.value = formatSaisie(ancienTotal);
-          afficherMessage("Saisissez une capacité positive ou nulle et de taille raisonnable. La dernière valeur valide a été conservée."); return;
+        const valeurActuelle = propriete === "flowOverride"
+          ? capacites.flow * ligne.qty
+          : capacites.emul * ligne.qty;
+
+        // Ne pas marquer une cellule qui n’a pas changé.
+        if (Math.abs(valeur - valeurActuelle) < 0.000001) {
+          return;
         }
-        if (Math.abs(valeur - ancienTotal) < 1e-9) { champ.value = formatSaisie(ancienTotal); return; }
+
+        // Enregistrer la capacité par moyen :
+        // le tableau affiche le total pour la quantité de la ligne.
         ligne[propriete] = valeur / ligne.qty;
-        try { totaux(); }
-        catch (erreur) {
-          if (ancienneSurcharge === undefined) delete ligne[propriete]; else ligne[propriete] = ancienneSurcharge;
-          champ.value = formatSaisie(ancienTotal); afficherMessage(erreur.message); return;
-        }
-        // Ne pas remplacer le DOM : un clic Modifier/Supprimer doit rester actif.
-        champ.value = formatSaisie(valeur);
+
+        // Marquer la cellule modifiée, sans recréer le tableau.
         champ.classList.add("capacite-modifiee");
-        actualiserTotaux(); invaliderSimulation(); afficherMessage(); sauvegarderEngins();
+
+        // Recalculer les totaux avec les capacités personnalisées.
+        let nouveauDebit = 0;
+        let nouvelEmulseur = 0;
+
+        rows.forEach(r => {
+          const capacites = getEnginCapacites(r);
+          nouveauDebit += capacites.flow * r.qty;
+          nouvelEmulseur += capacites.emul * r.qty;
+        });
+
+        // Actualiser seulement les cellules TOTAL.
+        ligneTotal.querySelector(
+          'td[data-label="Débit (L/min)"]'
+        ).textContent = `${nouveauDebit.toLocaleString("fr-FR")} L/min`;
+
+        ligneTotal.querySelector(
+          'td[data-label="Émulseur (L)"]'
+        ).textContent = `${nouvelEmulseur.toLocaleString("fr-FR")} L`;
+
+        // Q ext réel est strictement égal au total débit du tableau.
+        $("pillQextReel").innerHTML =
+          `Q ext <sub>réel</sub> : ${fmt(nouveauDebit)} L/min`;
+
+        sauvegarderEngins();
+
+        // Le graphique précédent ne correspond plus au tableau.
+        blocCourbe.style.display = "none";
       });
     });
     tbody.querySelectorAll("button[data-edit]").forEach(btn => {
       btn.addEventListener("click", () => {
         indexModification = Number(btn.dataset.edit);
         const ligne = rows[indexModification];
-        const capacites = getEnginCapacites(ligne);
+
         $("enginType").value = ligne.type;
         $("arrivee").value = ligne.atStr;
-        $("arrivalDay").value = String(ligne.dayOffset || 0);
         $("qty").value = ligne.qty;
-        $("industrialFlow").value = ligne.type === "INDUSTRIEL" ? formatSaisie(capacites.flow) : "";
-        $("industrialEmul").value = ligne.type === "INDUSTRIEL" ? formatSaisie(capacites.emul) : "";
-        updateIndustrialUI(); $("btnAdd").textContent = "Enregistrer";
-        $("enginType").scrollIntoView({ behavior: "smooth", block: "center" });
+        $("industrialFlow").value = ligne.type === "INDUSTRIEL" ? ligne.customFlow : "";
+        $("industrialEmul").value = ligne.type === "INDUSTRIEL" ? ligne.customEmul : "";
+        updateIndustrialUI();
+
+        $("btnAdd").textContent = "Enregistrer";
+
+        $("enginType").scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
         $("enginType").focus({ preventScroll: true });
       });
     });
+
     tbody.querySelectorAll("button[data-i]").forEach(btn => {
       btn.addEventListener("click", () => {
         const i = Number(btn.dataset.i);
-        if (indexModification === i) { indexModification = null; $("btnAdd").textContent = "Ajouter"; }
-        else if (indexModification !== null && i < indexModification) indexModification--;
-        rows.splice(i, 1); render(); invaliderSimulation(); afficherMessage(); sauvegarderEngins();
+
+        if (indexModification === i) {
+          indexModification = null;
+          $("btnAdd").textContent = "Ajouter";
+        } else if (indexModification !== null && i < indexModification) {
+          indexModification--;
+        }
+
+        rows.splice(i, 1);
+        render();
+        blocCourbe.style.display = "none";
       });
     });
   };
-  $("btnAdd").addEventListener("click", () => {
+
+    $("btnAdd").addEventListener("click", () => {
     const type = $("enginType").value;
-    const atStr = $("arrivee").value;
-    const qty = n($("qty").value);
-    const dayOffset = n($("arrivalDay").value);
-    if (!Number.isFinite(timeToMin(atStr))) { afficherMessage("Renseignez une heure d’arrivée valide."); return; }
-    if (!Number.isSafeInteger(qty) || qty < 1) { afficherMessage("La quantité doit être un entier supérieur ou égal à 1."); return; }
-    let ligne = { type, atStr, qty, dayOffset };
+    const atStr = $("arrivee").value || "00:00";
+    const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
+
+    const ligne = { type, atStr, qty };
+
     if (type === "INDUSTRIEL") {
-      ligne.customFlow = n($("industrialFlow").value);
-      ligne.customEmul = n($("industrialEmul").value);
-      if (!nombreCapacite(ligne.customFlow) || !nombreCapacite(ligne.customEmul) ||
-          (ligne.customFlow === 0 && ligne.customEmul === 0)) {
-        afficherMessage("Renseignez des capacités industrielles positives ou nulles, dont au moins une supérieure à zéro."); return;
+      const customFlow = n($("industrialFlow").value);
+      const customEmul = n($("industrialEmul").value);
+
+      if (![customFlow, customEmul].every(Number.isFinite) ||
+          customFlow < 0 || customEmul < 0) {
+        alert("Renseigne un débit et un volume d’émulseur valides, supérieurs ou égaux à zéro.");
+        return;
       }
+      if (customFlow === 0 && customEmul === 0) {
+        alert("Renseigne au moins un débit ou un volume d’émulseur supérieur à zéro.");
+        return;
+      }
+      ligne.customFlow = customFlow;
+      ligne.customEmul = customEmul;
+    } else if (!ENGINS[type]) {
+      return;
     }
+
+    if (!Number.isFinite(timeToMin(atStr))) {
+      alert("Heure d’arrivée invalide.");
+      return;
+    }
+
     if (indexModification !== null) {
-      const ancienne = rows[indexModification];
-      if (ancienne?.type === type) {
-        const anciennesCapacites = getEnginCapacites(ancienne);
-        if (Number.isFinite(ancienne.flowOverride) &&
-            (type !== "INDUSTRIEL" || ligne.customFlow === anciennesCapacites.flow)) ligne.flowOverride = ancienne.flowOverride;
-        if (Number.isFinite(ancienne.emulOverride) &&
-            (type !== "INDUSTRIEL" || ligne.customEmul === anciennesCapacites.emul)) ligne.emulOverride = ancienne.emulOverride;
+            const ancienne = rows[indexModification];
+
+      if (ancienne.type === ligne.type) {
+        if (Number.isFinite(ancienne.flowOverride)) {
+          ligne.flowOverride = ancienne.flowOverride;
+        }
+
+        if (Number.isFinite(ancienne.emulOverride)) {
+          ligne.emulOverride = ancienne.emulOverride;
+        }
       }
+      rows[indexModification] = ligne;
+      indexModification = null;
+      $("btnAdd").textContent = "Ajouter";
+    } else {
+      rows.push(ligne);
     }
-    ligne = normaliserLigne(ligne);
-    if (!ligne) { afficherMessage("Vérifiez les capacités, le type et le jour d’arrivée."); return; }
-    const futures = rows.slice();
-    if (indexModification === null) futures.push(ligne); else futures[indexModification] = ligne;
-    try { totaux(futures); } catch (erreur) { afficherMessage(erreur.message); return; }
-    rows.splice(0, rows.length, ...futures);
-    indexModification = null; $("btnAdd").textContent = "Ajouter";
-    rows.sort((a, b) => arriveeAbsolue(a) - arriveeAbsolue(b));
-    render(); invaliderSimulation(); afficherMessage(); sauvegarderEngins();
+
+    rows.sort((a, b) => timeToMin(a.atStr) - timeToMin(b.atStr));
+    render();
+    blocCourbe.style.display = "none";
   });
+
   $("btnReset").addEventListener("click", () => {
-    rows.length = 0; indexModification = null;
+    rows.length = 0;
+    $("industrialFlow").value = "";
+    $("industrialEmul").value = "";
+    updateIndustrialUI();
+    indexModification = null;
     $("btnAdd").textContent = "Ajouter";
-    $("industrialFlow").value = ""; $("industrialEmul").value = "";
-    $("arrivee").value = ""; $("arrivalDay").value = "0"; $("qty").value = "1";
-    updateIndustrialUI(); render(); invaliderSimulation(); afficherMessage(); sauvegarderEngins();
-  });
-  window.addEventListener("storage", evenement => {
-    if (evenement.key === "LIF_CMP_INPUTS" || evenement.key === null) {
-      parametresObsoletes = true; invaliderSimulation();
-      afficherMessage("Les paramètres du calcul ont changé dans un autre onglet. Rechargez la CMP depuis le calcul pour utiliser les nouvelles valeurs.");
-    }
+    render();
+    blocCourbe.style.display = "none";
   });
 
   // ===== Simulation =====
   function simulate() {
-    if (rows.some(ligne => !normaliserLigne(ligne))) throw new Error("Le tableau contient une ligne invalide.");
-    totaux();
     const totalDebitTableau = rows.reduce((total, ligne) => {
       return total + getEnginCapacites(ligne).flow * ligne.qty;
     }, 0);
@@ -1260,18 +1291,17 @@ function fmt(valeur) {
         !Number.isFinite(Qentretien) || Qentretien < 0) {
       throw new Error("Paramètres de calcul importés invalides.");
     }
-    if (!nombreCapacite(totalDebitTableau * tExt * conc)) throw new Error("Le besoin d’émulseur dépasse les limites numériques du calcul.");
     const t0Abs = getFirstArrivalMin(rows);
     if (!Number.isFinite(t0Abs)) throw new Error("Aucune arrivée valide.");
     const derniereArrivee = Math.max(0, ...rows.map(r =>
-      arrivalRelMin(r.atStr, t0Abs, r.dayOffset || 0)).filter(Number.isFinite));
+      arrivalRelMin(r.atStr, t0Abs)).filter(Number.isFinite));
     HORIZON_MIN = Math.max(HORIZON_H * 60,
       Math.ceil((derniereArrivee + tExt + 240) / STEP_MIN) * STEP_MIN);
 
     const addFlow = Array(HORIZON_MIN + 1).fill(0);
     const addEmul = Array(HORIZON_MIN + 1).fill(0);
     rows.forEach(r => {
-      const rel = arrivalRelMin(r.atStr, t0Abs, r.dayOffset || 0);
+      const rel = arrivalRelMin(r.atStr, t0Abs);
       if (!Number.isFinite(rel) || rel < 0 || rel > HORIZON_MIN) return;
       const capacites = getEnginCapacites(r);
       const minute = Math.round(rel);
@@ -1297,7 +1327,7 @@ function fmt(valeur) {
       if (tExtStart === null) {
         const besoinAvecMoyensPresents = flowAvail * tExt * conc;
         if (flowAvail >= params.Qext &&
-            emulStock >= besoinAvecMoyensPresents) {
+            emulStock + 0.000001 >= besoinAvecMoyensPresents) {
           tExtStart = t;
           tStockOK = t;
           // Figer le débit engagé : les renforts ultérieurs restent en réserve.
@@ -1369,7 +1399,6 @@ function fmt(valeur) {
     // Revenir au début à chaque nouveau tracé.
     conteneur.scrollLeft = 0;
     const ctx = c.getContext("2d");
-    if (!ctx) throw new Error("Le navigateur ne permet pas l’affichage du graphique.");
     const W = c.width, H = c.height;
     ctx.clearRect(0, 0, W, H);
 
@@ -1396,7 +1425,7 @@ function fmt(valeur) {
     const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
 
     // Helpers temps
-    const t0Str = minToHHMM(data.t0Abs);
+    const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
     const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
 
     // roundRect compat
@@ -1435,8 +1464,6 @@ function fmt(valeur) {
       const idx = Math.round(t / STEP_MIN);
       const label = data.labels[idx] || "";
       ctx.fillText(label, x(t) - 16, mT + plotH + 20);
-      const jour = Math.floor((data.t0Abs + t) / 1440);
-      if (jour > 0) ctx.fillText(`J+${jour}`, x(t) - 12, mT + plotH + 36);
     }
 
     // Axe Y gauche
@@ -1472,7 +1499,7 @@ ctx.restore();
 
     // Bande extinction
     if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
-      const x1 = x(Math.min(data.tExtStart, HORIZON_MIN));
+      const x1 = x(data.tExtStart);
       const x2 = x(Math.min(data.tExtEnd, HORIZON_MIN));
       ctx.fillStyle = "rgba(34,197,94,0.10)";
       ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
@@ -1690,17 +1717,17 @@ function legendItem(x0, y0, color, label, dash = null) {
       "Volume émulseur extinction retenu",
       [6, 6]
     );
+    // IMPORTANT : les “pastilles” visuelles sont gérées en HTML (extIndStart/extIndEnd),
+    // donc on ne dessine PAS de pastilles dans le canvas => aucun doublon.
   }
 
   // ===== Tracer (une seule fois) =====
   $("btnTracer").addEventListener("click", () => {
-    if (parametresObsoletes) { afficherMessage("Rechargez la CMP depuis le calcul : les paramètres ont changé."); return; }
-    if (rows.length === 0) { afficherMessage("Ajoutez au moins un engin avant de tracer."); return; }
-    afficherMessage();
+    if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
 
     let data;
     try { data = simulate(); }
-    catch (e) { invaliderSimulation(); afficherMessage(e.message || "La simulation n’a pas pu être calculée."); return; }
+    catch (e) { alert(e.message || "Erreur simulation."); return; }
 
     // Valeurs théoriques importées du calcul.
     $("pillQext").innerHTML =
@@ -1717,14 +1744,51 @@ function legendItem(x0, y0, color, label, dash = null) {
     $("pillVtotal").innerHTML =
       `V émulseur total <sub>théorique</sub> : ${fmt(VemulTotal)} L`;
 
-    actualiserTotaux();
+    // Débit total des engins, quantités comprises.
+    const QextReel = rows.reduce((total, ligne) => {
+      const capacites = getEnginCapacites(ligne);
+      return total + capacites.flow * ligne.qty;
+    }, 0);
+
+    const QtempoReel = QextReel / 2;
+    const dureeExtReelle = data.tExt;
+    const concentration = data.concPct / 100;
+
+    const VextReel =
+      QextReel * dureeExtReelle * concentration;
+
+       // Temporisation adaptée au débit réel.
+    // Entretien conservé selon le besoin théorique importé.
+      const rapportDebit =
+      params.Qext > 0 ? QextReel / params.Qext : NaN;
+
+    const VtempoReel = params.VemulTempo * rapportDebit;
+    const VentretienReel = params.VemulEntretien;
+
+    const VtotalReel =
+      VextReel + VtempoReel + VentretienReel;
+
+    $("pillQextReel").innerHTML =
+      `Q ext <sub>réel</sub> : ${fmt(QextReel)} L/min`;
+
+    $("pillQtempoReel").innerHTML =
+      `Q tempo <sub>réel</sub> : ${fmt(QtempoReel)} L/min`;
+
+    $("pilltExtReel").innerHTML =
+      `Durée extinction <sub>réelle</sub> : ${fmt(dureeExtReelle)} min`;
+
+    $("pillBesoinReel").innerHTML =
+      `V émulseur extinction <sub>réel</sub> : ${fmt(VextReel)} L`;
+
+    $("pillVtotalReel").innerHTML =
+      `V émulseur total <sub>réel</sub> : ${fmt(VtotalReel)} L`;
     $("pillDebitRetenu").textContent = data.tExtStart === null
       ? "Débit extinction retenu : —"
       : `Débit extinction retenu : ${fmt(data.debitExtinctionRetenu)} L/min`;
     $("pillBesoinRetenu").textContent = data.tExtStart === null
       ? "V émulseur extinction retenu : —"
       : `V émulseur extinction retenu : ${fmt(data.needExtTotal)} L`;
-    $("pillT0").textContent = `T0 : ${horaireScenario(data.t0Abs)}`;
+    $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
 
     const t0Str = minToHHMM(data.t0Abs);
 
@@ -1733,10 +1797,21 @@ function legendItem(x0, y0, color, label, dash = null) {
     $("pillExtStart").style.display = "";
     $("pillExtEnd").style.display = "";
     $("pillExtStart").textContent =
-      (data.tExtStart === null) ? "Début extinction possible à : —" : `Début extinction possible à : ${horaireScenario(data.t0Abs, data.tExtStart)}`;
+      (data.tExtStart === null) ? "Début extinction possible à : —" : `Début extinction possible à : ${addMinToHHMM(t0Str, data.tExtStart)}`;
     $("pillExtEnd").textContent =
-      (data.tExtEnd === null) ? "Fin extinction possible à : —" : `Fin extinction possible à : ${horaireScenario(data.t0Abs, data.tExtEnd)}`;
+      (data.tExtEnd === null) ? "Fin extinction possible à : —" : `Fin extinction possible à : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
 
+    // Indicateurs visuels sous l’axe X (FIXES, sans superposition)
+    const extIndStart = $("extIndStart");
+    const extIndEnd = $("extIndEnd");
+    if (extIndStart) {
+      extIndStart.textContent =
+        (data.tExtStart === null) ? "Début ext. : —" : `Début ext. : ${addMinToHHMM(t0Str, data.tExtStart)}`;
+    }
+    if (extIndEnd) {
+      extIndEnd.textContent =
+        (data.tExtEnd === null) ? "Fin ext. : —" : `Fin ext. : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
+    }
     // Bulles des quatre créneaux d’entretien.
     for (let numero = 0; numero < 4; numero++) {
       const bulle = $(`pillEntretien${numero + 1}`);
@@ -1750,7 +1825,7 @@ function legendItem(x0, y0, color, label, dash = null) {
       }
 
       const debut = data.tExtEnd + numero * 60 + 50;
-      const horaire = horaireScenario(data.t0Abs, debut);
+      const horaire = addMinToHHMM(t0Str, debut);
       const manqueStock = data.entretienStockInsuffisant[numero];
 
       bulle.textContent =
@@ -1774,13 +1849,9 @@ function legendItem(x0, y0, color, label, dash = null) {
       volumeManquant > 0.000001 ? "" : "none";
 
     bulleManque.textContent =
-      `V émulseur manquant : ${fmt(Math.ceil(volumeManquant - 1e-9))} L`;
+      `V émulseur manquant : ${fmt(Math.ceil(volumeManquant))} L`;
     blocCourbe.style.display = "block";
-    try { drawChart(data); }
-    catch (erreur) { invaliderSimulation(); afficherMessage(erreur.message || "Affichage du graphique impossible."); return; }
-    const consomme = data.volumeTempoConsomme + data.volumeExtConsomme + data.volumeEntretienConsomme;
-    $("simulationBilan").textContent = `Émulseur consommé sur ce scénario : ${fmt(consomme)} L (temporisation ${fmt(data.volumeTempoConsomme)} L / extinction ${fmt(data.volumeExtConsomme)} L / entretien ${fmt(data.volumeEntretienConsomme)} L).`;
-    if (data.tExtStart === null) afficherMessage("L’extinction n’a pas pu démarrer : le débit présent et le stock d’émulseur nécessaires n’ont jamais été disponibles simultanément. Les plages d’entretien ne sont donc pas affichées.");
+    drawChart(data);
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 

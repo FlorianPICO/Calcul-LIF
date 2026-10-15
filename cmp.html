@@ -771,10 +771,10 @@ th, td {
     </div>
 
     <div class="small">
-      <u>Axe gauche :</u> Lire les valeurs Débit dispo et Débit cible (L/min)<br>
-      <u>Axe droit :</u> Lire les valeurs Volume émulseur (L)<br>
-      <u>Consommation émulseur :</u> À la moitié du débit présent en temporisation, puis au débit fixé au début de l’extinction, puis au débit théorique d’entretien pendant ses créneaux<br>
-      <u>Extinction :</u> Possible si débit présent ≥ Q ext théorique ET stock restant ≥ besoin au débit présent. Le débit engagé est ensuite conservé.
+      <strong>Axe gauche :</strong> débits des moyens présents, débit d’extinction théorique et débit de temporisation, en <strong>L/min</strong>.<br><br>
+      <strong>Axe droit :</strong> volume d’émulseur disponible et volume nécessaire à l’extinction retenue, en <strong>L</strong>.<br><br>
+      <strong>Consommation d’émulseur :</strong> calculée en multipliant la concentration (3 % = 0,03) par la moitié du débit présent pendant la phase de temporisation, puis par le débit d’extinction retenu pendant la phase d’extinction, puis par le débit théorique d’entretien du tapis de mousse pendant les quatre créneaux d’entretien de 10 minutes. La consommation est limitée au volume d’émulseur disponible.<br><br>
+      <strong>Déclenchement de l’extinction :</strong> automatique lorsque le débit des moyens présents atteint ou dépasse le débit d’extinction théorique requis <strong>ET</strong> que le volume d’émulseur disponible permet de tenir toute la durée d’extinction à ce débit. Le débit retenu au démarrage est conservé jusqu’à la fin de l’extinction.
     </div>
 
 <div class="lif-signature">

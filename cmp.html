@@ -553,6 +553,22 @@ th, td {
   background: #181818 !important;
   color: #fff !important;
 }
+    #liste .capacite-editable {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-weight: 700;
+}
+
+#liste .capacite-editable.capacite-modifiee {
+  color: #2563eb;
+}
   </style>
 </head>
 
@@ -846,11 +862,23 @@ function fmt(valeur) {
     CEEM:  { flow: 0,    emul: 6000 }
   };
 
-  // Chaque ligne industrielle conserve ses propres capacités unitaires.
+  // Capacités unitaires utilisées par le tableau et la simulation.
   function getEnginCapacites(ligne) {
-    return ligne.type === "INDUSTRIEL"
+    const reference = ligne.type === "INDUSTRIEL"
       ? { flow: ligne.customFlow, emul: ligne.customEmul }
       : ENGINS[ligne.type];
+
+    if (!reference) return null;
+
+    return {
+      flow: Number.isFinite(ligne.flowOverride)
+        ? ligne.flowOverride
+        : reference.flow,
+
+      emul: Number.isFinite(ligne.emulOverride)
+        ? ligne.emulOverride
+        : reference.emul
+    };
   }
 
   function updateIndustrialUI() {
@@ -988,8 +1016,27 @@ tr.innerHTML = `
   <td data-label="Type"><b>${r.type === "INDUSTRIEL" ? "Moyens industriels" : r.type}</b></td>
   <td data-label="Arrivée">${r.atStr}</td>
  <td data-label="Qté">${fmt(r.qty)}</td>
-<td data-label="Débit (L/min)">${fmt(flow)}</td>
-<td data-label="Émulseur (L)">${fmt(emul)}</td>
+<td data-label="Débit (L/min)">
+  <input
+    type="text"
+    inputmode="decimal"
+    class="capacite-editable ${Number.isFinite(r.flowOverride) ? 'capacite-modifiee' : ''}"
+    data-index="${idx}"
+    data-capacite="flowOverride"
+    value="${flow.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
+    aria-label="Débit total de la ligne ${idx + 1} en L/min">
+</td>
+
+<td data-label="Émulseur (L)">
+  <input
+    type="text"
+    inputmode="decimal"
+    class="capacite-editable ${Number.isFinite(r.emulOverride) ? 'capacite-modifiee' : ''}"
+    data-index="${idx}"
+    data-capacite="emulOverride"
+    value="${emul.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
+    aria-label="Volume total d’émulseur de la ligne ${idx + 1} en litres">
+</td>
   <td data-label="Action">
     <button type="button" data-edit="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Modifier</button>
     <button type="button" data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
@@ -1000,6 +1047,17 @@ tr.innerHTML = `
     });
     // ===== TOTAL DES MOYENS INSCRITS AU TABLEAU =====
     let totalDebit = 0;
+          const ancienne = rows[indexModification];
+
+      if (ancienne.type === ligne.type) {
+        if (Number.isFinite(ancienne.flowOverride)) {
+          ligne.flowOverride = ancienne.flowOverride;
+        }
+
+        if (Number.isFinite(ancienne.emulOverride)) {
+          ligne.emulOverride = ancienne.emulOverride;
+        }
+      }
     let totalEmulseur = 0;
 
     rows.forEach(r => {
@@ -1028,6 +1086,52 @@ tr.innerHTML = `
     `;
 
     tbody.appendChild(ligneTotal);
+        tbody.querySelectorAll("input[data-capacite]").forEach(champ => {
+      champ.addEventListener("keydown", evenement => {
+        if (evenement.key === "Enter") {
+          evenement.preventDefault();
+          champ.blur();
+        }
+      });
+
+      champ.addEventListener("change", () => {
+        const index = Number(champ.dataset.index);
+        const propriete = champ.dataset.capacite;
+        const ligne = rows[index];
+
+        const saisie = champ.value
+          .replace(/\s/g, "")
+          .replace(",", ".")
+          .trim();
+
+        const valeur = saisie === "" ? NaN : Number(saisie);
+
+        if (!Number.isFinite(valeur) || valeur < 0) {
+          alert("Saisis une valeur supérieure ou égale à zéro.");
+          render();
+          return;
+        }
+
+        const capacites = getEnginCapacites(ligne);
+        const valeurActuelle = propriete === "flowOverride"
+          ? capacites.flow * ligne.qty
+          : capacites.emul * ligne.qty;
+
+        // Ne pas marquer une cellule qui n’a pas changé.
+        if (Math.abs(valeur - valeurActuelle) < 0.000001) {
+          return;
+        }
+
+        // Enregistrer la capacité par moyen :
+        // le tableau affiche le total pour la quantité de la ligne.
+        ligne[propriete] = valeur / ligne.qty;
+
+        render();
+
+        // Le graphique précédent ne correspond plus au tableau.
+        blocCourbe.style.display = "none";
+      });
+    });
     tbody.querySelectorAll("button[data-edit]").forEach(btn => {
       btn.addEventListener("click", () => {
         indexModification = Number(btn.dataset.edit);

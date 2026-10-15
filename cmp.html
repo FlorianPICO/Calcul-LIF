@@ -818,7 +818,7 @@ function fmt(valeur) {
 
   const n = (v) => {
     if (v === null || v === undefined) return NaN;
-    const s = String(v).replace(/\s/g, "").replace(",", ".").trim();
+    const s = String(v).replace(",", ".").trim();
     if (!s) return NaN;
     const x = Number(s);
     return Number.isFinite(x) ? x : NaN;
@@ -884,8 +884,7 @@ function fmt(valeur) {
       ? { flow: ligne.customFlow, emul: ligne.customEmul }
       : ENGINS[ligne.type];
 
-    if (!reference || (ligne.type !== "INDUSTRIEL" &&
-        !Object.prototype.hasOwnProperty.call(ENGINS, ligne.type))) return null;
+    if (!reference) return null;
 
     return {
       flow: Number.isFinite(ligne.flowOverride)
@@ -919,21 +918,6 @@ function fmt(valeur) {
 
   if (!params || params.mode !== "lock") {
     status.textContent = "Impossible : aucun calcul SDIS 27 n’a été transmis. Retourne sur la page calcul, fais un calcul en mode SDIS 27, puis clique sur “Courbe de montée en puissance”.";
-    return;
-  }
-
-  const champsParametres = ["Qext", "Qtempo", "tExt", "concPct", "besoinExt",
-    "Qentretien", "VemulEntretien", "VemulTempo"];
-  const parametresValides = champsParametres.every(cle => Number.isFinite(params[cle]) &&
-    params[cle] >= 0 && params[cle] <= Number.MAX_SAFE_INTEGER) && params.Qext > 0 &&
-    params.Qtempo > 0 && [20, 40].includes(params.tExt) && Math.abs(params.concPct - 3) < 1e-6;
-  const proche = (recu, attendu) => Math.abs(recu - attendu) <= Math.max(1, Math.abs(attendu) * 1e-9);
-  if (!parametresValides ||
-      !proche(params.besoinExt, params.Qext * params.tExt * params.concPct / 100) ||
-      !proche(params.Qtempo, params.Qext / 2) ||
-      !proche(params.VemulEntretien, params.Qentretien * 40 * params.concPct / 100) ||
-      !Number.isFinite(params.besoinExt + params.VemulEntretien + params.VemulTempo)) {
-    status.textContent = "Paramètres de calcul invalides ou incohérents. Revenez au calcul, recalculez puis ouvrez à nouveau la CMP.";
     return;
   }
 
@@ -982,73 +966,43 @@ function fmt(valeur) {
     // Sauvegarde propre à la CMP SDIS 27.
   const CLE_ENGINS_CMP = "LIF_CMP_SDIS27_ENGINS";
 
-  const capaciteValide = valeur => Number.isFinite(valeur) && valeur >= 0 && valeur <= Number.MAX_SAFE_INTEGER;
-
-  function ligneValide(ligne) {
-    if (!ligne || typeof ligne !== "object" || Array.isArray(ligne) ||
-        typeof ligne.type !== "string" ||
-        (ligne.type !== "INDUSTRIEL" && !Object.prototype.hasOwnProperty.call(ENGINS, ligne.type)) ||
-        !Number.isFinite(timeToMin(ligne.atStr)) ||
-        !Number.isSafeInteger(ligne.qty) || ligne.qty < 1) return false;
-    if (ligne.type === "INDUSTRIEL" &&
-        (!capaciteValide(ligne.customFlow) || !capaciteValide(ligne.customEmul))) return false;
-    for (const cle of ["flowOverride", "emulOverride"]) {
-      if (ligne[cle] !== undefined && !capaciteValide(ligne[cle])) return false;
-    }
-    const cap = getEnginCapacites(ligne);
-    return !!cap && capaciteValide(cap.flow * ligne.qty) && capaciteValide(cap.emul * ligne.qty);
-  }
-
-  function verifierTotaux(lignes = rows) {
-    let debit = 0, emulseur = 0;
-    for (const ligne of lignes) {
-      if (!ligneValide(ligne)) throw new Error("Une ligne du tableau contient des valeurs invalides.");
-      const cap = getEnginCapacites(ligne);
-      debit += cap.flow * ligne.qty;
-      emulseur += cap.emul * ligne.qty;
-    }
-    const besoinExt = debit * params.tExt * params.concPct / 100;
-    const besoinTotal = besoinExt + params.VemulTempo * (debit / params.Qext) + params.VemulEntretien;
-    if (![debit, emulseur, besoinExt, besoinTotal].every(capaciteValide)) {
-      throw new Error("Les valeurs saisies dépassent les limites numériques. Vérifiez les capacités et les quantités.");
-    }
-    return { debit, emulseur };
-  }
-
-  let erreurSauvegardeSignalee = false;
   function sauvegarderEngins() {
     try {
       localStorage.setItem(CLE_ENGINS_CMP, JSON.stringify(rows));
-      erreurSauvegardeSignalee = false;
     } catch (erreur) {
       console.warn("Sauvegarde des engins impossible.", erreur);
-      if (!erreurSauvegardeSignalee) {
-        alert("Les valeurs sont prises en compte, mais le navigateur ne peut pas les sauvegarder. Elles risquent d’être perdues en quittant la page.");
-        erreurSauvegardeSignalee = true;
-      }
     }
   }
 
   function restaurerEngins() {
     try {
-      const texte = localStorage.getItem(CLE_ENGINS_CMP);
-      if (!texte) return;
-      const sauvegarde = JSON.parse(texte);
-      if (!Array.isArray(sauvegarde)) throw new Error("Sauvegarde invalide");
-      let ignorees = 0;
-      for (const ligne of sauvegarde) {
-        if (!ligneValide(ligne)) { ignorees++; continue; }
-        const copie = { type: ligne.type, atStr: ligne.atStr, qty: ligne.qty };
-        for (const cle of ["customFlow", "customEmul", "flowOverride", "emulOverride"]) {
-          if (Number.isFinite(ligne[cle])) copie[cle] = ligne[cle];
+      const sauvegarde = JSON.parse(
+        localStorage.getItem(CLE_ENGINS_CMP) || "[]"
+      );
+
+      if (!Array.isArray(sauvegarde)) return;
+
+      const lignesValides = sauvegarde.filter(ligne => {
+        if (!ligne || !Number.isFinite(timeToMin(ligne.atStr))) {
+          return false;
         }
-        try { verifierTotaux([...rows, copie]); rows.push(copie); }
-        catch { ignorees++; }
-      }
-      if (ignorees) alert(`${ignorees} ligne(s) sauvegardée(s) invalide(s) n’ont pas été chargées. Vérifiez le tableau.`);
+
+        if (!Number.isInteger(ligne.qty) || ligne.qty < 1) {
+          return false;
+        }
+
+        const capacites = getEnginCapacites(ligne);
+
+        return capacites &&
+          Number.isFinite(capacites.flow) &&
+          Number.isFinite(capacites.emul) &&
+          capacites.flow >= 0 &&
+          capacites.emul >= 0;
+      });
+
+      rows.push(...lignesValides);
     } catch (erreur) {
       console.warn("Restauration des engins impossible.", erreur);
-      alert("Le tableau sauvegardé ne peut pas être lu. Vous pouvez saisir de nouveaux moyens. La sauvegarde précédente n’a pas été remplacée.");
     }
   }
   $("arrivee").addEventListener("focus", () => {
@@ -1066,6 +1020,7 @@ function fmt(valeur) {
   const tbody = $("liste");
 
   const render = () => {
+        sauvegarderEngins();
     tbody.innerHTML = "";
     rows.forEach((r, idx) => {
       const def = getEnginCapacites(r);
@@ -1156,7 +1111,7 @@ tr.innerHTML = `
 
         const valeur = saisie === "" ? NaN : Number(saisie);
 
-                if (!capaciteValide(valeur)) {
+                if (!Number.isFinite(valeur) || valeur < 0) {
           const capacites = getEnginCapacites(ligne);
           const ancienneValeur = propriete === "flowOverride"
             ? capacites.flow * ligne.qty
@@ -1179,16 +1134,7 @@ tr.innerHTML = `
 
         // Enregistrer la capacité par moyen :
         // le tableau affiche le total pour la quantité de la ligne.
-        const ancienneSurcharge = ligne[propriete];
         ligne[propriete] = valeur / ligne.qty;
-        try { verifierTotaux(); }
-        catch (erreur) {
-          if (ancienneSurcharge === undefined) delete ligne[propriete];
-          else ligne[propriete] = ancienneSurcharge;
-          champ.value = valeurActuelle.toLocaleString("fr-FR");
-          alert(erreur.message);
-          return;
-        }
 
         // Marquer la cellule modifiée, sans recréer le tableau.
         champ.classList.add("capacite-modifiee");
@@ -1230,8 +1176,8 @@ tr.innerHTML = `
         $("enginType").value = ligne.type;
         $("arrivee").value = ligne.atStr;
         $("qty").value = ligne.qty;
-        $("industrialFlow").value = ligne.type === "INDUSTRIEL" ? getEnginCapacites(ligne).flow : "";
-        $("industrialEmul").value = ligne.type === "INDUSTRIEL" ? getEnginCapacites(ligne).emul : "";
+        $("industrialFlow").value = ligne.type === "INDUSTRIEL" ? ligne.customFlow : "";
+        $("industrialEmul").value = ligne.type === "INDUSTRIEL" ? ligne.customEmul : "";
         updateIndustrialUI();
 
         $("btnAdd").textContent = "Enregistrer";
@@ -1256,7 +1202,6 @@ tr.innerHTML = `
         }
 
         rows.splice(i, 1);
-        sauvegarderEngins();
         render();
         blocCourbe.style.display = "none";
       });
@@ -1265,11 +1210,8 @@ tr.innerHTML = `
 
     $("btnAdd").addEventListener("click", () => {
     const type = $("enginType").value;
-    const atStr = $("arrivee").value;
-    const qty = n($("qty").value);
-    if (!Number.isSafeInteger(qty) || qty < 1) {
-      alert("La quantité doit être un entier supérieur ou égal à 1."); return;
-    }
+    const atStr = $("arrivee").value || "00:00";
+    const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
 
     const ligne = { type, atStr, qty };
 
@@ -1277,7 +1219,8 @@ tr.innerHTML = `
       const customFlow = n($("industrialFlow").value);
       const customEmul = n($("industrialEmul").value);
 
-      if (![customFlow, customEmul].every(capaciteValide)) {
+      if (![customFlow, customEmul].every(Number.isFinite) ||
+          customFlow < 0 || customEmul < 0) {
         alert("Renseigne un débit et un volume d’émulseur valides, supérieurs ou égaux à zéro.");
         return;
       }
@@ -1287,7 +1230,7 @@ tr.innerHTML = `
       }
       ligne.customFlow = customFlow;
       ligne.customEmul = customEmul;
-    } else if (!Object.prototype.hasOwnProperty.call(ENGINS, type)) {
+    } else if (!ENGINS[type]) {
       return;
     }
 
@@ -1297,26 +1240,25 @@ tr.innerHTML = `
     }
 
     if (indexModification !== null) {
-      const ancienne = rows[indexModification];
-      if (ancienne?.type === ligne.type) {
-        const cap = getEnginCapacites(ancienne);
-        if (Number.isFinite(ancienne.flowOverride) &&
-            (type !== "INDUSTRIEL" || ligne.customFlow === cap.flow)) ligne.flowOverride = ancienne.flowOverride;
-        if (Number.isFinite(ancienne.emulOverride) &&
-            (type !== "INDUSTRIEL" || ligne.customEmul === cap.emul)) ligne.emulOverride = ancienne.emulOverride;
+            const ancienne = rows[indexModification];
+
+      if (ancienne.type === ligne.type) {
+        if (Number.isFinite(ancienne.flowOverride)) {
+          ligne.flowOverride = ancienne.flowOverride;
+        }
+
+        if (Number.isFinite(ancienne.emulOverride)) {
+          ligne.emulOverride = ancienne.emulOverride;
+        }
       }
+      rows[indexModification] = ligne;
+      indexModification = null;
+      $("btnAdd").textContent = "Ajouter";
+    } else {
+      rows.push(ligne);
     }
-    const prochaines = rows.slice();
-    if (indexModification === null) prochaines.push(ligne);
-    else prochaines[indexModification] = ligne;
-    try { verifierTotaux(prochaines); }
-    catch (erreur) { alert(erreur.message); return; }
-    rows.splice(0, rows.length, ...prochaines);
-    indexModification = null;
-    $("btnAdd").textContent = "Ajouter";
 
     rows.sort((a, b) => timeToMin(a.atStr) - timeToMin(b.atStr));
-    sauvegarderEngins();
     render();
     blocCourbe.style.display = "none";
   });
@@ -1328,14 +1270,12 @@ tr.innerHTML = `
     updateIndustrialUI();
     indexModification = null;
     $("btnAdd").textContent = "Ajouter";
-    sauvegarderEngins();
     render();
     blocCourbe.style.display = "none";
   });
 
   // ===== Simulation =====
   function simulate() {
-    verifierTotaux();
     const totalDebitTableau = rows.reduce((total, ligne) => {
       return total + getEnginCapacites(ligne).flow * ligne.qty;
     }, 0);
@@ -1459,7 +1399,6 @@ tr.innerHTML = `
     // Revenir au début à chaque nouveau tracé.
     conteneur.scrollLeft = 0;
     const ctx = c.getContext("2d");
-    if (!ctx) throw new Error("Le navigateur ne permet pas l’affichage du graphique.");
     const W = c.width, H = c.height;
     ctx.clearRect(0, 0, W, H);
 
@@ -1788,7 +1727,7 @@ function legendItem(x0, y0, color, label, dash = null) {
 
     let data;
     try { data = simulate(); }
-    catch (e) { blocCourbe.style.display = "none"; alert(e.message || "Erreur simulation."); return; }
+    catch (e) { alert(e.message || "Erreur simulation."); return; }
 
     // Valeurs théoriques importées du calcul.
     $("pillQext").innerHTML =
@@ -1912,11 +1851,7 @@ function legendItem(x0, y0, color, label, dash = null) {
     bulleManque.textContent =
       `V émulseur manquant : ${fmt(Math.ceil(volumeManquant))} L`;
     blocCourbe.style.display = "block";
-    try { drawChart(data); }
-    catch (erreur) {
-      blocCourbe.style.display = "none";
-      alert(erreur.message || "Affichage du graphique impossible."); return;
-    }
+    drawChart(data);
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 

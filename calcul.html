@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Calcul MEMO LIF – SDIS 27</title>
+  <title>Calcul LIF – SDIS 27 / SDIS 33 / Autre SDIS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -97,9 +97,9 @@
     }
 
 /* ===== LOGO HEADER (aligné avec index) ===== */
-header img.Logo {
-  width: min(220px, 60vw);
-  max-height: 140px;
+header img.logo {
+  width: auto;
+  max-width: 100%;
   height: auto;
   object-fit: contain;
   margin: 0;
@@ -375,6 +375,34 @@ a.lif-btn {
   text-decoration: none;
 }
 
+
+/* Résultats : mêmes espacements, conversions et retours à la ligne. */
+.lif-result-group { margin: 0 0 12px; min-width: 0; }
+.lif-result-group .lif-row { padding-bottom: 2px; }
+.lif-row { align-items: baseline; }
+.lif-row > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.lif-row > span:last-child { flex-shrink: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.lif-conversion { display: block; margin: 0; color: #5b5b5b; font-size: 12px; line-height: 1.5; text-align: right; }
+.lif-help { line-height: 1.5; }
+.lif-resume { white-space: normal; }
+.lif-resume > div { margin-bottom: 5px; overflow-wrap: anywhere; }
+.lif-field { min-width: 0; }
+.lif-field input, .lif-field select { font: inherit; font-size: 16px; max-width: 100%; }
+.lif-feedback { margin: 10px 0; padding: 10px 12px; border-radius: 9px; background: #fff7ed; color: #7c2d12; font-size: 0.9rem; line-height: 1.5; }
+.lif-feedback[hidden] { display: none; }
+.lif-btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+.lif-ref-table { width: 100%; table-layout: fixed; }
+.lif-ref-table th, .lif-ref-table td { overflow-wrap: anywhere; }
+.lif-ref-table th:first-child { width: 50%; }
+@media (max-width: 520px) {
+  section.page { padding: 10px 6px; }
+  .card { padding: 10px; }
+  .lif-container { max-width: 100%; padding: 0; }
+  .lif-card { padding: 12px; }
+  .resume-actions { flex-direction: column; align-items: stretch; }
+  .resume-actions > * { width: 100%; }
+  .lif-badges { grid-template-columns: 1fr; }
+}
   </style>
 </head>
 
@@ -409,7 +437,7 @@ a.lif-btn {
 
         <div class="lif-grid">
           <div class="lif-field">
-            <label>Mode :</label>
+            <label for="modeSdis">Mode :</label>
             <select id="modeSdis">
               <option value="lock" selected>SDIS 27 (taux d'application verrouillés et taux de concentration fixé à 3%)</option>
               <option value="sdis33">SDIS 33 (taux d’application verrouillés et taux de concentration fixée à 3 %)</option>
@@ -426,7 +454,7 @@ a.lif-btn {
     Taux réflexes en L/min/m² :
   </div>
 
-  <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+  <table class="lif-ref-table" style="width:100%;border-collapse:collapse;font-size:0.9rem;">
     <thead>
       <tr>
         <th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">
@@ -467,7 +495,7 @@ a.lif-btn {
           
           <div id="fixedParams33" style="display:none;">
             <div class="lif-help" style="margin:6px 0 10px;">SDIS 33 — Concentration fixe : <strong>3 %</strong>. Taux réflexes en L/min/m² :</div>
-            <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+            <table class="lif-ref-table" style="width:100%;border-collapse:collapse;font-size:0.9rem;">
               <thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">Scénario / Attaque</th><th style="padding:6px;border-bottom:1px solid #ddd;">Non miscible</th><th style="padding:6px;border-bottom:1px solid #ddd;">Miscible</th></tr></thead>
               <tbody>
                 <tr><td style="padding:6px;">Nappe / Direct</td><td style="text-align:center;">5</td><td style="text-align:center;">10</td></tr>
@@ -480,28 +508,28 @@ a.lif-btn {
           <div id="customParams" style="display:none;">
             <div class="lif-grid">
               <div class="lif-field">
-                <label>Concentration émulseur (%) :</label>
+                <label for="concentrationPct">Concentration émulseur (%) :</label>
                 <input id="concentrationPct" type="number" min="0" step="0.1" value="3" disabled>
                 <small class="lif-help">Déverrouillé uniquement en mode “Autre SDIS”.</small>
               </div>
 
               <div class="lif-field">
-                <label>Tapp Réflexe – Indirect – Non miscible (L/min/m²) :</label>
+                <label for="texIndNonMisc">Taux d’application réflexe – Indirect – Non miscible (L/min/m²) :</label>
                 <input id="texIndNonMisc" type="number" min="0" step="0.1" value="5" disabled>
               </div>
 
               <div class="lif-field">
-                <label>Tapp Réflexe – Direct – Non miscible (L/min/m²) :</label>
+                <label for="texDirNonMisc">Taux d’application réflexe – Direct – Non miscible (L/min/m²) :</label>
                 <input id="texDirNonMisc" type="number" min="0" step="0.1" value="10" disabled>
               </div>
 
               <div class="lif-field">
-                <label>Tapp Réflexe – Indirect – Miscible (L/min/m²) :</label>
+                <label for="texIndMisc">Taux d’application réflexe – Indirect – Miscible (L/min/m²) :</label>
                 <input id="texIndMisc" type="number" min="0" step="0.1" value="10" disabled>
               </div>
 
               <div class="lif-field">
-                <label>Tapp Réflexe – Direct – Miscible (L/min/m²) :</label>
+                <label for="texDirMisc">Taux d’application réflexe – Direct – Miscible (L/min/m²) :</label>
                 <input id="texDirMisc" type="number" min="0" step="0.1" value="20" disabled>
               </div>
             </div>
@@ -518,12 +546,12 @@ a.lif-btn {
 
         <div class="lif-grid">
           <div class="lif-field">
-            <label>Surface en feu (m²) :</label>
+            <label for="surfaceFeu">Surface en feu (m²) :</label>
             <input id="surfaceFeu" type="number" min="0" step="0.01" placeholder="Ex : 300">
           </div>
 
           <div class="lif-field">
-            <label>Type de feu / Scénario :</label>
+            <label for="typeFeu">Type de feu / Scénario :</label>
             <select id="typeFeu">
               <option value="nappe">Feu de nappe</option>
               <option value="bac">Feu de bac / rétention</option>
@@ -531,7 +559,7 @@ a.lif-btn {
           </div>
 
           <div class="lif-field">
-            <label>Mode d’attaque :</label>
+            <label for="attaque">Mode d’attaque :</label>
             <select id="attaque">
               <option value="indirect">Indirect</option>
               <option value="direct">Direct</option>
@@ -539,7 +567,7 @@ a.lif-btn {
           </div>
 
           <div class="lif-field">
-            <label>Produit :</label>
+            <label for="produit">Produit :</label>
             <select id="produit">
               <option value="non_miscible">Non miscible</option>
               <option value="miscible">Miscible (alcool)</option>
@@ -548,7 +576,7 @@ a.lif-btn {
           </div>
 
           <div class="lif-field" id="blocReflexe">
-            <label>Réflexe / Réfléchi :</label>
+            <label for="reflexe">Réflexe / Réfléchi :</label>
             <select id="reflexe">
               <option value="reflexe">Réflexe</option>
               <option value="reflechi">Réfléchi (POI)</option>
@@ -556,19 +584,19 @@ a.lif-btn {
           </div>
 
           <div class="lif-field" id="blocTexPoi" style="display:none;">
-            <label>Taux d'application défini dans POI (L/min/m²) :</label>
+            <label for="texPoi">Taux d'application défini dans POI (L/min/m²) :</label>
             <input id="texPoi" type="number" min="0" step="0.1" placeholder="Ex : 8">
             <small class="lif-help">Visible uniquement si “Réfléchi (POI)”</small>
           </div>
 
           <div class="lif-grid-2">
             <div class="lif-field">
-              <label>Heure début temporisation réelle :</label>
+              <label for="tempoDebut">Heure de début de temporisation réelle :</label>
               <input id="tempoDebut" type="time">
             </div>
 
             <div class="lif-field">
-              <label>Heure fin temporisation estimée :</label>
+              <label for="tempoFin">Heure de fin de temporisation estimée :</label>
               <input id="tempoFin" type="time">
             </div>
           </div>
@@ -602,42 +630,30 @@ a.lif-btn {
         <div class="lif-split">
          <div class="lif-panel lif-phase-ext">
             <div class="lif-panel-title">EXTINCTION</div>
-            <div class="lif-row"><span>Q ext (L/min) :</span><span id="oQext">—</span></div>
-            <small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oQextM3h">—</span> m³/h
+            <div class="lif-result-group"><div class="lif-row"><span>Q ext (L/min) :</span><span id="oQext">—</span></div>
+<small class="lif-conversion"><span id="oQextM3h">—</span> m³/h</small></div>
+            <div class="lif-result-group"><div class="lif-row"><span>V émulseur extinction (L) :</span><span id="oVemul">—</span></div>
+<small class="lif-conversion"><span id="oVemulM3">—</span> m³</small></div>
+            <div class="lif-result-group"><div class="lif-row"><span>Q entretien du tapis sur 4 h (L/min) :</span><span id="oQentretien">—</span></div>
+<small class="lif-conversion"><span id="oQentretienM3h">—</span> m³/h</small></div>
+                <small class="lif-help" style="margin-top:10px;">
+ Débit d’entretien = Q ext / 6. Application : 10 min par heure pendant 4 h.
 </small>
-            <div class="lif-row"><span>V émulseur ext (L) :</span><span id="oVemul">—</span></div>
-            <small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oVemulM3">—</span> m³
-</small>
-            <div class="lif-row"><span>Q entretien du tapis sur 4h (L/min) :</span><span id="oQentretien">—</span></div>
-            <small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oQentretienM3h">—</span> m³/h
-</small>
-                <small class="lif-help" style="margin-top: -4px;">
- égal à 1/6ème de Q ext soit 10 min/h pendant 4h
-</small>
-            <div class="lif-row"><span>V émulseur pour entretien du tapis sur 4h (L) :</span><span id="oVentretien">—</span></div>
-            <small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oVentretienM3">—</span> m³
-</small>
+            <div class="lif-result-group"><div class="lif-row"><span>V émulseur pour entretien du tapis sur 4 h (L) :</span><span id="oVentretien">—</span></div>
+<small class="lif-conversion"><span id="oVentretienM3">—</span> m³</small></div>
           </div>
 
          <div class="lif-panel lif-phase-tempo">
             <div class="lif-panel-title">TEMPORISATION</div>
-            <div class="lif-row"><span>Q tempo (L/min) :</span><span id="oQtempo">—</span></div>
-            <small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oQtempoM3h">—</span> m³/h
-</small>
-             <small class="lif-help" style="margin-top: -4px;">
+            <div class="lif-result-group"><div class="lif-row"><span>Q tempo (L/min) :</span><span id="oQtempo">—</span></div>
+<small class="lif-conversion"><span id="oQtempoM3h">—</span> m³/h</small></div>
+             <small class="lif-help" style="margin-top:10px;">
  Q tempo = Q ext / 2
 </small>
-            <div class="lif-row"><span>V émulseur tempo (L) :</span><span id="oVtempo">—</span></div>
-            <small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oVtempoM3">—</span> m³
-</small>
-           <small class="lif-help" style="margin-top: -4px;">
-  Si heure de fin de temporisation estimée non renseignée alors V émulseur tempo = V émulseur ext / 2
+            <div class="lif-result-group"><div class="lif-row"><span>V émulseur tempo (L) :</span><span id="oVtempo">—</span></div>
+<small class="lif-conversion"><span id="oVtempoM3">—</span> m³</small></div>
+           <small class="lif-help" style="margin-top:10px;">
+  Sans heure de fin renseignée : V émulseur tempo = V émulseur extinction / 2.
 </small>
           </div>
         </div>
@@ -647,15 +663,15 @@ a.lif-btn {
 
           <div class="lif-grid">
             <div class="lif-field">
-              <label>Volume déjà présent dans le bac / rétention, au début du sinistre (avant notre arrivée) (L) :</label>
+              <label for="vPresent">Volume déjà présent dans le bac / rétention, au début du sinistre (avant notre arrivée) (L) :</label>
               <input id="vPresent" type="number" min="0">
             </div>
             <div class="lif-field">
-              <label>Capacitée totale du bac (L) :</label>
+              <label for="vTotal">Capacité totale du bac (L) :</label>
               <input id="vTotal" type="number" min="0">
             </div>
             <div class="lif-field">
-              <label>Durée réelle temporisation (min) :</label>
+              <label for="tReel">Durée réelle de temporisation (min) :</label>
               <input id="tReel" type="number" min="0" step="0.1">
               <small class="lif-help" style="margin-top: 6px;">
   Entre groupe horaire du début de temporisation et le top mousse
@@ -663,70 +679,56 @@ a.lif-btn {
             </div>
           </div>
 
-          <div class="lif-row">
+          <div class="lif-result-group"><div class="lif-row">
   <span>Volume ajouté pendant temporisation (L) :</span>
   <span id="oAjTempo">—</span>
 </div>
-<small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oAjTempoM3">—</span> m³
-</small>
+<small class="lif-conversion"><span id="oAjTempoM3">—</span> m³</small></div>
 
-<div class="lif-row">
+<div class="lif-result-group"><div class="lif-row">
   <span>Volume ajouté pendant extinction (40 min) (L) :</span>
   <span id="oAjExt">—</span>
 </div>
-<small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oAjExtM3">—</span> m³
-</small>
+<small class="lif-conversion"><span id="oAjExtM3">—</span> m³</small></div>
 
-<div class="lif-row">
+<div class="lif-result-group"><div class="lif-row">
   <span>Marge avant débordement (L) :</span>
   <span id="oMarge">—</span>
 </div>
-<small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oMargeM3">—</span> m³
-</small>
-          <div class="lif-row"><span>Avec ces débits, débordement au bout de :</span><span id="oTemps">—</span></div>
-<small class="lif-help" style="margin-top: -4px; text-align: right;">
-  <span id="oTempsHM">—</span>
-</small>
+<small class="lif-conversion"><span id="oMargeM3">—</span> m³</small></div>
+          <div class="lif-result-group"><div class="lif-row"><span>Avec ces débits, débordement au bout de :</span><span id="oTemps">—</span></div>
+<small class="lif-conversion"><span id="oTempsHM">—</span></small></div>
           <div class="lif-debord" id="oDebord">—</div>
         </div>
 
         <div class="lif-panel lif-panel-muted" id="blocTapisPreventif" style="display:none;margin-top:12px;">
           <div class="lif-panel-title">TAPIS PRÉVENTIF</div>
           <div class="lif-grid" style="margin-top:10px;">
-            <small class="lif-help" style="margin-top: -4px;">
+            <small class="lif-help" style="margin-top:10px;">
   15 cm de mousse entretenue à 0,2  L/min/m²
 </small>
   <div class="lif-field">
-    <label>Surface de la rétention (m²) :</label>
+    <label for="surfaceCuvette">Surface de la rétention (m²) :</label>
     <input id="surfaceCuvette" type="number" min="0" step="0.01" placeholder="Ex : 200">
     <small class="lif-help">Attention ! surface de la rétention = surface rétention - surface du bac</small>
     <small class="lif-help">Bien vérifier que la surface de rétention, donnée par l'industriel, soit bien avec la surface du bac déduite ou s'il s'agit d'une cuvette déportée</small>
   </div>
 </div>
 
-<div class="lif-panel lif-panel-muted" id="blocTapisPreventif" style="display:none;margin-top:12px;">
-  ...
-</div>
 
 
-           <div class="lif-row">
+
+           <div class="lif-result-group"><div class="lif-row">
   <span>Volume émulseur (L)</span>
   <span id="oVtapis">—</span>
 </div>
-<small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oVtapisM3">—</span> m³
-</small>
+<small class="lif-conversion"><span id="oVtapisM3">—</span> m³</small></div>
 
-<div class="lif-row">
+<div class="lif-result-group"><div class="lif-row">
   <span>Débit entretien (L/min)</span>
   <span id="oDentretien">—</span>
 </div>
-<small class="lif-help" style="margin-top: -4px; text-align: right;">
-   <span id="oDentretienM3h">—</span> m³/h
-</small>
+<small class="lif-conversion"><span id="oDentretienM3h">—</span> m³/h</small></div>
         </div>
       </section>
 
@@ -737,6 +739,7 @@ a.lif-btn {
   <span>Résumé</span>
 </div>
 
+<div id="calculMessage" class="lif-feedback" role="status" aria-live="polite" hidden></div>
 <div id="resumeCmd" class="lif-resume">
   Surface estimée : —<br>
   Taux d'application : —<br>
@@ -781,6 +784,34 @@ a.lif-btn {
 
 (() => {
   const $ = (id) => document.getElementById(id);
+  let resultatsCourants = null;
+  const idsResultats = [
+    "oTapp", "oT", "oQext", "oQextM3h", "oVemul", "oVemulM3",
+    "oQtempo", "oQtempoM3h", "oVtempo", "oVtempoM3", "oQentretien",
+    "oQentretienM3h", "oVentretien", "oVentretienM3", "oAjTempo",
+    "oAjTempoM3", "oAjExt", "oAjExtM3", "oMarge", "oMargeM3",
+    "oTemps", "oTempsHM", "oDebord", "oVtapis", "oVtapisM3",
+    "oDentretien", "oDentretienM3h"
+  ];
+
+  function afficherMessage(texte = "") {
+    $("calculMessage").textContent = texte;
+    $("calculMessage").hidden = !texte;
+  }
+
+  function invaliderCalcul(message = "") {
+    resultatsCourants = null;
+    idsResultats.forEach(id => { if ($(id)) $(id).textContent = "—"; });
+    $("oConc").textContent = isCustomMode() ? "—" : "3 %";
+    $("resumeCmd").textContent = "Calcul à compléter : aucun résultat valide.";
+    $("btnCmp").setAttribute("aria-disabled", "true");
+    $("blocTapisPreventif").style.display = "none";
+    $("oDebord").style.background = "#fff";
+    $("oDebord").style.borderColor = "#ddd";
+    $("oDebord").style.color = "#111";
+    afficherMessage(message);
+  }
+
 // Affichage français : espaces entre milliers et millions.
 function fmt(valeur, decimales = 0) {
   if (!Number.isFinite(valeur)) return "—";
@@ -873,18 +904,15 @@ champsNumeriques.forEach(champ => {
     proposerFinTempo();
   }
   function getTempoMinutes() {
-    const d = $("tempoDebut").value;
-    const f = $("tempoFin").value;
-    if (!d || !f) return NaN;
-
-    const [hd, md] = d.split(":").map(Number);
-    const [hf, mf] = f.split(":").map(Number);
-
-    let debut = hd * 60 + md;
-    let fin = hf * 60 + mf;
-
-    if (fin < debut) fin += 24 * 60; // passage minuit
-    return fin - debut;
+    const debut = $("tempoDebut").value;
+    const fin = $("tempoFin").value;
+    const minute = valeur => {
+      if (!/^\d{2}:\d{2}$/.test(valeur)) return NaN;
+      const [h, m] = valeur.split(":").map(Number);
+      return h < 24 && m < 60 ? h * 60 + m : NaN;
+    };
+    const d = minute(debut), f = minute(fin);
+    return Number.isFinite(d) && Number.isFinite(f) ? (f - d + 1440) % 1440 : NaN;
   }
 
   function setDebordUI(isDebord) {
@@ -950,230 +978,136 @@ if (!isBac) $("surfaceCuvette").value = "";
   }
 
 function compute() {
+  resultatsCourants = null;
+  $("btnCmp").setAttribute("aria-disabled", "true");
+  afficherMessage();
   const S = n($("surfaceFeu").value);
-  if (!Number.isFinite(S) || S <= 0) return;
-
-  const type = $("typeFeu").value;       // nappe | bac
-  const atk  = $("attaque").value;       // indirect | direct
-  const prod = $("produit").value;       // non_miscible | miscible
-  const ref  = $("reflexe").value;       // reflexe | reflechi
-  const texPoi = n($("texPoi").value);
-
-  // Paramètres (lisibles même si disabled)
-  const concPct = isCustomMode() ? n($("concentrationPct").value) : 3;
-  const conc = (Number.isFinite(concPct) && concPct >= 0) ? (concPct / 100) : 0.03;
-  $("oConc").textContent = Number.isFinite(concPct) ? `${fmt(concPct, 1)} %` : "3 %";
-
-  const texIndNonMisc = n($("texIndNonMisc").value);
-  const texDirNonMisc = n($("texDirNonMisc").value);
-  const texIndMisc    = n($("texIndMisc").value);
-  const texDirMisc    = n($("texDirMisc").value);
-
-  /* ================== TEX ================== */
-  let Tex;
-  if (ref === "reflechi") {
-    if (!Number.isFinite(texPoi) || texPoi <= 0) return;
-    Tex = texPoi;
-  } else if ($("modeSdis").value === "sdis33") {
-    Tex = tauxSdis33(type, atk, prod);
-  } else {
-    const ind = (prod === "miscible") ? texIndMisc : texIndNonMisc;
-    const dir = (prod === "miscible") ? texDirMisc : texDirNonMisc;
-    Tex = (atk === "indirect") ? ind : dir;
-  }
-  if (!Number.isFinite(Tex) || Tex <= 0) return;
-
-  /* ================== DURÉES / DÉBITS ================== */
-  const tExt = (type === "bac") ? 40 : (S < 400 ? 20 : 40);
-  const Qext = S * Tex;
-  const Qtempo = S * (Tex / 2);
-
-  /* ================== AFFICHAGE DE BASE ================== */
-$("oTapp").textContent   = fmt(Tex, 2);
-$("oT").textContent     = fmt(tExt);
-$("oQext").textContent  = fmt(Qext);
-  $("oQextM3h").textContent = fmt(Qext * 0.06, 1);
-$("oQtempo").textContent = fmt(Qtempo);
-  $("oQtempoM3h").textContent = fmt(Qtempo * 0.06, 1);
-
-  /* ================== V ÉMULSEUR EXTINCTION ================== */
-  const Vemul = Qext * tExt * conc;
-  $("oVemul").textContent = fmt(Vemul);
-  $("oVemulM3").textContent = fmt(Vemul / 1000, 2);
-
-/* ================== ENTRETIEN TAPIS MOUSSE ==================
-   Hypothèse simple (à adapter si tu as une doctrine précise) :
-   - Q entretien = Qext / 6
-   - Durée entretien = 4 h = 240 min
-   - Volume émulseur entretien = Q entretien * durée * concentration
-*/
-const Qentretien = Qext / 6;
-const tEntretien = 240; // minutes (4h)
-const VemulEntretien = Qentretien * 40 * conc;
-
-$("oQentretien").textContent = fmt(Qentretien);
-  $("oQentretienM3h").textContent = fmt(Qentretien * 0.06, 1);
-$("oVentretien").textContent = fmt(VemulEntretien);
-  $("oVentretienM3").textContent = fmt(VemulEntretien / 1000, 2);
-
-
-  /* ================== V TEMPO ================== */
-  const finRenseignee = !!$("tempoFin").value;
-  const tTempoMin = getTempoMinutes();
-  let VtempoAff = 0;
-
-  if (!finRenseignee) {
-    VtempoAff = Vemul / 2;
-    $("oVtempo").textContent = fmt(VtempoAff);
-    $("oVtempoM3").textContent = fmt(VtempoAff / 1000, 2);
-  } else {
-    if (Number.isFinite(tTempoMin)) {
-      VtempoAff = Qtempo * tTempoMin * conc;
-      $("oVtempo").textContent = fmt(VtempoAff);
-      $("oVtempoM3").textContent = fmt(VtempoAff / 1000, 2);
-    } else {
-      $("oVtempo").textContent = "—";
-      $("oVtempoM3").textContent = "—";
-      VtempoAff = 0;
-    }
-  }
-
-/* ================== RÉSUMÉ COMMANDEMENT ================== */
-const updateResume = (vTapisPreventif = 0) => {
-  const vExt = Math.round(Vemul);
-  const vTempo = Math.round(VtempoAff);
-  const vEntretien = Math.round(VemulEntretien);
-  const vTapis = Math.round(vTapisPreventif);
-
-  const vTotal = vExt + vTempo + vEntretien + vTapis;
-
-  const line = (label, value) =>
-    `<div><strong>${label} :</strong> ${value}</div>`;
-
-    $("resumeCmd").innerHTML =
-    line("Surface estimée", `${fmt(S)} m²`) +
-        line("Taux d'application", `${fmt(Tex, 1)} L/min/m²`) +
-    line("Concentration", `${fmt(Number.isFinite(concPct) ? concPct : 3, 1)} %`) +
-       line(
-  "Débit extinction",
-  `${fmt(Qext)} L/min <span style="font-size:0.9em; color:#475569;">soit ${fmt(Qext * 0.06, 1)} m³/h</span>`
-) +
-        line(
-      "Volume émulseur total",
-      `${fmt(vTotal)} L <span style="font-size:0.9em;color:#475569;">soit ${fmt(vTotal / 1000, 2)} m³</span> <span style="font-size:0.9em;color:#475569;">(Ext ${fmt(vExt)} L / Tempo ${fmt(vTempo)} L / Entretien ${fmt(vEntretien)} L / Tapis ${fmt(vTapis)} L)</span>`
-    );
-};
-
-
-
-
-
-
-  // ✅ résumé dispo immédiatement (sans tapis préventif)
-  updateResume(0);
-
-  /* ================== DÉBORDEMENT (BAC UNIQUEMENT) ================== */
-  if (type !== "bac") {
-    setDebordUI(false);
+  if (!Number.isFinite(S) || S <= 0) {
+    invaliderCalcul("Renseignez une surface en feu supérieure à zéro.");
     return;
   }
-
-  const Vp = n($("vPresent").value);
-  const Vt = n($("vTotal").value);
-  const tr = n($("tReel").value);
-
-  if (![Vp, Vt, tr].every(Number.isFinite) || Vt <= 0) {
-    $("oAjTempo").textContent = "—";
-    $("oAjExt").textContent   = "—";
-    $("oMarge").textContent   = "—";
-    $("oAjTempoM3").textContent = "—";
-$("oAjExtM3").textContent = "—";
-$("oMargeM3").textContent = "—";
-    $("oTemps").textContent   = "—";
-    $("oTempsHM").textContent = "—";
-    $("oDebord").textContent  = "—";
-    setDebordUI(false);
-    return; // résumé déjà affiché
+  const mode = $("modeSdis").value;
+  const type = $("typeFeu").value;
+  const atk = $("attaque").value;
+  const prod = $("produit").value;
+  const ref = $("reflexe").value;
+  if (!["lock", "sdis33", "custom"].includes(mode) ||
+      !["nappe", "bac"].includes(type) || !["direct", "indirect"].includes(atk) ||
+      !["miscible", "non_miscible"].includes(prod) || !["reflexe", "reflechi"].includes(ref)) {
+    invaliderCalcul("Vérifiez les paramètres du scénario."); return;
   }
+  const concPct = isCustomMode() ? n($("concentrationPct").value) : 3;
+  if (!Number.isFinite(concPct) || concPct <= 0 || concPct > 100) {
+    invaliderCalcul("La concentration doit être supérieure à 0 % et inférieure ou égale à 100 %."); return;
+  }
+  const conc = concPct / 100;
+  const taux = ["texIndNonMisc", "texDirNonMisc", "texIndMisc", "texDirMisc"].map(id => n($(id).value));
+  if (isCustomMode() && taux.some(v => !Number.isFinite(v) || v <= 0)) {
+    invaliderCalcul("Renseignez quatre taux d’application strictement positifs."); return;
+  }
+  let Tex;
+  if (ref === "reflechi") Tex = n($("texPoi").value);
+  else if (mode === "sdis33") Tex = tauxSdis33(type, atk, prod);
+  else {
+    const [indNon, dirNon, indMisc, dirMisc] = taux;
+    Tex = atk === "indirect" ? (prod === "miscible" ? indMisc : indNon)
+      : (prod === "miscible" ? dirMisc : dirNon);
+  }
+  if (!Number.isFinite(Tex) || Tex <= 0) {
+    invaliderCalcul("Renseignez un taux d’application positif, notamment le taux POI en mode réfléchi."); return;
+  }
+  const finRenseignee = !!$("tempoFin").value;
+  const tTempoMin = getTempoMinutes();
+  if (finRenseignee && !Number.isFinite(tTempoMin)) {
+    invaliderCalcul("Renseignez une heure de début valide pour calculer la temporisation."); return;
+  }
+  const tExt = type === "bac" ? 40 : S < 400 ? 20 : 40;
+  const Qext = S * Tex;
+  const Qtempo = Qext / 2;
+  const Vemul = Qext * tExt * conc;
+  const Qentretien = Qext / 6;
+  // Quatre applications de 10 min, réparties sur une période de 4 h.
+  const VemulEntretien = Qentretien * 40 * conc;
+  const VtempoAff = finRenseignee ? Qtempo * tTempoMin * conc : Vemul / 2;
+  if (![Qext, Qtempo, Vemul, Qentretien, VemulEntretien, VtempoAff,
+        Vemul + VemulEntretien + VtempoAff].every(Number.isFinite)) {
+    invaliderCalcul("Les valeurs saisies sont trop élevées pour effectuer un calcul fiable."); return;
+  }
+  const afficher = (id, valeur, decimales = 0) => { $(id).textContent = fmt(valeur, decimales); };
+  afficher("oTapp", Tex, 2); afficher("oT", tExt);
+  $("oConc").textContent = `${fmt(concPct, 2)} %`;
+  afficher("oQext", Qext); afficher("oQextM3h", Qext * 0.06, 1);
+  afficher("oQtempo", Qtempo); afficher("oQtempoM3h", Qtempo * 0.06, 1);
+  afficher("oVemul", Vemul); afficher("oVemulM3", Vemul / 1000, 2);
+  afficher("oQentretien", Qentretien); afficher("oQentretienM3h", Qentretien * 0.06, 1);
+  afficher("oVentretien", VemulEntretien); afficher("oVentretienM3", VemulEntretien / 1000, 2);
+  afficher("oVtempo", VtempoAff); afficher("oVtempoM3", VtempoAff / 1000, 2);
+  resultatsCourants = { mode, Qext, Qtempo, tExt, concPct, besoinExt: Vemul,
+    Qentretien, VemulEntretien, VemulTempo: VtempoAff };
+  $("btnCmp").setAttribute("aria-disabled", "false");
 
+  function updateResume(vTapis = 0) {
+    const total = Vemul + VtempoAff + VemulEntretien + vTapis;
+    const line = (label, valeur) => `<div><strong>${label} :</strong> ${valeur}</div>`;
+    $("resumeCmd").innerHTML =
+      line("Surface estimée", `${fmt(S, 2)} m²`) +
+      line("Taux d’application", `${fmt(Tex, 2)} L/min/m²`) +
+      line("Concentration", `${fmt(concPct, 2)} %`) +
+      line("Débit extinction", `${fmt(Qext)} L/min <span style="font-size:0.9em;color:#475569;">soit ${fmt(Qext * 0.06, 1)} m³/h</span>`) +
+      line("Volume émulseur total", `${fmt(total)} L <span style="font-size:0.9em;color:#475569;">soit ${fmt(total / 1000, 2)} m³ (Ext ${fmt(Vemul)} L / Tempo ${fmt(VtempoAff)} L / Entretien ${fmt(VemulEntretien)} L / Tapis ${fmt(vTapis)} L)</span>`);
+  }
+  updateResume();
+  ["oAjTempo", "oAjExt", "oMarge", "oAjTempoM3", "oAjExtM3", "oMargeM3",
+   "oTemps", "oTempsHM", "oDebord", "oVtapis", "oDentretien", "oVtapisM3", "oDentretienM3h"]
+    .forEach(id => { $(id).textContent = "—"; });
+  setDebordUI(false);
+  $("oDebord").style.background = "#fff";
+  $("oDebord").style.borderColor = "#ddd";
+  $("oDebord").style.color = "#111";
+  if (type !== "bac") return;
+
+  const debordIds = ["vPresent", "vTotal", "tReel"];
+  const valeurs = debordIds.map(id => n($(id).value));
+  const [Vp, Vt, tr] = valeurs;
+  if (!valeurs.every(Number.isFinite) || Vp < 0 || Vt <= 0 || tr < 0) {
+    afficherMessage("Calcul principal valide. Pour évaluer le débordement, renseignez un volume présent et une durée positifs ou nuls, et une capacité totale supérieure à zéro.");
+    return;
+  }
   const Vtempo = Qtempo * tr;
-  const Vext   = Qext * 40;
-  const marge  = Vt - (Vp + Vtempo + Vext);
-
-  $("oAjTempo").textContent = fmt(Vtempo);
-  $("oAjExt").textContent   = fmt(Vext);
-  $("oMarge").textContent   = fmt(marge);
-  $("oAjTempoM3").textContent = fmt(Vtempo / 1000, 2);
-$("oAjExtM3").textContent = fmt(Vext / 1000, 2);
-$("oMargeM3").textContent = fmt(marge / 1000, 2);
-
-  let deb = false;
-  let msg = "Pas de débordement";
-
-  if (Vp >= Vt) {
-    deb = true;
-    msg = "Débordement immédiat (0 min)";
-  } else {
-    const margeInit = Vt - Vp;
-    if (Qtempo * tr >= margeInit) {
-      deb = true;
-      msg = `(~${fmt(margeInit / Qtempo, 1)} min)`;
-    } else {
-            const reste = margeInit - Qtempo * tr;
-      const tDebExt = reste / Qext;
-      const tDebTotal = tr + tDebExt;
-
-      // Le risque reste évalué sur les 40 minutes d’extinction.
-      deb = tDebExt <= 40;
-
-      // Afficher le délai même au-delà des 40 minutes prévues.
-      msg = tDebExt <= 40
-        ? `~${fmt(tDebTotal, 1)} min `
-        : `~${fmt(tDebTotal, 1)} min `;
-    }
+  const Vext = Qext * 40;
+  const marge = Vt - (Vp + Vtempo + Vext);
+  const margeInit = Vt - Vp;
+  const delai = Vp >= Vt ? 0 : Vtempo >= margeInit ? margeInit / Qtempo
+    : tr + (margeInit - Vtempo) / Qext;
+  if (![Vtempo, Vext, marge, delai].every(Number.isFinite)) {
+    afficherMessage("Calcul principal valide. Les valeurs de débordement sont trop élevées."); return;
   }
-
-  $("oTemps").textContent = msg;
-  // Délai depuis le début de temporisation.
-const delaiMinutes =
-  Vp >= Vt
-    ? 0
-    : Qtempo * tr >= Vt - Vp
-      ? (Vt - Vp) / Qtempo
-      : tr + (Vt - Vp - Qtempo * tr) / Qext;
-
-// Conversion arrondie à la minute.
-const minutesTotales = Math.round(delaiMinutes);
-const heures = Math.floor(minutesTotales / 60);
-const minutes = minutesTotales % 60;
-
-$("oTempsHM").textContent =
-  `soit ${fmt(heures)} ${heures > 1 ? "heures" : "heure"} et ` +
-  `${minutes} ${minutes > 1 ? "minutes" : "minute"}`;
+  const deb = Vp >= Vt || Vtempo >= margeInit || delai - tr <= 40;
+  afficher("oAjTempo", Vtempo); afficher("oAjTempoM3", Vtempo / 1000, 2);
+  afficher("oAjExt", Vext); afficher("oAjExtM3", Vext / 1000, 2);
+  afficher("oMarge", marge); afficher("oMargeM3", marge / 1000, 2);
+  $("oTemps").textContent = Vp >= Vt ? "Débordement immédiat (0 min)"
+    : `~${fmt(delai, 1)} min${deb ? "" : " — au-delà des 40 min d’extinction"}`;
+  const minutesTotales = Math.round(delai);
+  const heures = Math.floor(minutesTotales / 60), minutes = minutesTotales % 60;
+  $("oTempsHM").textContent = `soit ${fmt(heures)} ${heures > 1 ? "heures" : "heure"} et ${minutes} ${minutes > 1 ? "minutes" : "minute"}`;
   $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
-  $("oDebord").style.background  = deb ? "#fee2e2" : "#dcfce7";
-  $("oDebord").style.borderColor = deb ? "#ef4444" : "#22c55e";
-  $("oDebord").style.color       = deb ? "#7f1d1d" : "#065f46";
-
+  $("oDebord").style.background = deb ? "#fee2e2" : "#dcfce7";
+  $("oDebord").style.borderColor = deb ? "#fecaca" : "#bbf7d0";
+  $("oDebord").style.color = deb ? "#7f1d1d" : "#14532d";
   setDebordUI(deb);
-
   if (deb) {
     const Sc = n($("surfaceCuvette").value);
-    const vTapis = Number.isFinite(Sc) ? (Sc * 0.15 * 3) : NaN;
-
-    $("oVtapis").textContent = fmt(vTapis);
-    $("oDentretien").textContent = Number.isFinite(Sc) ? fmt(Sc * 0.2) : "—";
-$("oVtapisM3").textContent = fmt(vTapis / 1000, 2);
-
-$("oDentretienM3h").textContent =
-  Number.isFinite(Sc) ? fmt(Sc * 0.2 * 0.06, 1) : "—";
-    updateResume(Number.isFinite(vTapis) ? vTapis : 0);
-  } else {
-    updateResume(0);
+    if (!Number.isFinite(Sc) || Sc <= 0 || !Number.isFinite(Sc * 0.15 * 3)) {
+      afficherMessage("Débordement identifié. Renseignez une surface de rétention supérieure à zéro : le tapis préventif n’est pas encore inclus dans le volume total."); return;
+    }
+    // Conserver la formule du tapis préventif validée dans le fichier source.
+    const vTapis = Sc * 0.15 * 3;
+    afficher("oVtapis", vTapis); afficher("oVtapisM3", vTapis / 1000, 2);
+    afficher("oDentretien", Sc * 0.2); afficher("oDentretienM3h", Sc * 0.2 * 0.06, 1);
+    updateResume(vTapis);
   }
 }
-
-
 
   function resetAll() {
     $("surfaceFeu").value = "";
@@ -1189,32 +1123,12 @@ initialiserHorairesTempo();
     $("vTotal").value = "";
     $("tReel").value = "";
 
-    ["oTapp","oT","oQext","oVemul","oVemulM3","oQtempo","oVtempo","oVtempoM3","oVentretien","oVentretienM3","oQentretien","oEntExt","oAjTempo","oAjExt","oMarge","oTemps","oTempsHM","oDebord","oVtapis","oDentretien"]
-      .forEach(id => { const e = $(id); if (e) e.textContent = "—"; });
-$("oQextM3h").textContent = "—";
-    $("oQentretienM3h").textContent = "—";
-    $("oQtempoM3h").textContent = "—";
-    $("oAjTempoM3").textContent = "—";
-$("oAjExtM3").textContent = "—";
-$("oMargeM3").textContent = "—";
-    $("oVtapisM3").textContent = "—";
-$("oDentretienM3h").textContent = "—";
-    $("oConc").textContent = "3 %";
-
-    $("resumeCmd").textContent =
-`Surface estimée : —
-Taux d'application : —
-Concentration : —
-Débit extinction : —
-Volume émulseur total : —`;
-
-    $("oDebord").style.background = "#fff";
-    $("oDebord").style.borderColor = "#ddd";
-    $("oDebord").style.color = "#111";
+    invaliderCalcul();
 
     $("modeSdis").value = "lock";
     updateLockUI();
     updateUI();
+    afficherMessage();
   }
 
   $("modeSdis").addEventListener("change", updateLockUI);
@@ -1229,68 +1143,39 @@ Volume émulseur total : —`;
   $("btnCalculer").addEventListener("click", compute);
   $("btnReset").addEventListener("click", resetAll);
 
-  $("btnCopyResume").addEventListener("click", () => {
-    const text = $("resumeCmd").textContent;
-    navigator.clipboard.writeText(text);
-    alert("Résumé commandement copié");
+  $("btnCopyResume").addEventListener("click", async () => {
+    compute();
+    if (!resultatsCourants) return;
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Presse-papiers indisponible");
+      await navigator.clipboard.writeText($("resumeCmd").innerText || $("resumeCmd").textContent);
+      afficherMessage("Résumé copié.");
+    } catch (erreur) {
+      afficherMessage("La copie automatique n’est pas disponible. Sélectionnez le résumé et copiez-le manuellement.");
+    }
   });
 // ================== PASSERELLE VERS CMP (stockage local) ==================
 const btnCmp = $("btnCmp");
 
-// Convertit un texte type "3 %" / "1 000" / "1000 L/min" en nombre
-const numFromText = (txt) => {
-  if (txt == null) return NaN;
-  const s = String(txt)
-    .replace(/\s/g, "")
-    .replace(",", ".")
-    .replace(/[^0-9.\-]/g, "");
-  const x = Number(s);
-  return Number.isFinite(x) ? x : NaN;
-};
-
 btnCmp.addEventListener("click", (e) => {
   e.preventDefault();
-
-  const mode = $("modeSdis").value; // lock | sdis33 | custom
-
-  // Valeurs calculées
-  const Qext   = numFromText($("oQext").textContent);
-  const Qtempo = numFromText($("oQtempo").textContent);
-  const tExt   = numFromText($("oT").textContent);
-  const concPct = numFromText($("oConc").textContent);
-
-  if (![Qext, Qtempo, tExt, concPct].every(Number.isFinite)) {
-    alert("Fais un calcul avant d’ouvrir la courbe.");
+  compute();
+  if (!resultatsCourants) {
+    afficherMessage("Complétez ou corrigez le calcul avant d’ouvrir la CMP.");
     return;
   }
-
-  const conc = concPct / 100;
-  const besoinExt = Qext * tExt * conc;
-
-  const payload = {
-    mode,
-    Qext,
-    Qtempo,
-    tExt,
-    concPct,
-    besoinExt,
-        Qentretien: numFromText($("oQentretien").textContent),
-    VemulEntretien: numFromText($("oVentretien").textContent),
-    VemulTempo: numFromText($("oVtempo").textContent),
-    savedAt: Date.now()
-  };
-
-  localStorage.setItem("LIF_CMP_INPUTS", JSON.stringify(payload));
-
-  // 🔀 Redirection selon le mode
-  const target = mode === "sdis33"
-    ? "cmp_sdis33.html"
-    : mode === "custom" ? "cmp_autre_sdis.html" : "cmp.html";
-
-sauvegarderCalcul();
-window.location.href = target;
+  const payload = { ...resultatsCourants, savedAt: Date.now() };
+  try {
+    localStorage.setItem("LIF_CMP_INPUTS", JSON.stringify(payload));
+  } catch (erreur) {
+    afficherMessage("Le navigateur ne permet pas d’enregistrer les paramètres. Vérifiez l’autorisation du stockage avant d’ouvrir la CMP.");
+    return;
+  }
+  const target = payload.mode === "sdis33" ? "cmp_sdis33.html"
+    : payload.mode === "custom" ? "cmp_autre_sdis.html" : "cmp.html";
+  sauvegarderCalcul();
+  window.location.href = target;
 });
-
 
   // ================== MÉMOIRE DE LA PAGE CALCUL ==================
   const CLE_CALCUL = "LIF_CALCUL_SESSION";
@@ -1316,10 +1201,10 @@ window.location.href = target;
   function restaurerCalcul() {
     try {
       const sauvegarde = sessionStorage.getItem(CLE_CALCUL);
-      if (!sauvegarde) return;
+      if (!sauvegarde) return false;
 
       const donnees = JSON.parse(sauvegarde);
-      if (!donnees || typeof donnees !== "object") return;
+      if (!donnees || typeof donnees !== "object" || Array.isArray(donnees)) return false;
 
       // Restaurer les valeurs saisies.
       champsCalcul.forEach(champ => {
@@ -1332,22 +1217,20 @@ window.location.href = target;
       updateUI();
       updateLockUI();
       compute();
+      return true;
     } catch (erreur) {
       console.warn("Restauration du calcul impossible :", erreur);
+      return false;
     }
   }
 
   // Initialiser la page, puis récupérer la saisie précédente.
   resetAll();
-  restaurerCalcul();
-    // Proposer les horaires si aucune valeur n’a été restaurée.
-  if (!$("tempoDebut").value) {
-    initialiserHorairesTempo();
-  } else if (!$("tempoFin").value) {
-    proposerFinTempo();
-  }
-
+  const saisieRestauree = restaurerCalcul();
+  // resetAll propose déjà l'heure actuelle et une fin à +20 min pour une nouvelle saisie.
+  // Une sauvegarde restaurée, y compris ses heures vides, est conservée telle quelle.
   compute();
+  if (!saisieRestauree) afficherMessage();
 
   // Chaque modification du début propose une fin 20 min plus tard.
   $("tempoDebut").addEventListener("change", () => {

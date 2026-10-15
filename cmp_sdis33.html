@@ -681,6 +681,8 @@ th, td {
   <span>Courbe de montée en puissance</span>
 </h2>
 
+    <div id="alerteExtinction" class="warn" role="status" aria-live="polite" style="display:none; margin:12px 0; white-space:pre-line;"></div>
+
    <h3 class="cmp-pills-title">Théorique :</h3>
 
 <div class="row" style="align-items:center;">
@@ -1375,6 +1377,52 @@ tr.innerHTML = `
     };
   }
 
+  // Expliquer le blocage à partir des stocks et débits au même instant.
+  // Le diagnostic ne modifie aucune règle de simulation.
+  function messageAlerteExtinction(data) {
+    if (data.tExtStart !== null) return "";
+
+    let debitMax = 0;
+    let meilleurInstant = null;
+    let manqueMinimum = Infinity;
+    const concentration = data.concPct / 100;
+    const besoinTheorique = params.Qext * data.tExt * concentration;
+
+    for (let t = 0; t < data.flowAvailSerie.length; t++) {
+      const debit = data.flowAvailSerie[t];
+      const stock = data.emulSerie[t];
+      debitMax = Math.max(debitMax, debit);
+      if (debit < params.Qext) continue;
+      const besoin = debit * data.tExt * concentration;
+      const manque = Math.max(0, besoin - stock);
+      if (manque < manqueMinimum) {
+        manqueMinimum = manque;
+        meilleurInstant = { t, debit, stock, besoin };
+      }
+    }
+
+    if (meilleurInstant === null) {
+      return `⚠️ Impossible de lancer l’extinction : le débit est insuffisant.
+
+Débit disponible : ${fmt(debitMax)} L/min. Débit minimum nécessaire : ${fmt(params.Qext)} L/min.`;
+    }
+
+    const point = meilleurInstant;
+    const heure = minToHHMM(data.t0Abs + point.t);
+
+    if (point.debit > params.Qext && point.stock + 0.000001 >= besoinTheorique) {
+      return `⚠️ Le débit des engins présents consomme trop d’émulseur pour assurer toute l’extinction.
+
+À ${heure}, il reste ${fmt(point.stock)} L, mais il faudrait ${fmt(point.besoin)} L à ce débit.
+
+Le stock serait suffisant en utilisant seulement le débit théorique de ${fmt(params.Qext)} L/min. La simulation utilise actuellement tout le débit des engins présents.`;
+    }
+
+    return `⚠️ Le débit est suffisant, mais il manque de l’émulseur pour réaliser toute l’extinction.
+
+À ${heure}, il reste ${fmt(point.stock)} L pour un besoin de ${fmt(point.besoin)} L. Il manque ${fmt(Math.ceil(manqueMinimum))} L.`;
+  }
+
   // ===== Dessin =====
   function drawChart(data) {
     const c = $("chart");
@@ -1834,6 +1882,10 @@ function legendItem(x0, y0, color, label, dash = null) {
 
     bulleManque.textContent =
       `V émulseur manquant : ${fmt(Math.ceil(volumeManquant))} L`;
+    const alerteExtinction = $("alerteExtinction");
+    const messageExtinction = messageAlerteExtinction(data);
+    alerteExtinction.textContent = messageExtinction;
+    alerteExtinction.style.display = messageExtinction ? "block" : "none";
     blocCourbe.style.display = "block";
     drawChart(data);
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });

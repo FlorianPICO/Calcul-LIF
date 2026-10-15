@@ -1095,9 +1095,14 @@ tr.innerHTML = `
 
         const valeur = saisie === "" ? NaN : Number(saisie);
 
-        if (!Number.isFinite(valeur) || valeur < 0) {
+                if (!Number.isFinite(valeur) || valeur < 0) {
+          const capacites = getEnginCapacites(ligne);
+          const ancienneValeur = propriete === "flowOverride"
+            ? capacites.flow * ligne.qty
+            : capacites.emul * ligne.qty;
+
+          champ.value = ancienneValeur.toLocaleString("fr-FR");
           alert("Saisis une valeur supérieure ou égale à zéro.");
-          render();
           return;
         }
 
@@ -1115,7 +1120,33 @@ tr.innerHTML = `
         // le tableau affiche le total pour la quantité de la ligne.
         ligne[propriete] = valeur / ligne.qty;
 
-        render();
+        // Marquer la cellule modifiée, sans recréer le tableau.
+        champ.classList.add("capacite-modifiee");
+
+        // Recalculer les totaux avec les capacités personnalisées.
+        let nouveauDebit = 0;
+        let nouvelEmulseur = 0;
+
+        rows.forEach(r => {
+          const capacites = getEnginCapacites(r);
+          nouveauDebit += capacites.flow * r.qty;
+          nouvelEmulseur += capacites.emul * r.qty;
+        });
+
+        // Actualiser seulement les cellules TOTAL.
+        ligneTotal.querySelector(
+          'td[data-label="Débit (L/min)"]'
+        ).textContent = `${nouveauDebit.toLocaleString("fr-FR")} L/min`;
+
+        ligneTotal.querySelector(
+          'td[data-label="Émulseur (L)"]'
+        ).textContent = `${nouvelEmulseur.toLocaleString("fr-FR")} L`;
+
+        // Q ext réel est strictement égal au total débit du tableau.
+        $("pillQextReel").innerHTML =
+          `Q ext <sub>réel</sub> : ${fmt(nouveauDebit)} L/min`;
+
+        sauvegarderEngins();
 
         // Le graphique précédent ne correspond plus au tableau.
         blocCourbe.style.display = "none";

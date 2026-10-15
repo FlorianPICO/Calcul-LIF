@@ -686,6 +686,8 @@ th, td {
   <span>Courbe de montée en puissance</span>
 </h2>
 
+    <div id="alerteExtinction" class="warn" role="status" aria-live="polite" style="display:none; margin:12px 0; white-space:pre-line;"></div>
+
    <h3 class="cmp-pills-title">Théorique :</h3>
 
 <div class="row" style="align-items:center;">
@@ -1385,6 +1387,51 @@ tr.innerHTML = `
     };
   }
 
+  // Expliquer le blocage à partir des stocks et débits au même instant.
+  // Le diagnostic ne modifie aucune règle de simulation.
+  function messageAlerteExtinction(data) {
+    if (data.tExtStart !== null) return "";
+
+    let debitMax = 0;
+    let meilleurInstant = null;
+    let manqueMinimum = Infinity;
+    const concentration = data.concPct / 100;
+    const besoinTheorique = params.Qext * data.tExt * concentration;
+
+    for (let t = 0; t < data.flowAvailSerie.length; t++) {
+      const debit = data.flowAvailSerie[t];
+      const stock = data.emulSerie[t];
+      debitMax = Math.max(debitMax, debit);
+      if (debit < params.Qext) continue;
+      const besoin = debit * data.tExt * concentration;
+      const manque = Math.max(0, besoin - stock);
+      if (manque < manqueMinimum) {
+        manqueMinimum = manque;
+        meilleurInstant = { t, debit, stock, besoin };
+      }
+    }
+
+    if (meilleurInstant === null) {
+      return `Attention ! Pas assez de débit pour lancer le top extinction.
+Débit maximal des moyens présents : ${fmt(debitMax)} L/min ; débit théorique requis : ${fmt(params.Qext)} L/min.
+Le débit requis n’est atteint à aucun moment de la simulation.`;
+    }
+
+    const point = meilleurInstant;
+    const heure = minToHHMM(data.t0Abs + point.t);
+    const details = `À ${heure}, instant où le manque est le plus faible avec un débit suffisant : stock restant ${fmt(point.stock)} L ; besoin ${fmt(point.besoin)} L pour ${fmt(data.tExt)} min à ${fmt(point.debit)} L/min. Il manque ${fmt(Math.ceil(manqueMinimum))} L à cet instant. La temporisation déjà consommée est déduite du stock.`;
+
+    if (point.debit > params.Qext && point.stock + 0.000001 >= besoinTheorique) {
+      return `Attention ! Le débit présent augmente le besoin d’émulseur et empêche le top extinction dans la simulation.
+${details}
+Ce stock couvrirait l’extinction au débit théorique de ${fmt(params.Qext)} L/min (besoin : ${fmt(besoinTheorique)} L), mais le code engage tout le débit présent au démarrage.`;
+    }
+
+    return `Attention ! Pas assez de volume d’émulseur pour lancer le top extinction au débit présent.
+${details}
+Le débit requis est atteint, mais le stock restant ne couvre jamais toute la durée d’extinction au débit présent.`;
+  }
+
   // ===== Dessin =====
   function drawChart(data) {
     const c = $("chart");
@@ -1844,6 +1891,10 @@ function legendItem(x0, y0, color, label, dash = null) {
 
     bulleManque.textContent =
       `V émulseur manquant : ${fmt(Math.ceil(volumeManquant))} L`;
+    const alerteExtinction = $("alerteExtinction");
+    const messageExtinction = messageAlerteExtinction(data);
+    alerteExtinction.textContent = messageExtinction;
+    alerteExtinction.style.display = messageExtinction ? "block" : "none";
     blocCourbe.style.display = "block";
     drawChart(data);
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });

@@ -1,0 +1,1851 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>CMP – Courbe de montée en puissance (SDIS 33)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <style>
+
+     body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: #f5f7fa;
+      color: #111;
+      line-height: 1.6;
+    }
+
+    /* ✅ HEADER RESPONSIVE (logo centré + texte adaptable) */
+    header {
+      background: #0b1220;
+      color: white;
+      padding: 42px 16px;
+      text-align: center;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 4.8vw, 2.2rem);
+      line-height: 1.2;
+      max-width: 28ch;
+    }
+
+    header p {
+      opacity: 0.9;
+      font-size: clamp(0.95rem, 3.2vw, 1.1rem);
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    section.page {
+      max-width: 900px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+.header-sub{
+  margin: 0;
+  display: flex;
+  flex-direction: column;   /* ✅ force 2 lignes */
+  gap: 18px;                 /* ✅ espace entre les lignes */
+  text-align: center;
+  line-height: 1.25;
+}
+  
+.header-mail{
+  color: #fff;           /* blanc lisible sur fond sombre */
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.header-mail:hover{
+  text-decoration: underline;
+ opacity: 0.9;
+}
+    
+    @media (max-width: 520px) {
+      section.page { padding: 14px 8px; }   /* ✅ moins de marge sur mobile */
+      .card { padding: 12px; }             /* ✅ la carte prend plus de largeur */
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #ddd;
+    }
+
+    /* ✅ Signature centrée et lisible (sans rognage) */
+    .lif-signature {
+      margin-top: 18px;
+      padding-top: 10px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+      border-top: 1px solid #eee;
+    }
+
+    @media (max-width: 420px) {
+      .lif-signature { font-size: 11px; padding-left: 10px; padding-right: 10px; }
+    }
+
+/* ===== LOGO HEADER (aligné avec index) ===== */
+header img.Logo {
+  width: min(220px, 60vw);
+  max-height: 140px;
+  height: auto;
+  object-fit: contain;
+  margin: 0;
+}
+
+    .hero-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .hero-title span { display: block; white-space: normal; }
+    
+    body{ margin:0; font-family:system-ui, Arial, sans-serif; background:#f5f7fa; color:#111; line-height:1.5; }
+    header{ background:#0b1220; color:#fff; padding:18px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    header .title{ font-weight:900; font-size:1.1rem; }
+    header a.back-btn{ color:#fff; text-decoration:none; font-weight:800; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,0.12); white-space:nowrap; display:inline-block; }
+    main{ max-width:980px; margin:auto; padding:16px 12px 26px; }
+    .card{ background:#fff; border:1px solid #ddd; border-radius:14px; padding:14px; margin-top:12px; }
+ /* Bandeaux des grands titres */
+.card h2.lif-card-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 18px 20px;
+  margin: -14px -14px 16px;
+
+  background: linear-gradient(105deg, #0b1220, #172a46);
+  border-left: 4px solid #60a5fa;
+  border-radius: 13px 13px 0 0;
+
+  color: #fff;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: 0.1px;
+}
+
+.lif-title-number {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+
+  width: 38px;
+  height: 38px;
+
+  background: rgba(96, 165, 250, 0.14);
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  border-radius: 10px;
+
+  color: #bfdbfe;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  .card h2.lif-card-title {
+    padding: 15px 14px;
+    gap: 11px;
+    font-size: 16px;
+  }
+}
+    .grid{ display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:start; }
+/* ===================================== */
+/* ALIGNEMENT PARFAIT DES 4 CASES (DESKTOP) */
+/* ===================================== */
+@media (min-width: 769px){
+
+  /* même structure pour chaque colonne */
+  .grid .cell{
+    display: grid;
+    grid-template-rows: 2.2em 56px 2.6em; /* label / champ / aide */
+    row-gap: 6px;
+    align-content: start;
+  }
+
+  /* uniformise la hauteur des labels */
+  .grid .cell > label{
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  /* uniformise la hauteur des champs + bouton */
+  .grid .field,
+  .grid .field-btn{
+    height: 56px !important;
+    box-sizing: border-box;
+  }
+
+  /* bouton = même hauteur et centré */
+  .grid .field-btn{
+    padding: 0 !important; /* annule padding .btn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* réserve la même "ligne aide" pour Quantité + Ajouter même si pas de .small */
+  .grid .cell-qty::after,
+  .grid .cell-add::after{
+    content: "";
+    display: block;
+    height: 2.6em; /* même que la 3e ligne */
+  }
+}
+
+
+    @media (max-width:720px){ .grid{ grid-template-columns: 1fr 1fr; } }
+    label{ font-weight:800; font-size:0.95rem; }
+    input, select, button{ width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; box-sizing:border-box; font-family:inherit; font-size:1rem; }
+    .row{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+    .btn{ cursor:pointer; font-weight:900; border:0; border-radius:12px; padding:12px 14px; }
+    .btn-primary{ background:#2563eb; color:#fff; }
+    .btn-ghost{ background:#fff; border:1px solid #ccc; }
+    .small{ font-size:12px; color:#555; margin-top:6px; }
+    .warn{ background:#fff3cd; border:1px solid #ffeeba; padding:10px 12px; border-radius:12px; font-size:0.95rem; }
+/* ===== Desktop : aligner hauteur du bouton "Ajouter" avec les champs ===== */
+@media (min-width: 769px){
+  #btnAdd{
+    height: 56px;
+    padding: 0;            /* annule le padding de .btn */
+    line-height: 56px;     /* centre le texte verticalement */
+    border-radius: 12px;   /* garde ton style */
+  }
+}
+
+   /* Empêche le débordement du tableau sur mobile */
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  margin-top:10px;
+  display:block;              /* clé */
+  overflow-x:auto;            /* clé */
+  -webkit-overflow-scrolling: touch;
+}
+
+thead, tbody, tr{
+  display:table;
+  width:100%;
+  table-layout:fixed;
+}
+/* ===== TABLE DESKTOP : ALIGNEMENT STRICT ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  display: table-cell;   /* ← CRITIQUE */
+  vertical-align: middle;
+  text-align: left;
+}
+@media (max-width: 768px) {
+
+  thead {
+    display: none;
+  }
+
+  table, tbody, tr {
+    display: block;
+    width: 100%;
+  }
+
+  td {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    column-gap: 14px;
+    padding: 6px 0;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: 800;
+    color: #555;
+  }
+
+  /* bouton supprimer */
+  td:last-child {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+
+    .pill{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:0.85rem; border:1px solid #ddd; background:#f8fafc; }
+.pill.entretien-ok {
+  background: rgba(34,197,94,0.10);
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.pill.entretien-impossible {
+  background: rgba(239,68,68,0.18);
+  border-color: #ef4444;
+  color: #991b1b;
+}
+    
+    .canvas-wrap {
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+#chart {
+  display: block;
+  height: auto;
+  max-width: none;
+}
+    
+.pill-ext {
+  border-color:#16a34a !important;
+  background:rgba(22,163,74,0.10) !important;
+  color:#166534 !important;
+}
+  .pillBesoin {
+  border-color:#f7ba5c !important;
+  background:rgba(234,88,12,0.10) !important;
+  color:#7c2d12 !important;
+}
+  .pillQext {
+  border-color:#2563eb !important;
+  background:rgba(37,99,235,0.10) !important;
+  color:#1e3a8a !important;
+}
+    .pillVtotal {
+  border-color: transparent !important;
+  background:
+    linear-gradient(
+      110deg,
+      #fecaca,
+      #fed7aa,
+      #fef08a,
+      #bbf7d0,
+      #bfdbfe,
+      #ddd6fe,
+      #f5d0fe
+    ) !important;
+  color: #0f172a !important;
+}
+    .pillQtempo {
+  border-color: #d946ef !important;
+  background: rgba(217, 70, 239, 0.10) !important;
+  color: #86198f !important;
+}
+
+/* ===== Desktop : aligner le bouton avec les champs (pas les titres) ===== */
+@media (min-width: 769px){
+
+  /* Toutes les cellules ont la même structure verticale */
+  .grid .cell{
+    display: grid;
+    grid-template-rows: auto 56px auto;
+    row-gap: 6px;
+  }
+
+  /* Le bouton n’a pas de label → on réserve la place du label */
+  .grid .cell-add::before{
+    content: "";
+    height: 1.4em; /* même hauteur qu’un label */
+  }
+
+  /* Bouton exactement à la hauteur des champs */
+  #btnAdd{
+    height: 56px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+
+/* ===================================== */
+/* ALIGNEMENT PARFAIT DES CHAMPS (MOBILE) */
+/* ===================================== */
+@media (max-width: 768px){
+
+  /* grille 2 colonnes */
+  .grid{
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  /* chaque cellule a EXACTEMENT la même structure */
+  .grid .cell{
+    display: grid;
+    grid-template-rows: 2.6em 56px 3.2em; 
+    /* label / champ / aide */
+    row-gap: 6px;
+  }
+
+  /* labels : hauteur figée */
+  .grid .cell > label{
+    margin: 0;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+ }
+@media (max-width: 768px){
+
+  .grid{
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  /* même structure pour toutes les cellules */
+  .grid .cell{
+    display: grid;
+    grid-template-rows: 2.6em 56px 3.2em; /* label / champ / aide */
+    row-gap: 6px;
+    align-content: start;
+  }
+
+  .grid .cell > label{
+    margin: 0;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+
+  .grid .cell > .small{
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    color: #6b7280;
+  }
+
+  /* champs : hauteur identique (sans flex) */
+  .grid .field{
+    height: 56px !important;
+    box-sizing: border-box;
+    padding: 10px 14px;   /* padding normal */
+    border-radius: 18px;
+  }
+
+  .grid input[type="time"].field{ text-align: center; }
+
+  .grid select.field{
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 40px;
+    text-align-last: center;
+  }
+
+  /* ✅ bouton Ajouter : placé sur la rangée 2 comme les inputs */
+  .grid .cell-add{
+    display: grid;
+    grid-template-rows: 2.6em 56px 3.2em;
+    row-gap: 6px;
+    align-content: start;
+  }
+  .grid .cell-add > button{
+    grid-row: 2;                    /* <<< alignement parfait avec Quantité */
+    height: 56px !important;
+    padding: 0 16px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.05rem;
+  }
+
+  /* flèche select */
+  .grid .cell-type{ position: relative; }
+  .grid .cell-type::after{
+    content: "▾";
+    position: absolute;
+    right: 16px;
+    top: calc(2.6em + 28px);
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #222;
+    pointer-events: none;
+  }
+}
+@media (max-width: 768px){
+
+  /* 🔧 CORRECTION iOS / mobile input time */
+  .grid input[type="time"].field{
+    padding: 0 !important;        /* SUPPRIME le padding fantôme */
+    line-height: 56px;            /* force l’alignement vertical */
+    height: 56px !important;
+    text-align: center;
+  }
+/* Heure en bleu */
+.grid input[type="time"].field{
+  color: #2563eb;          /* bleu */
+  font-weight: 700;
+}
+}
+
+
+
+
+/* Champs propres aux moyens industriels : grille indépendante. */
+.industrial-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.industrial-fields[hidden] { display: none; }
+.industrial-cell { min-width: 0; }
+.industrial-cell label { display: block; margin-bottom: 6px; }
+.industrial-cell .field { height: 56px; border-radius: 18px; }
+@media (max-width: 520px) {
+  .industrial-fields { grid-template-columns: 1fr; }
+}
+
+  .cmp-pills-title {
+  margin: 14px 0 6px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #172a46;
+}
+
+.cmp-pills-divider {
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+  margin: 18px 0;
+}
+
+.pill sub {
+  font-size: 0.7em;
+  vertical-align: sub;
+}
+.pillQextReel {
+  border-color: #181818 !important;
+  background: #181818 !important;
+  color: #fff !important;
+}
+    #liste .capacite-editable {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-weight: 700;
+}
+
+#liste .capacite-editable.capacite-modifiee {
+  color: #2563eb;
+}
+  </style>
+</head>
+
+<body>
+<header>
+  <img src="Logo.png" alt="Logo SDIS 27" class="logo">
+
+  <h1 class="hero-title">
+    <span>Calcul LIF</span>
+    <span>Outil opérationnel</span>
+  </h1>
+
+<p class="header-sub">
+  <span>SDIS 27 – GGOC – Capitaine Florian PICO</span>
+  <a href="mailto:florian.pico@sdis27.fr" class="header-mail">
+    florian.pico@sdis27.fr </a>
+  <a href="calcul.html" class="back-btn">← Retour calcul</a>
+</p>
+</header>
+
+<main>
+  <div class="card" id="blocStatus">
+  <h2 class="lif-card-title">
+  <span>Paramètres importés depuis le calcul</span>
+</h2>
+    <div id="status" class="warn">Chargement…</div>
+    <div class="small">CMP mode SDIS 33.</div>
+  </div>
+
+  <div class="card" id="blocSaisie" style="display:none;">
+   <h2 class="lif-card-title">
+  <span class="lif-title-number">5</span>
+  <span>Saisir les engins
+    <span style="font-weight:400; color:#cbd5e1;">(arrivée échelonnée)</span>
+  </span>
+</h2>
+
+    <div class="grid">
+   <div class="cell cell-type">
+        <label>Type d’engin :</label>
+        <select id="enginType" class="field">
+          <option value="FMOGP">FMOGP</option>
+          <option value="CEEM6">CEEM6</option>
+          <option value="CEEM8">CEEM8</option>
+          <option value="GPM10">GPM10</option>
+          <option value="INDUSTRIEL">Moyens industriels</option>
+        </select>
+        <div class="small">Débit + volume émulseur propre au SDIS 33.</div>
+      </div>
+
+       <div class="cell cell-time">
+        <label>Heure d’arrivée :</label>
+        <input id="arrivee" class="field" type="time">
+        <div class="small">Heure à laquelle l'engin commence à projeter de la mousse.</div>
+      </div>
+
+      <div class="cell cell-qty">
+        <label>Quantité :</label>
+        <input id="qty" class="field" type="number" min="1" step="1" value="1">
+      </div>
+
+     <div class="cell cell-add">
+        <button id="btnAdd" class="btn btn-primary field-btn" type="button">Ajouter</button>
+      </div>
+    </div>
+
+    <div id="industrialParams" class="industrial-fields" hidden>
+      <div class="industrial-cell">
+        <label for="industrialFlow">Débit par moyen (L/min) :</label>
+        <input id="industrialFlow" class="field" type="number" min="0" step="any"
+               inputmode="decimal" placeholder="Ex : 2 500" disabled>
+        <div class="small">Débit disponible pour chaque moyen industriel.</div>
+      </div>
+      <div class="industrial-cell">
+        <label for="industrialEmul">Volume émulseur par moyen (L) :</label>
+        <input id="industrialEmul" class="field" type="number" min="0" step="any"
+               inputmode="decimal" placeholder="Ex : 1 000" disabled>
+        <div class="small">Stock d’émulseur par moyen, multiplié par la quantité.</div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Heure</th>
+          <th>Qté</th>
+          <th>Débit</th>
+          <th>Émulseur</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="liste"></tbody>
+    </table>
+
+    <div class="row">
+      <button id="btnTracer" class="btn btn-primary" type="button">Tracer la courbe</button>
+      <button id="btnReset" class="btn btn-ghost" type="button">Tout effacer</button>
+    </div>
+
+    <div class="small">
+      <u>Logique :</u> Temporisation tant que le débit présent ne couvre pas Q ext théorique ou que le stock ne couvre pas l’extinction au débit présent.<br>
+      <u>Temporisation :</u> conso = moitié du débit présent × concentration.<br>
+      <u>Extinction :</u> conso = débit retenu au démarrage × concentration, pendant la durée d’extinction.
+    </div>
+  </div>
+
+  <div class="card" id="blocCourbe" style="display:none;">
+    <h2 class="lif-card-title">
+  <span class="lif-title-number">6</span>
+  <span>Courbe de montée en puissance</span>
+</h2>
+
+   <h3 class="cmp-pills-title">Théorique :</h3>
+
+<div class="row" style="align-items:center;">
+  <span class="pill pillQext" id="pillQext">
+    Q ext <sub>théorique</sub> : —
+  </span>
+ <span class="pill" id="pillQtempo">
+    Q tempo <sub>théorique</sub> : —
+  </span>
+  <span class="pill" id="pilltExt">
+    Durée extinction <sub>théorique</sub> : —
+  </span>
+ <span class="pill" id="pillBesoin">
+    V émulseur extinction <sub>théorique</sub> : —
+  </span>
+<span class="pill" id="pillVtotal">
+    V émulseur total <sub>théorique</sub> : —
+  </span>
+</div>
+
+<hr class="cmp-pills-divider">
+
+<h3 class="cmp-pills-title">Réel :</h3>
+
+<div class="row" style="align-items:center;">
+<span class="pill pillQextReel" id="pillQextReel">
+    Q ext <sub>réel</sub> : —
+  </span>
+  <span class="pill pillQtempo" id="pillQtempoReel">
+    Q tempo <sub>réel</sub> : —
+  </span>
+  <span class="pill" id="pilltExtReel">
+    Durée extinction <sub>réelle</sub> : —
+  </span>
+  <span class="pill pillBesoin" id="pillBesoinReel">
+    V émulseur extinction <sub>réel</sub> : —
+  </span>
+  <span class="pill pillVtotal" id="pillVtotalReel">
+    V émulseur total <sub>réel</sub> : —
+  </span>
+</div>
+
+<div class="small" style="margin-top:10px;">
+  Les bulles « Réel » affichent les capacités de tous les engins inscrits dans le tableau,
+  y compris ceux qui ne sont pas encore arrivés.<br><br>
+  Dans le graphique, chaque engin est pris en compte à l’heure d’arrivée renseignée.
+  L’extinction commence dès que les moyens présents disposent d’un débit et d’un stock
+  d’émulseur suffisants. Le débit utilisé est alors conservé jusqu’à la fin de l’extinction.<br><br>
+  Les engins arrivant ensuite augmentent le stock d’émulseur disponible, mais
+  n’augmentent pas automatiquement le débit utilisé pour l’extinction.
+</div>
+<div class="row" style="align-items:center; margin-top:10px;">
+  <span class="pill pillQextReel" id="pillDebitRetenu">Débit extinction retenu : —</span>
+  <span class="pill pillBesoin" id="pillBesoinRetenu">V émulseur extinction retenu : —</span>
+</div>
+
+<div class="row" style="align-items:center; margin-top:14px;">
+  <span class="pill" id="pillT0">T0 : —</span>
+  <span class="pill pill-ext" id="pillExtStart">
+    Début extinction possible à : —
+  </span>
+  <span class="pill pill-ext" id="pillExtEnd">
+    Fin extinction possible à : —
+  </span>
+</div>
+<div class="row" style="align-items:center; margin-top:10px;">
+  <span class="pill" id="pillEntretien1">Entretien tapis n°1 à —</span>
+  <span class="pill" id="pillEntretien2">Entretien tapis n°2 à —</span>
+  <span class="pill" id="pillEntretien3">Entretien tapis n°3 à —</span>
+  <span class="pill" id="pillEntretien4">Entretien tapis n°4 à —</span>
+  <span class="pill entretien-impossible"
+      id="pillEmulseurManquant"
+      style="display:none;">
+  V émulseur manquant : —
+</span>
+</div>
+    
+    <div class="canvas-wrap" style="margin-top:10px;">
+<canvas id="chart" width="1100" height="622"></canvas>
+    </div>
+
+    <div class="small">
+      <u>Axe gauche :</u> Lire les valeurs Débit dispo et Débit cible (L/min)<br>
+      <u>Axe droit :</u> Lire les valeurs Volume émulseur (L)<br>
+      <u>Consommation émulseur :</u> À la moitié du débit présent en temporisation, puis au débit fixé au début de l’extinction, puis au débit théorique d’entretien pendant ses créneaux<br>
+      <u>Extinction :</u> Possible si débit présent ≥ Q ext théorique ET stock restant ≥ besoin au débit présent. Le débit engagé est ensuite conservé.
+    </div>
+
+<div class="lif-signature">
+  © Capitaine Florian PICO – Tous droits réservés<br>
+  <small>Version 1.0 – 2026</small>
+</div>
+    
+  </div>
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+// Séparer les milliers et millions dans les résultats affichés.
+function fmt(valeur) {
+  if (!Number.isFinite(valeur)) return "—";
+
+  return Math.round(valeur).toLocaleString("fr-FR");
+}
+  function fmtConversion(valeur) {
+  if (!Number.isFinite(valeur)) return "—";
+
+  return valeur.toLocaleString("fr-FR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  });
+}
+  // ===== Paramètres CMP =====
+  const STEP_MIN = 20;
+  const HORIZON_H = 5;
+    let HORIZON_MIN = HORIZON_H * 60;
+
+  const pad2 = (x) => String(x).padStart(2, "0");
+
+  const minToHHMM = (min) => {
+    const mm = ((min % 1440) + 1440) % 1440;
+    const h = Math.floor(mm / 60);
+    const m = mm % 60;
+    return `${pad2(h)}:${pad2(m)}`;
+  };
+
+  const n = (v) => {
+    if (v === null || v === undefined) return NaN;
+    const s = String(v).replace(",", ".").trim();
+    if (!s) return NaN;
+    const x = Number(s);
+    return Number.isFinite(x) ? x : NaN;
+  };
+
+  const timeToMin = (hhmm) => {
+    if (!hhmm || !/^\d{2}:\d{2}$/.test(hhmm)) return NaN;
+    const [h, m] = hhmm.split(":").map(Number);
+    if (h < 0 || h > 23 || m < 0 || m > 59) return NaN;
+    return h * 60 + m;
+  };
+
+  const addMinToHHMM = (hhmm, add) => {
+    const base = timeToMin(hhmm);
+    if (!Number.isFinite(base)) return "??:??";
+    let total = (base + add) % (24 * 60);
+    if (total < 0) total += 24 * 60;
+    const h = Math.floor(total / 60);
+    const m = total % 60;
+    return `${pad2(h)}:${pad2(m)}`;
+  };
+
+  const getFirstArrivalMin = (rows) => {
+    let best = Infinity;
+    rows.forEach(r => {
+      const m = timeToMin(r.atStr);
+      if (Number.isFinite(m)) best = Math.min(best, m);
+    });
+    return best === Infinity ? NaN : best;
+  };
+
+  const arrivalRelMin = (hhmm, t0) => {
+    const m = timeToMin(hhmm);
+    if (!Number.isFinite(m) || !Number.isFinite(t0)) return NaN;
+    let rel = m - t0;
+    if (rel < 0) rel += 24 * 60;
+    return rel;
+  };
+
+  const buildTimeLabels = (t0MinAbs) => {
+    const t0 = `${pad2(Math.floor(t0MinAbs / 60))}:${pad2(t0MinAbs % 60)}`;
+    const labels = [];
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) labels.push(addMinToHHMM(t0, t));
+    return labels;
+  };
+
+  // ===== Engins =====
+  const ENGINS = {
+    FMOGP: { flow: 4000, emul: 4000 },
+    CEEM6: { flow: 6000, emul: 7500 },
+    CEEM8: { flow: 4000, emul: 7500 },
+    GPM10: { flow: 2000, emul: 1200 }
+  };
+
+  // Capacités unitaires utilisées par le tableau et la simulation.
+  function getEnginCapacites(ligne) {
+    const reference = ligne.type === "INDUSTRIEL"
+      ? { flow: ligne.customFlow, emul: ligne.customEmul }
+      : ENGINS[ligne.type];
+
+    if (!reference) return null;
+
+    return {
+      flow: Number.isFinite(ligne.flowOverride)
+        ? ligne.flowOverride
+        : reference.flow,
+
+      emul: Number.isFinite(ligne.emulOverride)
+        ? ligne.emulOverride
+        : reference.emul
+    };
+  }
+
+  function updateIndustrialUI() {
+    const industriel = $("enginType").value === "INDUSTRIEL";
+    $("industrialParams").hidden = !industriel;
+    $("industrialFlow").disabled = !industriel;
+    $("industrialEmul").disabled = !industriel;
+  }
+
+  $("enginType").addEventListener("change", updateIndustrialUI);
+  updateIndustrialUI();
+
+  // ===== Charge params =====
+  let params = null;
+  try { params = JSON.parse(localStorage.getItem("LIF_CMP_INPUTS") || "null"); }
+  catch (e) { params = null; }
+
+  const status = $("status");
+  const blocSaisie = $("blocSaisie");
+  const blocCourbe = $("blocCourbe");
+
+  if (!params || params.mode !== "sdis33") {
+    status.textContent = "Impossible : aucun calcul SDIS 33 n’a été transmis. Retourne sur la page calcul, fais un calcul en mode SDIS 33, puis clique sur “Courbe de montée en puissance”.";
+    return;
+  }
+
+     const VemulTotal =
+    params.besoinExt +
+    params.VemulEntretien +
+    params.VemulTempo;
+
+       status.innerHTML = `
+    <div>
+      <strong>Phase extinction :</strong><br>
+      - Q ext = <b>${fmt(params.Qext)}</b> L/min
+      <span style="color:#475569;">soit ${fmtConversion(params.Qext * 0.06)} m³/h</span><br>
+      - V émulseur extinction = <b>${fmt(params.besoinExt)}</b> L
+      <span style="color:#475569;">soit ${fmtConversion(params.besoinExt / 1000)} m³</span><br>
+      - Durée extinction = <b>${fmt(params.tExt)}</b> min<br>
+      - Concentration = <b>${params.concPct}</b> %
+    </div>
+
+    <div style="margin-top:14px;">
+      <strong>Phase temporisation :</strong><br>
+      - Q tempo = <b>${fmt(params.Qtempo)}</b> L/min
+      <span style="color:#475569;">soit ${fmtConversion(params.Qtempo * 0.06)} m³/h</span><br>
+      - V émulseur tempo = <b>${fmt(params.VemulTempo)}</b> L
+      <span style="color:#475569;">soit ${fmtConversion(params.VemulTempo / 1000)} m³</span>
+    </div>
+
+    <div style="margin-top:14px;">
+      <strong>Phase entretien du tapis :</strong><br>
+      - Q entretien du tapis sur 4h = <b>${fmt(params.Qentretien)}</b> L/min
+      <span style="color:#475569;">soit ${fmtConversion(params.Qentretien * 0.06)} m³/h</span><br>
+      - V émulseur pour entretien du tapis sur 4h = <b>${fmt(params.VemulEntretien)}</b> L
+      <span style="color:#475569;">soit ${fmtConversion(params.VemulEntretien / 1000)} m³</span>
+    </div>
+
+    <div style="margin-top:14px; padding-top:10px; border-top:1px solid #cbd5e1;">
+      <strong>V émulseur total = ${fmt(VemulTotal)} L</strong>
+      <span style="color:#475569;">soit ${fmtConversion(VemulTotal / 1000)} m³</span>
+    </div>
+  `;
+  blocSaisie.style.display = "block";
+
+  // ===== Liste engins =====
+  const rows = [];
+  let indexModification = null;
+    // Sauvegarde propre à la CMP SDIS 33.
+  const CLE_ENGINS_CMP = "LIF_CMP_SDIS33_ENGINS";
+
+  function sauvegarderEngins() {
+    try {
+      localStorage.setItem(CLE_ENGINS_CMP, JSON.stringify(rows));
+    } catch (erreur) {
+      console.warn("Sauvegarde des engins impossible.", erreur);
+    }
+  }
+
+  function restaurerEngins() {
+    try {
+      const sauvegarde = JSON.parse(
+        localStorage.getItem(CLE_ENGINS_CMP) || "[]"
+      );
+
+      if (!Array.isArray(sauvegarde)) return;
+
+      const lignesValides = sauvegarde.filter(ligne => {
+        if (!ligne || !Number.isFinite(timeToMin(ligne.atStr))) {
+          return false;
+        }
+
+        if (!Number.isInteger(ligne.qty) || ligne.qty < 1) {
+          return false;
+        }
+
+        const capacites = getEnginCapacites(ligne);
+
+        return capacites &&
+          Number.isFinite(capacites.flow) &&
+          Number.isFinite(capacites.emul) &&
+          capacites.flow >= 0 &&
+          capacites.emul >= 0;
+      });
+
+      rows.push(...lignesValides);
+    } catch (erreur) {
+      console.warn("Restauration des engins impossible.", erreur);
+    }
+  }
+  $("arrivee").addEventListener("focus", () => {
+  const champ = $("arrivee");
+
+  // Conserver une heure déjà saisie ou chargée pour modification.
+  if (champ.value || indexModification !== null) return;
+
+  const maintenant = new Date();
+  const heures = String(maintenant.getHours()).padStart(2, "0");
+  const minutes = String(maintenant.getMinutes()).padStart(2, "0");
+
+  champ.value = `${heures}:${minutes}`;
+});
+  const tbody = $("liste");
+
+  const render = () => {
+        sauvegarderEngins();
+    tbody.innerHTML = "";
+    rows.forEach((r, idx) => {
+      const def = getEnginCapacites(r);
+      const flow = def.flow * r.qty;
+      const emul = def.emul * r.qty;
+
+      const tr = document.createElement("tr");
+tr.innerHTML = `
+  <td data-label="Type"><b>${r.type === "INDUSTRIEL" ? "Moyens industriels" : r.type}</b></td>
+  <td data-label="Arrivée">${r.atStr}</td>
+ <td data-label="Qté">${fmt(r.qty)}</td>
+<td data-label="Débit (L/min)">
+  <input
+    type="text"
+    inputmode="decimal"
+    class="capacite-editable ${Number.isFinite(r.flowOverride) ? 'capacite-modifiee' : ''}"
+    data-index="${idx}"
+    data-capacite="flowOverride"
+    value="${flow.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
+    aria-label="Débit total de la ligne ${idx + 1} en L/min">
+</td>
+
+<td data-label="Émulseur (L)">
+  <input
+    type="text"
+    inputmode="decimal"
+    class="capacite-editable ${Number.isFinite(r.emulOverride) ? 'capacite-modifiee' : ''}"
+    data-index="${idx}"
+    data-capacite="emulOverride"
+    value="${emul.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
+    aria-label="Volume total d’émulseur de la ligne ${idx + 1} en litres">
+</td>
+  <td data-label="Action">
+    <button type="button" data-edit="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Modifier</button>
+    <button type="button" data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
+  </td>
+`;
+
+      tbody.appendChild(tr);
+    });
+    // ===== TOTAL DES MOYENS INSCRITS AU TABLEAU =====
+    let totalDebit = 0;
+    let totalEmulseur = 0;
+
+    rows.forEach(r => {
+      const def = getEnginCapacites(r);
+
+      totalDebit += def.flow * r.qty;
+      totalEmulseur += def.emul * r.qty;
+    });
+
+    const ligneTotal = document.createElement("tr");
+
+    ligneTotal.style.background = "#f1f5f9";
+    ligneTotal.style.fontWeight = "800";
+
+    ligneTotal.innerHTML = `
+      <td data-label="Type">TOTAL</td>
+      <td></td>
+      <td></td>
+      <td data-label="Débit (L/min)">
+        ${totalDebit.toLocaleString("fr-FR")} L/min
+      </td>
+      <td data-label="Émulseur (L)">
+        ${totalEmulseur.toLocaleString("fr-FR")} L
+      </td>
+      <td></td>
+    `;
+
+    tbody.appendChild(ligneTotal);
+        tbody.querySelectorAll("input[data-capacite]").forEach(champ => {
+      champ.addEventListener("keydown", evenement => {
+        if (evenement.key === "Enter") {
+          evenement.preventDefault();
+          champ.blur();
+        }
+      });
+
+      champ.addEventListener("change", () => {
+        const index = Number(champ.dataset.index);
+        const propriete = champ.dataset.capacite;
+        const ligne = rows[index];
+
+        const saisie = champ.value
+          .replace(/\s/g, "")
+          .replace(",", ".")
+          .trim();
+
+        const valeur = saisie === "" ? NaN : Number(saisie);
+
+                if (!Number.isFinite(valeur) || valeur < 0) {
+          const capacites = getEnginCapacites(ligne);
+          const ancienneValeur = propriete === "flowOverride"
+            ? capacites.flow * ligne.qty
+            : capacites.emul * ligne.qty;
+
+          champ.value = ancienneValeur.toLocaleString("fr-FR");
+          alert("Saisis une valeur supérieure ou égale à zéro.");
+          return;
+        }
+
+        const capacites = getEnginCapacites(ligne);
+        const valeurActuelle = propriete === "flowOverride"
+          ? capacites.flow * ligne.qty
+          : capacites.emul * ligne.qty;
+
+        // Ne pas marquer une cellule qui n’a pas changé.
+        if (Math.abs(valeur - valeurActuelle) < 0.000001) {
+          return;
+        }
+
+        // Enregistrer la capacité par moyen :
+        // le tableau affiche le total pour la quantité de la ligne.
+        ligne[propriete] = valeur / ligne.qty;
+
+        // Marquer la cellule modifiée, sans recréer le tableau.
+        champ.classList.add("capacite-modifiee");
+
+        // Recalculer les totaux avec les capacités personnalisées.
+        let nouveauDebit = 0;
+        let nouvelEmulseur = 0;
+
+        rows.forEach(r => {
+          const capacites = getEnginCapacites(r);
+          nouveauDebit += capacites.flow * r.qty;
+          nouvelEmulseur += capacites.emul * r.qty;
+        });
+
+        // Actualiser seulement les cellules TOTAL.
+        ligneTotal.querySelector(
+          'td[data-label="Débit (L/min)"]'
+        ).textContent = `${nouveauDebit.toLocaleString("fr-FR")} L/min`;
+
+        ligneTotal.querySelector(
+          'td[data-label="Émulseur (L)"]'
+        ).textContent = `${nouvelEmulseur.toLocaleString("fr-FR")} L`;
+
+        // Q ext réel est strictement égal au total débit du tableau.
+        $("pillQextReel").innerHTML =
+          `Q ext <sub>réel</sub> : ${fmt(nouveauDebit)} L/min`;
+
+        sauvegarderEngins();
+
+        // Le graphique précédent ne correspond plus au tableau.
+        blocCourbe.style.display = "none";
+      });
+    });
+    tbody.querySelectorAll("button[data-edit]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        indexModification = Number(btn.dataset.edit);
+        const ligne = rows[indexModification];
+
+        $("enginType").value = ligne.type;
+        $("arrivee").value = ligne.atStr;
+        $("qty").value = ligne.qty;
+        $("industrialFlow").value = ligne.type === "INDUSTRIEL" ? ligne.customFlow : "";
+        $("industrialEmul").value = ligne.type === "INDUSTRIEL" ? ligne.customEmul : "";
+        updateIndustrialUI();
+
+        $("btnAdd").textContent = "Enregistrer";
+
+        $("enginType").scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+        $("enginType").focus({ preventScroll: true });
+      });
+    });
+
+    tbody.querySelectorAll("button[data-i]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.dataset.i);
+
+        if (indexModification === i) {
+          indexModification = null;
+          $("btnAdd").textContent = "Ajouter";
+        } else if (indexModification !== null && i < indexModification) {
+          indexModification--;
+        }
+
+        rows.splice(i, 1);
+        render();
+        blocCourbe.style.display = "none";
+      });
+    });
+  };
+
+    $("btnAdd").addEventListener("click", () => {
+    const type = $("enginType").value;
+    const atStr = $("arrivee").value || "00:00";
+    const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
+
+    const ligne = { type, atStr, qty };
+
+    if (type === "INDUSTRIEL") {
+      const customFlow = n($("industrialFlow").value);
+      const customEmul = n($("industrialEmul").value);
+
+      if (![customFlow, customEmul].every(Number.isFinite) ||
+          customFlow < 0 || customEmul < 0) {
+        alert("Renseigne un débit et un volume d’émulseur valides, supérieurs ou égaux à zéro.");
+        return;
+      }
+      if (customFlow === 0 && customEmul === 0) {
+        alert("Renseigne au moins un débit ou un volume d’émulseur supérieur à zéro.");
+        return;
+      }
+      ligne.customFlow = customFlow;
+      ligne.customEmul = customEmul;
+    } else if (!ENGINS[type]) {
+      return;
+    }
+
+    if (!Number.isFinite(timeToMin(atStr))) {
+      alert("Heure d’arrivée invalide.");
+      return;
+    }
+
+    if (indexModification !== null) {
+            const ancienne = rows[indexModification];
+
+      if (ancienne.type === ligne.type) {
+        if (Number.isFinite(ancienne.flowOverride)) {
+          ligne.flowOverride = ancienne.flowOverride;
+        }
+
+        if (Number.isFinite(ancienne.emulOverride)) {
+          ligne.emulOverride = ancienne.emulOverride;
+        }
+      }
+      rows[indexModification] = ligne;
+      indexModification = null;
+      $("btnAdd").textContent = "Ajouter";
+    } else {
+      rows.push(ligne);
+    }
+
+    rows.sort((a, b) => timeToMin(a.atStr) - timeToMin(b.atStr));
+    render();
+    blocCourbe.style.display = "none";
+  });
+
+  $("btnReset").addEventListener("click", () => {
+    rows.length = 0;
+    $("industrialFlow").value = "";
+    $("industrialEmul").value = "";
+    updateIndustrialUI();
+    indexModification = null;
+    $("btnAdd").textContent = "Ajouter";
+    render();
+    blocCourbe.style.display = "none";
+  });
+
+  // ===== Simulation =====
+  function simulate() {
+    const totalDebitTableau = rows.reduce((total, ligne) => {
+      return total + getEnginCapacites(ligne).flow * ligne.qty;
+    }, 0);
+    const tExt = params.tExt;
+    const conc = params.concPct / 100;
+    const Qentretien = params.Qentretien;
+    if (!(totalDebitTableau > 0) || !Number.isFinite(totalDebitTableau)) {
+      throw new Error("Renseigne au moins un moyen avec un débit supérieur à zéro.");
+    }
+    if (!(params.Qext > 0) || !Number.isFinite(params.Qext) ||
+        !Number.isInteger(tExt) || tExt <= 0 ||
+        !Number.isFinite(conc) || conc <= 0 || conc > 1 ||
+        !Number.isFinite(Qentretien) || Qentretien < 0) {
+      throw new Error("Paramètres de calcul importés invalides.");
+    }
+    const t0Abs = getFirstArrivalMin(rows);
+    if (!Number.isFinite(t0Abs)) throw new Error("Aucune arrivée valide.");
+    const derniereArrivee = Math.max(0, ...rows.map(r =>
+      arrivalRelMin(r.atStr, t0Abs)).filter(Number.isFinite));
+    HORIZON_MIN = Math.max(HORIZON_H * 60,
+      Math.ceil((derniereArrivee + tExt + 240) / STEP_MIN) * STEP_MIN);
+
+    const addFlow = Array(HORIZON_MIN + 1).fill(0);
+    const addEmul = Array(HORIZON_MIN + 1).fill(0);
+    rows.forEach(r => {
+      const rel = arrivalRelMin(r.atStr, t0Abs);
+      if (!Number.isFinite(rel) || rel < 0 || rel > HORIZON_MIN) return;
+      const capacites = getEnginCapacites(r);
+      const minute = Math.round(rel);
+      addFlow[minute] += capacites.flow * r.qty;
+      addEmul[minute] += capacites.emul * r.qty;
+    });
+
+    let flowAvail = 0, emulStock = 0;
+    let tExtStart = null, tStockOK = null;
+    let debitExtinctionRetenu = 0, besoinExtinctionRetenu = 0;
+    let volumeTempoConsomme = 0, volumeExtConsomme = 0;
+    let volumeEntretienConsomme = 0, emulseurManquantEntretien = 0;
+    const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0);
+    const emulSerie = Array(HORIZON_MIN + 1).fill(0);
+    const tempoFlowSerie = Array(HORIZON_MIN + 1).fill(null);
+    const entretienStockInsuffisant = [false, false, false, false];
+
+    for (let t = 0; t <= HORIZON_MIN; t++) {
+      // Les renforts n'existent dans le scénario qu'à leur arrivée.
+      flowAvail += addFlow[t];
+      emulStock += addEmul[t];
+
+      if (tExtStart === null) {
+        const besoinAvecMoyensPresents = flowAvail * tExt * conc;
+        if (flowAvail >= params.Qext &&
+            emulStock + 0.000001 >= besoinAvecMoyensPresents) {
+          tExtStart = t;
+          tStockOK = t;
+          // Figer le débit engagé : les renforts ultérieurs restent en réserve.
+          debitExtinctionRetenu = flowAvail;
+          besoinExtinctionRetenu = besoinAvecMoyensPresents;
+        }
+      }
+
+      // Stock à l'instant t, après les arrivées, avant la minute [t, t+1[.
+      flowAvailSerie[t] = flowAvail;
+      emulSerie[t] = emulStock;
+      if (tExtStart === null) tempoFlowSerie[t] = flowAvail / 2;
+      if (t === HORIZON_MIN) break;
+
+      let demande = 0, phase = "repos";
+      if (tExtStart === null) {
+        phase = "tempo";
+        demande = (flowAvail / 2) * conc;
+      } else if (t < tExtStart + tExt) {
+        phase = "extinction";
+        demande = debitExtinctionRetenu * conc;
+      } else {
+        const depuisFinExtinction = t - (tExtStart + tExt);
+        if (depuisFinExtinction >= 0 && depuisFinExtinction < 240 &&
+            depuisFinExtinction % 60 >= 50) {
+          phase = "entretien";
+          demande = Qentretien * conc;
+          if (demande > emulStock + 0.000001) {
+            entretienStockInsuffisant[Math.floor(depuisFinExtinction / 60)] = true;
+            emulseurManquantEntretien += demande - emulStock;
+          }
+        }
+      }
+      const consomme = Math.min(demande, emulStock);
+      emulStock = Math.max(0, emulStock - consomme);
+      if (phase === "tempo") volumeTempoConsomme += consomme;
+      if (phase === "extinction") volumeExtConsomme += consomme;
+      if (phase === "entretien") volumeEntretienConsomme += consomme;
+    }
+
+    return {
+      Qext: totalDebitTableau,
+      Qtempo: totalDebitTableau / 2,
+      tExt, concPct: params.concPct,
+      needExtTotal: besoinExtinctionRetenu,
+      debitExtinctionRetenu, volumeTempoConsomme,
+      volumeExtConsomme, volumeEntretienConsomme,
+      t0Abs, labels: buildTimeLabels(t0Abs), tStockOK, tExtStart,
+      tExtEnd: tExtStart === null ? null : tExtStart + tExt,
+      flowAvailSerie, emulSerie, tempoFlowSerie,
+      entretienStockInsuffisant, emulseurManquantEntretien
+    };
+  }
+
+  // ===== Dessin =====
+  function drawChart(data) {
+    const c = $("chart");
+        // Largeur visible du graphique.
+    const conteneur = c.parentElement;
+    const largeurVisible = Math.max(280, conteneur.clientWidth - 22);
+
+    // Garder la même lisibilité lorsque la simulation dépasse 5 h.
+    const facteur = HORIZON_MIN / (HORIZON_H * 60);
+
+    c.width = Math.round(1100 * facteur);
+    c.style.width = `${Math.round(largeurVisible * facteur)}px`;
+    c.style.maxWidth = "none";
+
+    // Revenir au début à chaque nouveau tracé.
+    conteneur.scrollLeft = 0;
+    const ctx = c.getContext("2d");
+    const W = c.width, H = c.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Marges (réduit l’espace sous l’axe X)
+    const mL = 88, mR = 92, mT = 160, mB = 60;
+    const plotW = W - mL - mR;
+    const plotH = H - mT - mB;
+
+    const xMax = HORIZON_MIN;
+
+       const maxFlow = Math.max(
+      params.Qext,
+      data.Qext,
+      data.Qtempo,
+      ...data.flowAvailSerie
+    ) || 1000;
+    const yFlowMax = maxFlow * 1.15;
+
+    const maxEmul = Math.max(...data.emulSerie, data.needExtTotal, 1);
+    const yEmulMax = maxEmul * 1.15;
+
+    const x = (t) => mL + (t / xMax) * plotW;
+    const yFlow = (v) => mT + (1 - (v / yFlowMax)) * plotH;
+    const yEmul = (v) => mT + (1 - (v / yEmulMax)) * plotH;
+
+    // Helpers temps
+    const t0Str = `${pad2(Math.floor(data.t0Abs / 60))}:${pad2(data.t0Abs % 60)}`;
+    const labelAt = (tMin) => addMinToHHMM(t0Str, tMin);
+
+    // roundRect compat
+    if (!ctx.roundRect) {
+      ctx.roundRect = function (x0, y0, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        this.beginPath();
+        this.moveTo(x0 + rr, y0);
+        this.arcTo(x0 + w, y0, x0 + w, y0 + h, rr);
+        this.arcTo(x0 + w, y0 + h, x0, y0 + h, rr);
+        this.arcTo(x0, y0 + h, x0, y0, rr);
+        this.arcTo(x0, y0, x0 + w, y0, rr);
+        this.closePath();
+        return this;
+      };
+    }
+
+    // Cadre
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.strokeRect(mL, mT, plotW, plotH);
+
+    // Grille verticale
+    ctx.strokeStyle = "#e5e7eb";
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
+      ctx.beginPath();
+      ctx.moveTo(x(t), mT);
+      ctx.lineTo(x(t), mT + plotH);
+      ctx.stroke();
+    }
+
+    // Axe X labels
+    ctx.fillStyle = "#111";
+    ctx.font = "12px system-ui, Arial";
+    for (let t = 0; t <= HORIZON_MIN; t += STEP_MIN) {
+      const idx = Math.round(t / STEP_MIN);
+      const label = data.labels[idx] || "";
+      ctx.fillText(label, x(t) - 16, mT + plotH + 20);
+    }
+
+    // Axe Y gauche
+    ctx.fillStyle = "#111";
+    ctx.fillText("Débit solution (L/min)", mL, mT - 16);
+    for (let i = 0; i <= 5; i++) {
+      const v = (yFlowMax * i / 5);
+      const yy = yFlow(v);
+
+      ctx.strokeStyle = "#e5e7eb";
+      ctx.beginPath();
+      ctx.moveTo(mL, yy);
+      ctx.lineTo(mL + plotW, yy);
+      ctx.stroke();
+
+      ctx.fillStyle = "#111";
+    ctx.save();
+ctx.textAlign = "right";
+ctx.fillText(fmt(v), mL - 10, yy + 4);
+ctx.restore();
+    }
+
+    // Axe Y droit (rouge)
+    ctx.font = "12px system-ui, Arial";
+    for (let i = 0; i <= 5; i++) {
+      const v = (yEmulMax * i / 5);
+      const yy = yEmul(v);
+      ctx.fillStyle = "#ef4444";
+    ctx.fillText(fmt(v), mL + plotW + 10, yy + 4);
+    }
+    ctx.fillStyle = "#ef4444";
+    ctx.fillText("Volume émulseur (L)", mL + plotW - 118, mT - 16);
+
+    // Bande extinction
+    if (Number.isFinite(data.tExtStart) && Number.isFinite(data.tExtEnd)) {
+      const x1 = x(data.tExtStart);
+      const x2 = x(Math.min(data.tExtEnd, HORIZON_MIN));
+      ctx.fillStyle = "rgba(34,197,94,0.10)";
+      ctx.fillRect(x1, mT, Math.max(0, x2 - x1), plotH);
+    }
+       // Entretien : vert si stock suffisant, rouge sinon.
+    if (Number.isFinite(data.tExtEnd)) {
+      ctx.save();
+
+      for (let heure = 0; heure < 4; heure++) {
+        const debut = data.tExtEnd + heure * 60 + 50;
+        const fin = debut + 10;
+
+        if (debut >= HORIZON_MIN) continue;
+
+        const x1 = x(debut);
+        const x2 = x(Math.min(fin, HORIZON_MIN));
+        const largeur = Math.max(0, x2 - x1);
+        const manqueStock = data.entretienStockInsuffisant[heure];
+
+        ctx.fillStyle = manqueStock
+          ? "rgba(239,68,68,0.18)"
+          : "rgba(34,197,94,0.10)";
+
+        ctx.fillRect(x1, mT, largeur, plotH);
+
+        if (manqueStock && largeur > 0) {
+          ctx.save();
+
+          // Garder le message à l’intérieur de la plage.
+          ctx.beginPath();
+          ctx.rect(x1, mT, largeur, plotH);
+          ctx.clip();
+
+          ctx.translate(x1 + largeur / 2, mT + plotH / 2);
+          ctx.rotate(-Math.PI / 2);
+          ctx.fillStyle = "#991b1b";
+          ctx.font = "bold 12px system-ui, Arial";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("Attention au stock d’émulseur", 0, 0);
+
+          ctx.restore();
+        }
+      }
+
+      ctx.restore();
+    }
+    // NOIR : débit dispo (escaliers)
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x(0), yFlow(data.flowAvailSerie[0] || 0));
+    for (let t = 1; t <= HORIZON_MIN; t++) {
+      const prev = data.flowAvailSerie[t - 1] || 0;
+      const cur = data.flowAvailSerie[t] || 0;
+      const xx = x(t);
+      ctx.lineTo(xx, yFlow(prev));
+      if (cur !== prev) ctx.lineTo(xx, yFlow(cur));
+    }
+    ctx.stroke();
+
+    // ROUGE : stock émulseur (escaliers)
+    ctx.strokeStyle = "#ef4444";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x(0), yEmul(data.emulSerie[0] || 0));
+    for (let t = 1; t <= HORIZON_MIN; t++) {
+      const prev = data.emulSerie[t - 1] || 0;
+      const cur = data.emulSerie[t] || 0;
+      const xx = x(t);
+      ctx.lineTo(xx, yEmul(prev));
+      if (cur !== prev) ctx.lineTo(xx, yEmul(cur));
+    }
+    ctx.stroke();
+
+    // Débit cible Qext (bleu)
+    ctx.strokeStyle = "#2563eb";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+       ctx.moveTo(mL, yFlow(params.Qext));
+    ctx.lineTo(mL + plotW, yFlow(params.Qext));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Débit de temporisation Qtempo (rose fuchsia)
+    ctx.strokeStyle = "#d946ef";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    let segmentTempo = false;
+    for (let t = 0; t <= HORIZON_MIN; t++) {
+      const debit = data.tempoFlowSerie[t];
+      if (debit === null) { segmentTempo = false; continue; }
+      if (!segmentTempo) {
+        ctx.moveTo(x(t), yFlow(debit));
+      } else {
+        ctx.lineTo(x(t), yFlow(data.tempoFlowSerie[t - 1]));
+        ctx.lineTo(x(t), yFlow(debit));
+      }
+      segmentTempo = true;
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Besoin de l'extinction effectivement déclenchée (orange).
+    if (data.tExtStart !== null) {
+    ctx.strokeStyle = "#ff8800";
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(mL, yEmul(data.needExtTotal));
+    ctx.lineTo(mL + plotW, yEmul(data.needExtTotal));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    }
+
+    // Lignes verticales extinction
+    function drawVLine(tMin, color) {
+      if (!Number.isFinite(tMin)) return;
+      const xx = x(tMin);
+      ctx.strokeStyle = color;
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(xx, mT);
+      ctx.lineTo(xx, mT + plotH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    drawVLine(data.tExtStart, "#16a34a");
+    drawVLine(data.tExtEnd, "#16a34a");
+
+    // LÉGENDE (ordre demandé)
+    const legendX = mL + 10;
+    const legendY = 26;
+
+function legendItem(x0, y0, color, label, dash = null) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";          // 🔥 clé visuelle
+  if (dash) ctx.setLineDash([4,4]); // 🔥 adapté à une ligne courte
+
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + 26, y0);
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+  ctx.lineCap = "butt";
+
+  ctx.fillStyle = "#111";
+  ctx.font = "12px system-ui, Arial";
+  ctx.fillText(label, x0 + 32, y0 + 4);
+}
+
+
+       // Fond de la légende.
+    const boxW = 860;
+    const boxH = 94;
+
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.lineWidth = 1;
+    ctx.roundRect(
+      legendX - 8, legendY - 14,
+      boxW, boxH, 10
+    );
+    ctx.fill();
+    ctx.stroke();
+
+    // Titres des deux colonnes.
+    ctx.fillStyle = "#172a46";
+    ctx.font = "bold 12px system-ui, Arial";
+    ctx.fillText("DÉBITS (L/min)", legendX, legendY);
+    ctx.fillText("VOLUMES (L)", legendX + 440, legendY);
+
+    // Séparation verticale.
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.beginPath();
+    ctx.moveTo(legendX + 420, legendY - 6);
+    ctx.lineTo(legendX + 420, legendY + 68);
+    ctx.stroke();
+
+    // Colonne gauche : débits.
+    legendItem(
+      legendX, legendY + 22,
+      "#111",
+      "Q ext réel (sommes débits engins)"
+    );
+
+    legendItem(
+      legendX, legendY + 42,
+      "#2563eb",
+      "Débit extinction théorique (Q ext théorique)",
+      [6, 6]
+    );
+
+    legendItem(
+      legendX, legendY + 62,
+      "#d946ef",
+      "Débit temporisation des moyens présents",
+      [6, 6]
+    );
+
+    // Colonne droite : volumes.
+    legendItem(
+      legendX + 440, legendY + 22,
+      "#ff0303",
+      "Volume émulseur disponible"
+    );
+
+    legendItem(
+      legendX + 440, legendY + 42,
+      "#ff8800",
+      "Volume émulseur extinction retenu",
+      [6, 6]
+    );
+    // IMPORTANT : les “pastilles” visuelles sont gérées en HTML (extIndStart/extIndEnd),
+    // donc on ne dessine PAS de pastilles dans le canvas => aucun doublon.
+  }
+
+  // ===== Tracer (une seule fois) =====
+  $("btnTracer").addEventListener("click", () => {
+    if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FMOGP à 00:00)."); return; }
+
+    let data;
+    try { data = simulate(); }
+    catch (e) { alert(e.message || "Erreur simulation."); return; }
+
+    // Valeurs théoriques importées du calcul.
+    $("pillQext").innerHTML =
+          `Q ext <sub>théorique</sub> : ${fmt(params.Qext)} L/min`;
+
+    $("pillQtempo").innerHTML =
+        `Q tempo <sub>théorique</sub> : ${fmt(params.Qtempo)} L/min`;
+    $("pilltExt").innerHTML =
+      `Durée extinction <sub>théorique</sub> : ${fmt(data.tExt)} min`;
+
+    $("pillBesoin").innerHTML =
+       `V émulseur extinction <sub>théorique</sub> : ${fmt(params.besoinExt)} L`;
+
+    $("pillVtotal").innerHTML =
+      `V émulseur total <sub>théorique</sub> : ${fmt(VemulTotal)} L`;
+
+    // Débit total des engins, quantités comprises.
+    const QextReel = rows.reduce((total, ligne) => {
+      const capacites = getEnginCapacites(ligne);
+      return total + capacites.flow * ligne.qty;
+    }, 0);
+
+    const QtempoReel = QextReel / 2;
+    const dureeExtReelle = data.tExt;
+    const concentration = data.concPct / 100;
+
+    const VextReel =
+      QextReel * dureeExtReelle * concentration;
+
+       // Temporisation adaptée au débit réel.
+    // Entretien conservé selon le besoin théorique importé.
+      const rapportDebit =
+      params.Qext > 0 ? QextReel / params.Qext : NaN;
+
+    const VtempoReel = params.VemulTempo * rapportDebit;
+    const VentretienReel = params.VemulEntretien;
+
+    const VtotalReel =
+      VextReel + VtempoReel + VentretienReel;
+
+    $("pillQextReel").innerHTML =
+      `Q ext <sub>réel</sub> : ${fmt(QextReel)} L/min`;
+
+    $("pillQtempoReel").innerHTML =
+      `Q tempo <sub>réel</sub> : ${fmt(QtempoReel)} L/min`;
+
+    $("pilltExtReel").innerHTML =
+      `Durée extinction <sub>réelle</sub> : ${fmt(dureeExtReelle)} min`;
+
+    $("pillBesoinReel").innerHTML =
+      `V émulseur extinction <sub>réel</sub> : ${fmt(VextReel)} L`;
+
+    $("pillVtotalReel").innerHTML =
+      `V émulseur total <sub>réel</sub> : ${fmt(VtotalReel)} L`;
+    $("pillDebitRetenu").textContent = data.tExtStart === null
+      ? "Débit extinction retenu : —"
+      : `Débit extinction retenu : ${fmt(data.debitExtinctionRetenu)} L/min`;
+    $("pillBesoinRetenu").textContent = data.tExtStart === null
+      ? "V émulseur extinction retenu : —"
+      : `V émulseur extinction retenu : ${fmt(data.needExtTotal)} L`;
+    $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
+
+    const t0Str = minToHHMM(data.t0Abs);
+
+       // Pastilles DU HAUT (on les garde ou on les masque au choix)
+    // Ici : on les garde visibles ET on les met à jour
+    $("pillExtStart").style.display = "";
+    $("pillExtEnd").style.display = "";
+    $("pillExtStart").textContent =
+      (data.tExtStart === null) ? "Début extinction possible à : —" : `Début extinction possible à : ${addMinToHHMM(t0Str, data.tExtStart)}`;
+    $("pillExtEnd").textContent =
+      (data.tExtEnd === null) ? "Fin extinction possible à : —" : `Fin extinction possible à : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
+
+    // Indicateurs visuels sous l’axe X (FIXES, sans superposition)
+    const extIndStart = $("extIndStart");
+    const extIndEnd = $("extIndEnd");
+    if (extIndStart) {
+      extIndStart.textContent =
+        (data.tExtStart === null) ? "Début ext. : —" : `Début ext. : ${addMinToHHMM(t0Str, data.tExtStart)}`;
+    }
+    if (extIndEnd) {
+      extIndEnd.textContent =
+        (data.tExtEnd === null) ? "Fin ext. : —" : `Fin ext. : ${addMinToHHMM(t0Str, data.tExtEnd)}`;
+    }
+    // Bulles des quatre créneaux d’entretien.
+    for (let numero = 0; numero < 4; numero++) {
+      const bulle = $(`pillEntretien${numero + 1}`);
+
+      bulle.classList.remove("entretien-ok", "entretien-impossible");
+
+      if (!Number.isFinite(data.tExtEnd)) {
+        bulle.textContent = `Entretien tapis n°${numero + 1} à —`;
+        bulle.title = "Extinction non déclenchée";
+        continue;
+      }
+
+      const debut = data.tExtEnd + numero * 60 + 50;
+      const horaire = addMinToHHMM(t0Str, debut);
+      const manqueStock = data.entretienStockInsuffisant[numero];
+
+      bulle.textContent =
+        `Entretien tapis n°${numero + 1} à ${horaire}`;
+
+      if (manqueStock) {
+        bulle.classList.add("entretien-impossible");
+        bulle.title = "Stock d’émulseur insuffisant pour réaliser les 10 minutes";
+      } else if (debut + 10 <= HORIZON_MIN) {
+        bulle.classList.add("entretien-ok");
+        bulle.title = "Stock d’émulseur suffisant pour les 10 minutes";
+      } else {
+        bulle.textContent += " — hors horizon";
+        bulle.title = "Créneau non entièrement évalué par la simulation";
+      }
+    }
+        const bulleManque = $("pillEmulseurManquant");
+    const volumeManquant = data.emulseurManquantEntretien;
+
+    bulleManque.style.display =
+      volumeManquant > 0.000001 ? "" : "none";
+
+    bulleManque.textContent =
+      `V émulseur manquant : ${fmt(Math.ceil(volumeManquant))} L`;
+    blocCourbe.style.display = "block";
+    drawChart(data);
+    blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  restaurerEngins();
+  render();
+})();
+</script>
+  
+</body>
+</html>

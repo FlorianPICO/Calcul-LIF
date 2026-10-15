@@ -675,7 +675,7 @@ th, td {
 
     <div class="small">
       <u>Logique :</u> Temporisation tant que le débit présent ne couvre pas Q ext théorique ou que le stock ne couvre pas l’extinction au débit présent.<br>
-      <u>Temporisation :</u> conso = moitié du débit présent × concentration.<br>
+      <u>Temporisation :</u> conso = débit de temporisation théorique × concentration, dans la limite du débit présent.<br>
       <u>Extinction :</u> conso = débit retenu au démarrage × concentration, pendant la durée d’extinction.
     </div>
   </div>
@@ -771,9 +771,9 @@ th, td {
     </div>
 
     <div class="small">
-      <strong>Axe gauche :</strong> débits des moyens présents, débit d’extinction théorique et débit de temporisation, en <strong>L/min</strong>.<br><br>
+      <strong>Axe gauche :</strong> débits des moyens présents, débit d’extinction théorique et débit de temporisation théorique, en <strong>L/min</strong>.<br><br>
       <strong>Axe droit :</strong> volume d’émulseur disponible et volume nécessaire à l’extinction retenue, en <strong>L</strong>.<br><br>
-      <strong>Consommation d’émulseur :</strong> calculée en multipliant la concentration (3 % = 0,03) par la moitié du débit présent pendant la phase de temporisation, puis par le débit d’extinction retenu pendant la phase d’extinction, puis par le débit théorique d’entretien du tapis de mousse pendant les quatre créneaux d’entretien de 10 minutes. La consommation est limitée au volume d’émulseur disponible.<br><br>
+      <strong>Consommation d’émulseur :</strong> calculée en multipliant la concentration (3 % = 0,03) par le débit de temporisation théorique pendant la phase de temporisation (limité au débit des moyens présents si celui-ci est insuffisant), puis par le débit d’extinction retenu pendant la phase d’extinction, puis par le débit théorique d’entretien du tapis de mousse pendant les quatre créneaux d’entretien de 10 minutes. La consommation est limitée au volume d’émulseur disponible.<br><br>
       <strong>Déclenchement de l’extinction :</strong> automatique lorsque le débit des moyens présents atteint ou dépasse le débit d’extinction théorique requis <strong>ET</strong> que le volume d’émulseur disponible permet de tenir toute la durée d’extinction à ce débit. Le débit retenu au démarrage est conservé jusqu’à la fin de l’extinction.
     </div>
 
@@ -1282,13 +1282,15 @@ tr.innerHTML = `
     const tExt = params.tExt;
     const conc = params.concPct / 100;
     const Qentretien = params.Qentretien;
+    const QtempoTheorique = params.Qtempo;
     if (!(totalDebitTableau > 0) || !Number.isFinite(totalDebitTableau)) {
       throw new Error("Renseigne au moins un moyen avec un débit supérieur à zéro.");
     }
     if (!(params.Qext > 0) || !Number.isFinite(params.Qext) ||
         !Number.isInteger(tExt) || tExt <= 0 ||
         !Number.isFinite(conc) || conc <= 0 || conc > 1 ||
-        !Number.isFinite(Qentretien) || Qentretien < 0) {
+        !Number.isFinite(Qentretien) || Qentretien < 0 ||
+        !Number.isFinite(QtempoTheorique) || QtempoTheorique <= 0) {
       throw new Error("Paramètres de calcul importés invalides.");
     }
     const t0Abs = getFirstArrivalMin(rows);
@@ -1339,13 +1341,14 @@ tr.innerHTML = `
       // Stock à l'instant t, après les arrivées, avant la minute [t, t+1[.
       flowAvailSerie[t] = flowAvail;
       emulSerie[t] = emulStock;
-      if (tExtStart === null) tempoFlowSerie[t] = flowAvail / 2;
+      if (tExtStart === null) tempoFlowSerie[t] = QtempoTheorique;
       if (t === HORIZON_MIN) break;
 
       let demande = 0, phase = "repos";
       if (tExtStart === null) {
         phase = "tempo";
-        demande = (flowAvail / 2) * conc;
+        // Le débit cible reste fixe ; on ne peut projeter au-delà du débit présent.
+        demande = Math.min(flowAvail, QtempoTheorique) * conc;
       } else if (t < tExtStart + tExt) {
         phase = "extinction";
         demande = debitExtinctionRetenu * conc;
@@ -1370,7 +1373,7 @@ tr.innerHTML = `
 
     return {
       Qext: totalDebitTableau,
-      Qtempo: totalDebitTableau / 2,
+      Qtempo: QtempoTheorique,
       tExt, concPct: params.concPct,
       needExtTotal: besoinExtinctionRetenu,
       debitExtinctionRetenu, volumeTempoConsomme,
@@ -1589,17 +1592,11 @@ ctx.restore();
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
     ctx.beginPath();
-    let segmentTempo = false;
-    for (let t = 0; t <= HORIZON_MIN; t++) {
-      const debit = data.tempoFlowSerie[t];
-      if (debit === null) { segmentTempo = false; continue; }
-      if (!segmentTempo) {
-        ctx.moveTo(x(t), yFlow(debit));
-      } else {
-        ctx.lineTo(x(t), yFlow(data.tempoFlowSerie[t - 1]));
-        ctx.lineTo(x(t), yFlow(debit));
-      }
-      segmentTempo = true;
+    // Cible théorique constante jusqu'au début de l'extinction.
+    const finTempo = data.tExtStart === null ? HORIZON_MIN : data.tExtStart;
+    if (finTempo > 0) {
+      ctx.moveTo(x(0), yFlow(params.Qtempo));
+      ctx.lineTo(x(finTempo), yFlow(params.Qtempo));
     }
     ctx.stroke();
     ctx.setLineDash([]);
@@ -1700,7 +1697,7 @@ function legendItem(x0, y0, color, label, dash = null) {
     legendItem(
       legendX, legendY + 62,
       "#d946ef",
-      "Débit temporisation des moyens présents",
+      "Débit temporisation théorique (Q tempo)",
       [6, 6]
     );
 
@@ -1750,19 +1747,16 @@ function legendItem(x0, y0, color, label, dash = null) {
       return total + capacites.flow * ligne.qty;
     }, 0);
 
-    const QtempoReel = QextReel / 2;
+    const QtempoReel = params.Qtempo;
     const dureeExtReelle = data.tExt;
     const concentration = data.concPct / 100;
 
     const VextReel =
       QextReel * dureeExtReelle * concentration;
 
-       // Temporisation adaptée au débit réel.
-    // Entretien conservé selon le besoin théorique importé.
-      const rapportDebit =
-      params.Qext > 0 ? QextReel / params.Qext : NaN;
-
-    const VtempoReel = params.VemulTempo * rapportDebit;
+    // Le débit de temporisation est désormais celui du calcul théorique.
+    // Son volume prévisionnel conserve la durée prévue dans le calcul.
+    const VtempoReel = params.VemulTempo;
     const VentretienReel = params.VemulEntretien;
 
     const VtotalReel =

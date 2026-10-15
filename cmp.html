@@ -1047,17 +1047,6 @@ tr.innerHTML = `
     });
     // ===== TOTAL DES MOYENS INSCRITS AU TABLEAU =====
     let totalDebit = 0;
-          const ancienne = rows[indexModification];
-
-      if (ancienne.type === ligne.type) {
-        if (Number.isFinite(ancienne.flowOverride)) {
-          ligne.flowOverride = ancienne.flowOverride;
-        }
-
-        if (Number.isFinite(ancienne.emulOverride)) {
-          ligne.emulOverride = ancienne.emulOverride;
-        }
-      }
     let totalEmulseur = 0;
 
     rows.forEach(r => {
@@ -1204,6 +1193,17 @@ tr.innerHTML = `
     }
 
     if (indexModification !== null) {
+            const ancienne = rows[indexModification];
+
+      if (ancienne.type === ligne.type) {
+        if (Number.isFinite(ancienne.flowOverride)) {
+          ligne.flowOverride = ancienne.flowOverride;
+        }
+
+        if (Number.isFinite(ancienne.emulOverride)) {
+          ligne.emulOverride = ancienne.emulOverride;
+        }
+      }
       rows[indexModification] = ligne;
       indexModification = null;
       $("btnAdd").textContent = "Ajouter";
@@ -1742,7 +1742,7 @@ function legendItem(x0, y0, color, label, dash = null) {
       params.Qext > 0 ? QextReel / params.Qext : NaN;
 
     const VtempoReel = params.VemulTempo * rapportDebit;
-    const VentretienReel = params.VemulEntretien * rapportDebit;
+    const VentretienReel = params.VemulEntretien;
 
     const VtotalReel =
       VextReel + VtempoReel + VentretienReel;

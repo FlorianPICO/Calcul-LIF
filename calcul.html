@@ -412,13 +412,26 @@ a.lif-btn {
             <label>Mode :</label>
             <select id="modeSdis">
               <option value="lock" selected>SDIS 27 (taux d'application verrouillés et taux de concentration fixé à 3%)</option>
+              <option value="sdis33">SDIS 33 (taux d’application verrouillés et concentration fixée à 3 %)</option>
               <option value="custom">Autre SDIS (personnalisable)</option>
             </select>
             <small class="lif-help">
-              Par défaut, les valeurs SDIS 27 sont appliquées. En mode “Autre SDIS”, vous pouvez saisir votre doctrine.
+              Choisissez SDIS 27 ou SDIS 33 pour appliquer les paramètres départementaux. En mode « Autre SDIS », les taux et la concentration sont personnalisables.
             </small>
           </div>
 
+          <div id="fixedParams33" style="display:none;">
+            <div class="lif-help" style="margin:6px 0 10px;">SDIS 33 — Concentration fixe : <strong>3 %</strong>. Taux réflexes en L/min/m² :</div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+              <thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">Scénario / Attaque</th><th style="padding:6px;border-bottom:1px solid #ddd;">Non miscible</th><th style="padding:6px;border-bottom:1px solid #ddd;">Miscible</th></tr></thead>
+              <tbody>
+                <tr><td style="padding:6px;">Nappe / Direct</td><td style="text-align:center;">5</td><td style="text-align:center;">10</td></tr>
+                <tr><td style="padding:6px;">Nappe / Indirect</td><td style="text-align:center;">5</td><td style="text-align:center;">8</td></tr>
+                <tr><td style="padding:6px;">Bac / rétention / Direct</td><td style="text-align:center;">10</td><td style="text-align:center;">20</td></tr>
+                <tr><td style="padding:6px;">Bac / rétention / Indirect</td><td style="text-align:center;">5</td><td style="text-align:center;">8</td></tr>
+              </tbody>
+            </table>
+          </div>
           <div id="customParams" style="display:none;">
             <div class="lif-grid">
               <div class="lif-field">
@@ -837,8 +850,24 @@ champsNumeriques.forEach(champ => {
     return $("modeSdis").value === "custom";
   }
 
+  // Taux SDIS 33 selon le scénario, le produit et le mode d’attaque.
+  function tauxSdis33(type, attaque, produit) {
+    const taux = {
+      nappe: {
+        direct: { non_miscible: 5, miscible: 10 },
+        indirect: { non_miscible: 5, miscible: 8 }
+      },
+      bac: {
+        direct: { non_miscible: 10, miscible: 20 },
+        indirect: { non_miscible: 5, miscible: 8 }
+      }
+    };
+    return taux[type]?.[attaque]?.[produit] ?? NaN;
+  }
+
   function updateLockUI() {
     const custom = isCustomMode();
+    $("fixedParams33").style.display = $("modeSdis").value === "sdis33" ? "block" : "none";
     $("customParams").style.display = custom ? "block" : "none";
 
     const ids = [
@@ -884,7 +913,7 @@ function compute() {
   const texPoi = n($("texPoi").value);
 
   // Paramètres (lisibles même si disabled)
-  const concPct = n($("concentrationPct").value);
+  const concPct = isCustomMode() ? n($("concentrationPct").value) : 3;
   const conc = (Number.isFinite(concPct) && concPct >= 0) ? (concPct / 100) : 0.03;
   $("oConc").textContent = Number.isFinite(concPct) ? `${fmt(concPct, 1)} %` : "3 %";
 
@@ -898,6 +927,8 @@ function compute() {
   if (ref === "reflechi") {
     if (!Number.isFinite(texPoi) || texPoi <= 0) return;
     Tex = texPoi;
+  } else if ($("modeSdis").value === "sdis33") {
+    Tex = tauxSdis33(type, atk, prod);
   } else {
     const ind = (prod === "miscible") ? texIndMisc : texIndNonMisc;
     const dir = (prod === "miscible") ? texDirMisc : texDirNonMisc;
@@ -1173,7 +1204,7 @@ const numFromText = (txt) => {
 btnCmp.addEventListener("click", (e) => {
   e.preventDefault();
 
-  const mode = $("modeSdis").value; // lock | custom
+  const mode = $("modeSdis").value; // lock | sdis33 | custom
 
   // Valeurs calculées
   const Qext   = numFromText($("oQext").textContent);
@@ -1205,10 +1236,9 @@ btnCmp.addEventListener("click", (e) => {
   localStorage.setItem("LIF_CMP_INPUTS", JSON.stringify(payload));
 
   // 🔀 Redirection selon le mode
-  const target =
-    mode === "custom"
-      ? "cmp_autre_sdis.html"
-      : "cmp.html";
+  const target = mode === "sdis33"
+    ? "cmp_sdis33.html"
+    : mode === "custom" ? "cmp_autre_sdis.html" : "cmp.html";
 
 sauvegarderCalcul();
 window.location.href = target;
@@ -1298,4 +1328,3 @@ window.location.href = target;
  
 </body>
 </html>
-

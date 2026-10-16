@@ -565,8 +565,11 @@ th, td {
   font-weight: 700;
 }
 
-#liste .capacite-editable.capacite-modifiee {
+#liste .capacite-editable.capacite-inferieure {
   color: #2563eb;
+}
+#liste .capacite-editable.capacite-superieure {
+  color: #dc2626;
 }
   </style>
 </head>
@@ -899,6 +902,19 @@ function fmt(valeur) {
     };
   }
 
+  // Comparer le total affiché à la capacité nominale pour la même quantité.
+  function classeCapacite(ligne, propriete) {
+    const reference = ligne.type === "INDUSTRIEL"
+      ? { flow: ligne.customFlow, emul: ligne.customEmul }
+      : ENGINS[ligne.type];
+    const capacites = getEnginCapacites(ligne);
+    if (!reference || !capacites) return "";
+    const cle = propriete === "flowOverride" ? "flow" : "emul";
+    const ecart = (capacites[cle] - reference[cle]) * ligne.qty;
+    if (Math.abs(ecart) < 0.000001) return "";
+    return ecart < 0 ? "capacite-inferieure" : "capacite-superieure";
+  }
+
   function updateIndustrialUI() {
     const industriel = $("enginType").value === "INDUSTRIEL";
     $("industrialParams").hidden = !industriel;
@@ -1038,7 +1054,7 @@ tr.innerHTML = `
   <input
     type="text"
     inputmode="decimal"
-    class="capacite-editable ${Number.isFinite(r.flowOverride) ? 'capacite-modifiee' : ''}"
+    class="capacite-editable ${classeCapacite(r, 'flowOverride')}"
     data-index="${idx}"
     data-capacite="flowOverride"
     value="${flow.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
@@ -1049,7 +1065,7 @@ tr.innerHTML = `
   <input
     type="text"
     inputmode="decimal"
-    class="capacite-editable ${Number.isFinite(r.emulOverride) ? 'capacite-modifiee' : ''}"
+    class="capacite-editable ${classeCapacite(r, 'emulOverride')}"
     data-index="${idx}"
     data-capacite="emulOverride"
     value="${emul.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
@@ -1138,8 +1154,10 @@ tr.innerHTML = `
         // le tableau affiche le total pour la quantité de la ligne.
         ligne[propriete] = valeur / ligne.qty;
 
-        // Marquer la cellule modifiée, sans recréer le tableau.
-        champ.classList.add("capacite-modifiee");
+        // Actualiser la couleur sans recréer le tableau ni ses boutons.
+        champ.classList.remove("capacite-inferieure", "capacite-superieure");
+        const classe = classeCapacite(ligne, propriete);
+        if (classe) champ.classList.add(classe);
 
         // Recalculer les totaux avec les capacités personnalisées.
         let nouveauDebit = 0;

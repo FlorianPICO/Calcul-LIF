@@ -346,6 +346,44 @@ th, td {
   background: rgba(217, 70, 239, 0.10) !important;
   color: #86198f !important;
 }
+
+/* Composants CMP communs, formulaire libre conservé. */
+.cmp-pills-title {
+  margin: 14px 0 6px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #172a46;
+}
+.cmp-pills-divider {
+  border: 0;
+  border-top: 1px solid #cbd5e1;
+  margin: 18px 0;
+}
+.pillQextReel {
+  border-color: #181818 !important;
+  background: #181818 !important;
+  color: #fff !important;
+}
+#liste .capacite-editable {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-weight: 700;
+}
+#liste .capacite-editable.capacite-inferieure {
+  color: #2563eb;
+}
+#liste .capacite-editable.capacite-superieure {
+  color: #dc2626;
+}
+.canvas-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+#chart { display: block; height: auto; max-width: none; }
   </style>
 </head>
 
@@ -440,30 +478,94 @@ th, td {
     </div>
 
     <div class="small">
-      <u>Logique :</u> Temporisation tant que débit dispo &lt; Q ext OU Volume émulseur &lt; besoin extinction.<br>
-      <u>Temporisation :</u> conso = Q tempo × Taux concentration (%).<br>
-      <u>Extinction :</u> conso = Q ext × Taux concentration (%) pendant Durée ext.<br>
-      <u>Entretien :</u> 4 applications de 10 min au débit Q entretien, sur les 10 dernières minutes de chaque heure après extinction.
+      <u>Logique :</u> Extinction dès que le débit présent atteint le débit théorique et que le stock restant couvre toute l’extinction au débit présent.<br>
+      <u>Temporisation :</u> débit théorique fixe, limité au débit présent ; consommation = débit utilisé × concentration.<br>
+      <u>Extinction :</u> débit fixé au démarrage, conservé jusqu’à la fin.<br>
+      <u>Entretien :</u> quatre applications de 10 min au débit d’extinction retenu.<br>
+      <u>Cellules :</u> bleu sous la capacité saisie à l’ajout, rouge au-dessus, noir à valeur égale ; la quantité est prise en compte.
     </div>
   </div>
 
   <div class="card" id="blocCourbe" style="display:none;">
-<h2 class="lif-card-title">
+    <h2 class="lif-card-title">
   <span class="lif-title-number">6</span>
   <span>Courbe de montée en puissance</span>
 </h2>
 
-    <div class="row" style="align-items:center;">
-      <span class="pill pillQext" id="pillQext">Q ext : —</span>
-      <span class="pill pillQtempo" id="pillQtempo">Q tempo : —</span>
-      <span class="pill" id="pilltExt">Durée ext. : —</span>
-      <span class="pill pillBesoin" id="pillBesoin">V émulseur extinction : —</span>
-      <span class="pill pillVtotal" id="pillVtotal">V émulseur total : —</span>
-      <span class="pill" id="pillT0">T0 : —</span>
-      <span class="pill" id="pillStockOK">Volume émulseur OK : —</span>
-<span class="pill pill-ext" id="pillExtStart">Début extinction possible à : —</span>
-<span class="pill pill-ext" id="pillExtEnd">Fin extinction possible à : —</span>
-    </div>
+    <div id="alerteExtinction" class="warn" role="status" aria-live="polite" style="display:none; margin:12px 0; white-space:pre-line;"></div>
+
+   <h3 class="cmp-pills-title">Théorique :</h3>
+
+<div class="row" style="align-items:center;">
+  <span class="pill pillQext" id="pillQext">
+    Q ext <sub>théorique</sub> : —
+  </span>
+ <span class="pill pillQtempo" id="pillQtempo">
+    Q tempo <sub>théorique</sub> : —
+  </span>
+  <span class="pill" id="pilltExt">
+    Durée extinction <sub>théorique</sub> : —
+  </span>
+ <span class="pill" id="pillBesoin">
+    V émulseur extinction <sub>théorique</sub> : —
+  </span>
+<span class="pill" id="pillVtotal">
+    V émulseur total <sub>théorique</sub> : —
+  </span>
+</div>
+
+<hr class="cmp-pills-divider">
+
+<h3 class="cmp-pills-title">Réel :</h3>
+
+<div class="row" style="align-items:center;">
+<span class="pill pillQextReel" id="pillQextReel">
+    Q ext <sub>réel</sub> : —
+  </span>
+  <span class="pill" id="pillQtempoReel">
+    Q tempo <sub>réel</sub> : —
+  </span>
+  <span class="pill" id="pilltExtReel">
+    Durée extinction <sub>réelle</sub> : —
+  </span>
+  <span class="pill" id="pillBesoinReel">
+    V émulseur extinction <sub>réel</sub> : —
+  </span>
+
+</div>
+
+<div class="small" style="margin-top:10px; line-height:1.6;">
+  Les bulles ci-dessus décrivent tous les engins inscrits dans le tableau,
+  y compris ceux qui ne sont pas encore arrivés. Q tempo réel vaut la moitié
+  de Q ext réel ; la simulation conserve le débit de temporisation théorique.
+  Le volume émulseur total réel, affiché après les valeurs retenues,
+  additionne uniquement les consommations effectivement simulées.
+  <br><br>
+  Dans le graphique, chaque engin est pris en compte à l’heure d’arrivée
+  renseignée. L’extinction commence dès que les moyens présents disposent
+  d’un débit et d’un stock d’émulseur suffisants.
+  Le débit utilisé est alors conservé jusqu’à la fin de l’extinction.
+  <br><br>
+  Les engins arrivant ensuite augmentent le stock d’émulseur disponible,
+  mais n’augmentent pas automatiquement le débit utilisé pour l’extinction si il est suffisant.
+</div>
+<div class="row" style="align-items:center; margin-top:10px;">
+  <span class="pill pillQextReel" id="pillDebitRetenu">Débit extinction retenu : —</span>
+  <span class="pill pillBesoin" id="pillBesoinRetenu">V émulseur extinction retenu : —</span>
+  <span class="pill pillVtotal" id="pillVtotalReel">
+    V émulseur total <sub>réel</sub> : —
+  </span>
+</div>
+
+<div class="row" style="align-items:center; margin-top:14px;">
+  <span class="pill" id="pillT0">T0 : —</span>
+  <span class="pill pill-ext" id="pillExtStart">
+    Début extinction possible à : —
+  </span>
+  <span class="pill pill-ext" id="pillExtEnd">
+    Fin extinction possible à : —
+  </span>
+</div>
 <div class="row" style="align-items:center; margin-top:10px;">
   <span class="pill" id="pillEntretien1">Entretien tapis n°1 à —</span>
   <span class="pill" id="pillEntretien2">Entretien tapis n°2 à —</span>
@@ -477,20 +579,21 @@ th, td {
 </div>
     
     <div class="canvas-wrap" style="margin-top:10px;">
-      <canvas id="chart" width="1100" height="520"></canvas>
+<canvas id="chart" width="1100" height="622"></canvas>
     </div>
 
     <div class="small">
-      <u>Axe gauche :</u> Lire les valeurs Débit dispo et Débit cible (L/min).<br>
-      <u>Axe droit :</u> Lire les valeurs Volume émulseur (L).<br>
-      <u>Consommation émulseur :</u> Au débit de temporisation, puis au débit d’extinction, puis au débit d’entretien pendant les créneaux prévus.<br>
-      <u>Extinction :</u> Possible si débit dispo ≥ Q ext ET volume émulseur dispo ≥ volume émulseur extinction (cible).
+      <strong>Axe gauche :</strong> débits des moyens présents, débit d’extinction théorique et débit de temporisation théorique, en <strong>L/min</strong>.<br><br>
+      <strong>Axe droit :</strong> volume d’émulseur disponible et volume nécessaire à l’extinction retenue, en <strong>L</strong>.<br><br>
+      <strong>Consommation d’émulseur :</strong> calculée en multipliant la concentration importée (pourcentage divisé par 100) par le débit de temporisation théorique pendant la phase de temporisation (limité au débit des moyens présents si celui-ci est insuffisant), puis par le débit d’extinction retenu pendant la phase d’extinction, puis par ce même débit d’extinction retenu pendant les quatre créneaux d’entretien du tapis de mousse de 10 minutes. La consommation est limitée au volume d’émulseur disponible.<br><br>
+      <strong>Déclenchement de l’extinction :</strong> automatique lorsque le débit des moyens présents atteint ou dépasse le débit d’extinction théorique requis <strong>ET</strong> que le volume d’émulseur disponible permet de tenir toute la durée d’extinction à ce débit. Le débit retenu au démarrage est conservé jusqu’à la fin de l’extinction.
     </div>
 
-    <div class="lif-signature">
-      © Capitaine Florian PICO – Tous droits réservés<br>
-      <small>Version 1.0 – 2026</small>
-    </div>
+<div class="lif-signature">
+  © Capitaine Florian PICO – Tous droits réservés<br>
+  <small>Version 1.0 – 2026</small>
+</div>
+    
   </div>
 </main>
 
@@ -517,7 +620,7 @@ th, td {
 
   const STEP_MIN = 20;
   const HORIZON_H = 5;
-  const HORIZON_MIN = HORIZON_H * 60;
+  let HORIZON_MIN = HORIZON_H * 60;
 
   const pad2 = (x) => String(x).padStart(2, "0");
 
@@ -632,6 +735,21 @@ th, td {
   `;
   blocSaisie.style.display = "block";
 
+  function getEnginCapacites(ligne) {
+    return {
+      flow: Number.isFinite(ligne.flowOverride) ? ligne.flowOverride : ligne.flow,
+      emul: Number.isFinite(ligne.emulOverride) ? ligne.emulOverride : ligne.emul
+    };
+  }
+
+  // Sans catalogue départemental, référence = capacités saisies pour ce moyen.
+  function classeCapacite(ligne, propriete) {
+    const cle = propriete === "flowOverride" ? "flow" : "emul";
+    const ecart = (getEnginCapacites(ligne)[cle] - ligne[cle]) * ligne.qty;
+    if (Math.abs(ecart) < 0.000001) return "";
+    return ecart < 0 ? "capacite-inferieure" : "capacite-superieure";
+  }
+
   // Tous les moyens restent saisis librement, y compris les industriels.
   const rows = [];
   let indexModification = null;
@@ -663,7 +781,11 @@ th, td {
         Number.isFinite(ligne.flow) &&
         ligne.flow >= 0 &&
         Number.isFinite(ligne.emul) &&
-        ligne.emul >= 0
+        ligne.emul >= 0 &&
+        (ligne.flowOverride === undefined ||
+          (Number.isFinite(ligne.flowOverride) && ligne.flowOverride >= 0)) &&
+        (ligne.emulOverride === undefined ||
+          (Number.isFinite(ligne.emulOverride) && ligne.emulOverride >= 0))
       );
 
       rows.push(...lignesValides);
@@ -683,54 +805,185 @@ th, td {
         sauvegarderEngins();
     tbody.innerHTML = "";
     rows.forEach((r, idx) => {
+      const def = getEnginCapacites(r);
+      const flow = def.flow * r.qty;
+      const emul = def.emul * r.qty;
+
       const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td data-label="Type"><b>${escapeHtml(r.label)}</b></td>
-        <td data-label="Arrivée">${r.atStr}</td>
-        <td data-label="Qté">${fmt(r.qty)}</td>
-        <td data-label="Débit (L/min)">${fmt(r.flow * r.qty)}</td>
-        <td data-label="Émulseur (L)">${fmt(r.emul * r.qty)}</td>
-        <td data-label="Action">
-          <button data-edit="${idx}" class="btn btn-ghost" style="padding:8px 10px;" type="button">Modifier</button>
-          <button data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;margin-top:6px;" type="button">Supprimer</button>
-        </td>`;
+tr.innerHTML = `
+  <td data-label="Type"><b>${escapeHtml(r.label)}</b></td>
+  <td data-label="Arrivée">${r.atStr}</td>
+ <td data-label="Qté">${fmt(r.qty)}</td>
+<td data-label="Débit (L/min)">
+  <input
+    type="text"
+    inputmode="decimal"
+    class="capacite-editable ${classeCapacite(r, 'flowOverride')}"
+    data-index="${idx}"
+    data-capacite="flowOverride"
+    value="${flow.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
+    aria-label="Débit total de la ligne ${idx + 1} en L/min">
+</td>
+
+<td data-label="Émulseur (L)">
+  <input
+    type="text"
+    inputmode="decimal"
+    class="capacite-editable ${classeCapacite(r, 'emulOverride')}"
+    data-index="${idx}"
+    data-capacite="emulOverride"
+    value="${emul.toLocaleString('fr-FR', { maximumFractionDigits: 10 })}"
+    aria-label="Volume total d’émulseur de la ligne ${idx + 1} en litres">
+</td>
+  <td data-label="Action">
+    <button type="button" data-edit="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Modifier</button>
+    <button type="button" data-i="${idx}" class="btn btn-ghost" style="padding:8px 10px;">Supprimer</button>
+  </td>
+`;
+
       tbody.appendChild(tr);
     });
+    // ===== TOTAL DES MOYENS INSCRITS AU TABLEAU =====
+    let totalDebit = 0;
+    let totalEmulseur = 0;
 
-    const totalDebit = rows.reduce((somme, r) => somme + r.flow * r.qty, 0);
-    const totalEmulseur = rows.reduce((somme, r) => somme + r.emul * r.qty, 0);
-    const total = document.createElement("tr");
-    total.style.background = "#f1f5f9";
-    total.style.fontWeight = "800";
-    total.innerHTML = `
-      <td data-label="Type">TOTAL</td><td></td><td></td>
-      <td data-label="Débit (L/min)">${fmt(totalDebit)} L/min</td>
-      <td data-label="Émulseur (L)">${fmt(totalEmulseur)} L</td><td></td>`;
-    tbody.appendChild(total);
+    rows.forEach(r => {
+      const def = getEnginCapacites(r);
 
+      totalDebit += def.flow * r.qty;
+      totalEmulseur += def.emul * r.qty;
+    });
+
+    const ligneTotal = document.createElement("tr");
+
+    ligneTotal.style.background = "#f1f5f9";
+    ligneTotal.style.fontWeight = "800";
+
+    ligneTotal.innerHTML = `
+      <td data-label="Type">TOTAL</td>
+      <td></td>
+      <td></td>
+      <td data-label="Débit (L/min)">
+        ${totalDebit.toLocaleString("fr-FR")} L/min
+      </td>
+      <td data-label="Émulseur (L)">
+        ${totalEmulseur.toLocaleString("fr-FR")} L
+      </td>
+      <td></td>
+    `;
+
+    tbody.appendChild(ligneTotal);
+        tbody.querySelectorAll("input[data-capacite]").forEach(champ => {
+      champ.addEventListener("keydown", evenement => {
+        if (evenement.key === "Enter") {
+          evenement.preventDefault();
+          champ.blur();
+        }
+      });
+
+      champ.addEventListener("change", () => {
+        const index = Number(champ.dataset.index);
+        const propriete = champ.dataset.capacite;
+        const ligne = rows[index];
+
+        const saisie = champ.value
+          .replace(/\s/g, "")
+          .replace(",", ".")
+          .trim();
+
+        const valeur = saisie === "" ? NaN : Number(saisie);
+
+                if (!Number.isFinite(valeur) || valeur < 0) {
+          const capacites = getEnginCapacites(ligne);
+          const ancienneValeur = propriete === "flowOverride"
+            ? capacites.flow * ligne.qty
+            : capacites.emul * ligne.qty;
+
+          champ.value = ancienneValeur.toLocaleString("fr-FR");
+          alert("Saisis une valeur supérieure ou égale à zéro.");
+          return;
+        }
+
+        const capacites = getEnginCapacites(ligne);
+        const valeurActuelle = propriete === "flowOverride"
+          ? capacites.flow * ligne.qty
+          : capacites.emul * ligne.qty;
+
+        // Ne pas marquer une cellule qui n’a pas changé.
+        if (Math.abs(valeur - valeurActuelle) < 0.000001) {
+          return;
+        }
+
+        // Enregistrer la capacité par moyen :
+        // le tableau affiche le total pour la quantité de la ligne.
+        ligne[propriete] = valeur / ligne.qty;
+
+        // Actualiser la couleur sans recréer le tableau ni ses boutons.
+        champ.classList.remove("capacite-inferieure", "capacite-superieure");
+        const classe = classeCapacite(ligne, propriete);
+        if (classe) champ.classList.add(classe);
+
+        // Recalculer les totaux avec les capacités personnalisées.
+        let nouveauDebit = 0;
+        let nouvelEmulseur = 0;
+
+        rows.forEach(r => {
+          const capacites = getEnginCapacites(r);
+          nouveauDebit += capacites.flow * r.qty;
+          nouvelEmulseur += capacites.emul * r.qty;
+        });
+
+        // Actualiser seulement les cellules TOTAL.
+        ligneTotal.querySelector(
+          'td[data-label="Débit (L/min)"]'
+        ).textContent = `${nouveauDebit.toLocaleString("fr-FR")} L/min`;
+
+        ligneTotal.querySelector(
+          'td[data-label="Émulseur (L)"]'
+        ).textContent = `${nouvelEmulseur.toLocaleString("fr-FR")} L`;
+
+        // Q ext réel est strictement égal au total débit du tableau.
+        $("pillQextReel").innerHTML =
+          `Q ext <sub>réel</sub> : ${fmt(nouveauDebit)} L/min`;
+
+        sauvegarderEngins();
+
+        // Le graphique précédent ne correspond plus au tableau.
+        blocCourbe.style.display = "none";
+      });
+    });
     tbody.querySelectorAll("button[data-edit]").forEach(btn => {
       btn.addEventListener("click", () => {
         indexModification = Number(btn.dataset.edit);
-        const r = rows[indexModification];
-        $("enginType").value = r.label;
-        $("enginFlow").value = r.flow;
-        $("enginEmul").value = r.emul;
-        $("arrivee").value = r.atStr;
-        $("qty").value = r.qty;
+        const ligne = rows[indexModification];
+
+        $("enginType").value = ligne.label;
+        $("enginFlow").value = ligne.flow;
+        $("enginEmul").value = ligne.emul;
+        $("arrivee").value = ligne.atStr;
+        $("qty").value = ligne.qty;
+
         $("btnAdd").textContent = "Enregistrer";
-        $("enginType").scrollIntoView({ behavior: "smooth", block: "center" });
+
+        $("enginType").scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
         $("enginType").focus({ preventScroll: true });
       });
     });
+
     tbody.querySelectorAll("button[data-i]").forEach(btn => {
       btn.addEventListener("click", () => {
         const i = Number(btn.dataset.i);
+
         if (indexModification === i) {
           indexModification = null;
           $("btnAdd").textContent = "Ajouter";
         } else if (indexModification !== null && i < indexModification) {
           indexModification--;
         }
+
         rows.splice(i, 1);
         render();
         blocCourbe.style.display = "none";
@@ -752,6 +1005,13 @@ th, td {
     }
     const ligne = { label, atStr, qty, flow, emul };
     if (indexModification !== null) {
+      const ancienne = rows[indexModification];
+      if (ancienne.flow === flow && Number.isFinite(ancienne.flowOverride)) {
+        ligne.flowOverride = ancienne.flowOverride;
+      }
+      if (ancienne.emul === emul && Number.isFinite(ancienne.emulOverride)) {
+        ligne.emulOverride = ancienne.emulOverride;
+      }
       rows[indexModification] = ligne;
       indexModification = null;
       $("btnAdd").textContent = "Ajouter";
@@ -776,133 +1036,220 @@ th, td {
     blocCourbe.style.display = "none";
   });
 
+  // ===== Simulation =====
   function simulate() {
-    const Qext = params.Qext;
-    const Qtempo = params.Qtempo;
+    const totalDebitTableau = rows.reduce((total, ligne) => {
+      return total + getEnginCapacites(ligne).flow * ligne.qty;
+    }, 0);
     const tExt = params.tExt;
-    const conc = (params.concPct / 100);
-
-    const needExtTotal = Qext * tExt * conc;
-
+    const conc = params.concPct / 100;
+    const QtempoTheorique = params.Qtempo;
+    if (!(totalDebitTableau > 0) || !Number.isFinite(totalDebitTableau)) {
+      throw new Error("Renseigne au moins un moyen avec un débit supérieur à zéro.");
+    }
+    if (!(params.Qext > 0) || !Number.isFinite(params.Qext) ||
+        !Number.isInteger(tExt) || tExt <= 0 ||
+        !Number.isFinite(conc) || conc <= 0 || conc > 1 ||
+        !Number.isFinite(QtempoTheorique) || QtempoTheorique <= 0) {
+      throw new Error("Paramètres de calcul importés invalides.");
+    }
     const t0Abs = getFirstArrivalMin(rows);
-    if (!Number.isFinite(t0Abs)) throw new Error("Impossible : aucune arrivée valide.");
+    if (!Number.isFinite(t0Abs)) throw new Error("Aucune arrivée valide.");
+    const derniereArrivee = Math.max(0, ...rows.map(r =>
+      arrivalRelMin(r.atStr, t0Abs)).filter(Number.isFinite));
+    HORIZON_MIN = Math.max(HORIZON_H * 60,
+      Math.ceil((derniereArrivee + tExt + 240) / STEP_MIN) * STEP_MIN);
 
     const addFlow = Array(HORIZON_MIN + 1).fill(0);
     const addEmul = Array(HORIZON_MIN + 1).fill(0);
-
     rows.forEach(r => {
       const rel = arrivalRelMin(r.atStr, t0Abs);
-      if (!Number.isFinite(rel)) return;
-      const m = Math.min(HORIZON_MIN, Math.max(0, Math.round(rel)));
-      addFlow[m] += r.flow * r.qty;
-      addEmul[m] += r.emul * r.qty;
+      if (!Number.isFinite(rel) || rel < 0 || rel > HORIZON_MIN) return;
+      const capacites = getEnginCapacites(r);
+      const minute = Math.round(rel);
+      addFlow[minute] += capacites.flow * r.qty;
+      addEmul[minute] += capacites.emul * r.qty;
     });
 
-    let flowAvail = 0;
-    let emulStock = 0;
-
-    let startedExt = false;
-    let extRemaining = 0;
-
-    let tStockOK = null;
-    let tExtStart = null;
-
+    let flowAvail = 0, emulStock = 0;
+    let tExtStart = null, tStockOK = null;
+    let debitExtinctionRetenu = 0, besoinExtinctionRetenu = 0;
+    let volumeTempoConsomme = 0, volumeExtConsomme = 0;
+    let volumeEntretienConsomme = 0, emulseurManquantEntretien = 0;
     const flowAvailSerie = Array(HORIZON_MIN + 1).fill(0);
     const emulSerie = Array(HORIZON_MIN + 1).fill(0);
-const entretienStockInsuffisant = [false, false, false, false];
-let emulseurManquantEntretien = 0;
-    
+    const tempoFlowSerie = Array(HORIZON_MIN + 1).fill(null);
+    const entretienStockInsuffisant = [false, false, false, false];
+
     for (let t = 0; t <= HORIZON_MIN; t++) {
+      // Les renforts n'existent dans le scénario qu'à leur arrivée.
       flowAvail += addFlow[t];
       emulStock += addEmul[t];
 
-      if (tStockOK === null && emulStock >= needExtTotal) tStockOK = t;
-
-      const canFlow = flowAvail >= Qext;
-      const canEmul = emulStock >= needExtTotal;
-
-      if (!startedExt && canFlow && canEmul) {
-        startedExt = true;
-        extRemaining = tExt;
-        tExtStart = t;
-      }
-
-      let emulCons = 0;
-
-       if (!startedExt) {
-        const flowUsedTempo = Math.min(flowAvail, Qtempo);
-        emulCons = flowUsedTempo * conc;
-
-      } else if (extRemaining > 0) {
-        emulCons = Qext * conc;
-        extRemaining -= 1;
-
-      } else {
-        // Entretien après la fin d’extinction.
-        const finExtinction = tExtStart + tExt;
-        const depuisFinExtinction = t - finExtinction;
-
-        // Mêmes créneaux que les quatre petites plages vertes :
-        // +50 à +60, +110 à +120, +170 à +180, +230 à +240 min.
-        const entretienEnCours =
-          depuisFinExtinction >= 0 &&
-          depuisFinExtinction < 240 &&
-          depuisFinExtinction % 60 >= 50;
-
-        if (entretienEnCours) {
-          // Consommation par minute au débit d’entretien du tapis.
-          emulCons = params.Qentretien * conc;
-
-          // Signaler toute minute d’entretien insuffisamment alimentée.
-          if (emulCons > emulStock + 0.000001) {
-            const numeroPlage = Math.floor(depuisFinExtinction / 60);
-            entretienStockInsuffisant[numeroPlage] = true;
-            emulseurManquantEntretien += emulCons - emulStock;
-          }
+      if (tExtStart === null) {
+        const besoinAvecMoyensPresents = flowAvail * tExt * conc;
+        if (flowAvail >= params.Qext &&
+            emulStock + 0.000001 >= besoinAvecMoyensPresents) {
+          tExtStart = t;
+          tStockOK = t;
+          // Figer le débit engagé : les renforts ultérieurs restent en réserve.
+          debitExtinctionRetenu = flowAvail;
+          besoinExtinctionRetenu = besoinAvecMoyensPresents;
         }
       }
 
-      if (emulCons > emulStock) emulCons = emulStock;
-      emulStock -= emulCons;
-
+      // Stock à l'instant t, après les arrivées, avant la minute [t, t+1[.
       flowAvailSerie[t] = flowAvail;
       emulSerie[t] = emulStock;
+      if (tExtStart === null) tempoFlowSerie[t] = QtempoTheorique;
+      if (t === HORIZON_MIN) break;
+
+      let demande = 0, phase = "repos";
+      if (tExtStart === null) {
+        phase = "tempo";
+        // Le débit cible reste fixe ; on ne peut projeter au-delà du débit présent.
+        demande = Math.min(flowAvail, QtempoTheorique) * conc;
+      } else if (t < tExtStart + tExt) {
+        phase = "extinction";
+        demande = debitExtinctionRetenu * conc;
+      } else {
+        const depuisFinExtinction = t - (tExtStart + tExt);
+        if (depuisFinExtinction >= 0 && depuisFinExtinction < 240 &&
+            depuisFinExtinction % 60 >= 50) {
+          phase = "entretien";
+          // Même débit que celui retenu au démarrage de l’extinction.
+          demande = debitExtinctionRetenu * conc;
+          if (demande > emulStock + 0.000001) {
+            entretienStockInsuffisant[Math.floor(depuisFinExtinction / 60)] = true;
+            emulseurManquantEntretien += demande - emulStock;
+          }
+        }
+      }
+      const consomme = Math.min(demande, emulStock);
+      emulStock = Math.max(0, emulStock - consomme);
+      if (phase === "tempo") volumeTempoConsomme += consomme;
+      if (phase === "extinction") volumeExtConsomme += consomme;
+      if (phase === "entretien") volumeEntretienConsomme += consomme;
     }
 
-    const labels = buildTimeLabels(t0Abs);
-    const tExtEnd = (tExtStart !== null) ? (tExtStart + tExt) : null;
-
     return {
-      Qext, Qtempo, tExt,
-      concPct: params.concPct,
-      needExtTotal,
-      t0Abs,
-      labels,
-      tStockOK,
-      tExtStart,
-      tExtEnd,
-      flowAvailSerie,
-           emulSerie,
-     entretienStockInsuffisant,
-emulseurManquantEntretien
+      Qext: totalDebitTableau,
+      Qtempo: QtempoTheorique,
+      tExt, concPct: params.concPct,
+      needExtTotal: besoinExtinctionRetenu,
+      debitExtinctionRetenu, volumeTempoConsomme,
+      volumeExtConsomme, volumeEntretienConsomme,
+      t0Abs, labels: buildTimeLabels(t0Abs), tStockOK, tExtStart,
+      tExtEnd: tExtStart === null ? null : tExtStart + tExt,
+      flowAvailSerie, emulSerie, tempoFlowSerie,
+      entretienStockInsuffisant, emulseurManquantEntretien
     };
+  }
+
+  function totalEmulseurConsomme(data) {
+    return data.volumeTempoConsomme + data.volumeExtConsomme +
+      data.volumeEntretienConsomme;
+  }
+
+  function manqueEmulseurExtinction(data) {
+    if (data.tExtStart !== null) return 0;
+    const concentration = data.concPct / 100;
+    let manqueAvecDebitSuffisant = Infinity;
+    let manqueAuDebitTheorique = Infinity;
+    for (let t = 0; t < data.flowAvailSerie.length; t++) {
+      const debit = data.flowAvailSerie[t];
+      const stock = data.emulSerie[t];
+      // Chaque comparaison porte sur le stock restant au même instant.
+      manqueAuDebitTheorique = Math.min(manqueAuDebitTheorique,
+        Math.max(0, params.Qext * data.tExt * concentration - stock));
+      if (debit >= params.Qext) {
+        manqueAvecDebitSuffisant = Math.min(manqueAvecDebitSuffisant,
+          Math.max(0, debit * data.tExt * concentration - stock));
+      }
+    }
+    return Number.isFinite(manqueAvecDebitSuffisant)
+      ? manqueAvecDebitSuffisant : manqueAuDebitTheorique;
+  }
+
+  // Expliquer le blocage à partir des stocks et débits au même instant.
+  // Le diagnostic ne modifie aucune règle de simulation.
+  function messageAlerteExtinction(data) {
+    if (data.tExtStart !== null) return "";
+
+    let debitMax = 0;
+    let meilleurInstant = null;
+    let manqueMinimum = Infinity;
+    const concentration = data.concPct / 100;
+    const besoinTheorique = params.Qext * data.tExt * concentration;
+
+    for (let t = 0; t < data.flowAvailSerie.length; t++) {
+      const debit = data.flowAvailSerie[t];
+      const stock = data.emulSerie[t];
+      debitMax = Math.max(debitMax, debit);
+      if (debit < params.Qext) continue;
+      const besoin = debit * data.tExt * concentration;
+      const manque = Math.max(0, besoin - stock);
+      if (manque < manqueMinimum) {
+        manqueMinimum = manque;
+        meilleurInstant = { t, debit, stock, besoin };
+      }
+    }
+
+    if (meilleurInstant === null) {
+      return `⚠️ Impossible de lancer l’extinction : le débit est insuffisant.
+
+Débit disponible : ${fmt(debitMax)} L/min. Débit minimum nécessaire : ${fmt(params.Qext)} L/min.`;
+    }
+
+    const point = meilleurInstant;
+    const heure = minToHHMM(data.t0Abs + point.t);
+
+    if (point.debit > params.Qext && point.stock + 0.000001 >= besoinTheorique) {
+      return `⚠️ Le débit des engins présents consomme trop d’émulseur pour assurer toute l’extinction.
+
+À ${heure}, il reste ${fmt(point.stock)} L, mais il faudrait ${fmt(point.besoin)} L à ce débit.
+
+Le stock serait suffisant en utilisant seulement le débit théorique de ${fmt(params.Qext)} L/min. La simulation utilise actuellement tout le débit des engins présents.`;
+    }
+
+    return `⚠️ Le débit est suffisant, mais il manque de l’émulseur pour réaliser toute l’extinction.
+
+À ${heure}, il reste ${fmt(point.stock)} L pour un besoin de ${fmt(point.besoin)} L. Il manque ${fmt(Math.ceil(manqueMinimum))} L.`;
   }
 
   // ===== Dessin =====
   function drawChart(data) {
     const c = $("chart");
+        // Largeur visible du graphique.
+    const conteneur = c.parentElement;
+    const largeurVisible = Math.max(280, conteneur.clientWidth - 22);
+
+    // Garder la même lisibilité lorsque la simulation dépasse 5 h.
+    const facteur = HORIZON_MIN / (HORIZON_H * 60);
+
+    c.width = Math.round(1100 * facteur);
+    c.style.width = `${Math.round(largeurVisible * facteur)}px`;
+    c.style.maxWidth = "none";
+
+    // Revenir au début à chaque nouveau tracé.
+    conteneur.scrollLeft = 0;
     const ctx = c.getContext("2d");
     const W = c.width, H = c.height;
     ctx.clearRect(0, 0, W, H);
 
     // Marges (réduit l’espace sous l’axe X)
-    const mL = 88, mR = 92, mT = 58, mB = 60;
+    const mL = 88, mR = 92, mT = 160, mB = 60;
     const plotW = W - mL - mR;
     const plotH = H - mT - mB;
 
     const xMax = HORIZON_MIN;
 
-    const maxFlow = Math.max(data.Qext, ...data.flowAvailSerie) || 1000;
+       const maxFlow = Math.max(
+      params.Qext,
+      data.Qext,
+      data.Qtempo,
+      ...data.flowAvailSerie
+    ) || 1000;
     const yFlowMax = maxFlow * 1.15;
 
     const maxEmul = Math.max(...data.emulSerie, data.needExtTotal, 1);
@@ -1068,8 +1415,8 @@ ctx.restore();
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(mL, yFlow(data.Qext));
-    ctx.lineTo(mL + plotW, yFlow(data.Qext));
+       ctx.moveTo(mL, yFlow(params.Qext));
+    ctx.lineTo(mL + plotW, yFlow(params.Qext));
     ctx.stroke();
     ctx.setLineDash([]);
     // Débit de temporisation Qtempo (rose fuchsia)
@@ -1077,11 +1424,16 @@ ctx.restore();
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(mL, yFlow(data.Qtempo));
-    ctx.lineTo(mL + plotW, yFlow(data.Qtempo));
+    // Cible théorique constante jusqu'au début de l'extinction.
+    const finTempo = data.tExtStart === null ? HORIZON_MIN : data.tExtStart;
+    if (finTempo > 0) {
+      ctx.moveTo(x(0), yFlow(params.Qtempo));
+      ctx.lineTo(x(finTempo), yFlow(params.Qtempo));
+    }
     ctx.stroke();
     ctx.setLineDash([]);
-    // Volume émulseur extinction (orange)
+    // Besoin de l'extinction effectivement déclenchée (orange).
+    if (data.tExtStart !== null) {
     ctx.strokeStyle = "#ff8800";
     ctx.setLineDash([6, 6]);
     ctx.lineWidth = 2;
@@ -1090,6 +1442,8 @@ ctx.restore();
     ctx.lineTo(mL + plotW, yEmul(data.needExtTotal));
     ctx.stroke();
     ctx.setLineDash([]);
+
+    }
 
     // Lignes verticales extinction
     function drawVLine(tMin, color) {
@@ -1109,7 +1463,7 @@ ctx.restore();
 
     // LÉGENDE (ordre demandé)
     const legendX = mL + 10;
-    const legendY = mT + 14;
+    const legendY = 26;
 
 function legendItem(x0, y0, color, label, dash = null) {
   ctx.strokeStyle = color;
@@ -1131,52 +1485,137 @@ function legendItem(x0, y0, color, label, dash = null) {
 }
 
 
+       // Fond de la légende.
     const boxW = 860;
-   const boxH = 44;
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    const boxH = 94;
+
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
     ctx.strokeStyle = "#e5e7eb";
     ctx.lineWidth = 1;
-    ctx.roundRect(legendX - 8, legendY - 14, boxW, boxH, 10);
+    ctx.roundRect(
+      legendX - 8, legendY - 14,
+      boxW, boxH, 10
+    );
     ctx.fill();
     ctx.stroke();
 
-    legendItem(legendX + 0,   legendY, "#111",    "Débit cumulé dispo (somme engins)");
-    legendItem(legendX + 250, legendY, "#2563eb", "Débit cible (Q ext)", [6, 6]);
-    legendItem(legendX + 440, legendY, "#ff0303", "Volume émulseur dispo");
-    legendItem(legendX + 620, legendY, "#ff8800", "Volume émulseur extinction (cible)", [6, 6]);
-legendItem(
-  legendX,
-  legendY + 20,
-  "#d946ef",
-  "Débit temporisation (Q tempo)",
-  [6, 6]
-);
+    // Titres des deux colonnes.
+    ctx.fillStyle = "#172a46";
+    ctx.font = "bold 12px system-ui, Arial";
+    ctx.fillText("DÉBITS (L/min)", legendX, legendY);
+    ctx.fillText("VOLUMES (L)", legendX + 440, legendY);
+
+    // Séparation verticale.
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.beginPath();
+    ctx.moveTo(legendX + 420, legendY - 6);
+    ctx.lineTo(legendX + 420, legendY + 68);
+    ctx.stroke();
+
+    // Colonne gauche : débits.
+    legendItem(
+      legendX, legendY + 22,
+      "#111",
+      "Q ext réel (sommes débits engins)"
+    );
+
+    legendItem(
+      legendX, legendY + 42,
+      "#2563eb",
+      "Débit extinction théorique (Q ext théorique)",
+      [6, 6]
+    );
+
+    legendItem(
+      legendX, legendY + 62,
+      "#d946ef",
+      "Débit temporisation théorique (Q tempo)",
+      [6, 6]
+    );
+
+    // Colonne droite : volumes.
+    legendItem(
+      legendX + 440, legendY + 22,
+      "#ff0303",
+      "Volume émulseur disponible"
+    );
+
+    legendItem(
+      legendX + 440, legendY + 42,
+      "#ff8800",
+      "Volume émulseur extinction retenu",
+      [6, 6]
+    );
     // IMPORTANT : les “pastilles” visuelles sont gérées en HTML (extIndStart/extIndEnd),
     // donc on ne dessine PAS de pastilles dans le canvas => aucun doublon.
   }
 
   // ===== Tracer (une seule fois) =====
   $("btnTracer").addEventListener("click", () => {
-    if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FPT à 00:00)."); return; }
+    if (rows.length === 0) { alert("Ajoute au moins un engin (ex : un moyen à 00:00)."); return; }
 
     let data;
     try { data = simulate(); }
     catch (e) { alert(e.message || "Erreur simulation."); return; }
 
-$("pillQext").textContent = `Q ext : ${fmt(data.Qext)} L/min`;
-$("pillQtempo").textContent = `Q tempo : ${fmt(data.Qtempo)} L/min`;
-$("pilltExt").textContent = `Durée ext. : ${fmt(data.tExt)} min`;
-$("pillBesoin").textContent = `V émulseur extinction : ${fmt(data.needExtTotal)} L`;
-    $("pillVtotal").textContent =
-  `V émulseur total : ${fmt(VemulTotal)} L`;
+    // Valeurs théoriques importées du calcul.
+    $("pillQext").innerHTML =
+          `Q ext <sub>théorique</sub> : ${fmt(params.Qext)} L/min`;
+
+    $("pillQtempo").innerHTML =
+        `Q tempo <sub>théorique</sub> : ${fmt(params.Qtempo)} L/min`;
+    $("pilltExt").innerHTML =
+      `Durée extinction <sub>théorique</sub> : ${fmt(data.tExt)} min`;
+
+    $("pillBesoin").innerHTML =
+       `V émulseur extinction <sub>théorique</sub> : ${fmt(params.besoinExt)} L`;
+
+    $("pillVtotal").innerHTML =
+      `V émulseur total <sub>théorique</sub> : ${fmt(VemulTotal)} L`;
+
+    // Débit total des engins, quantités comprises.
+    const QextReel = rows.reduce((total, ligne) => {
+      const capacites = getEnginCapacites(ligne);
+      return total + capacites.flow * ligne.qty;
+    }, 0);
+
+    const QtempoReel = QextReel / 2;
+    const dureeExtReelle = data.tExt;
+    const concentration = data.concPct / 100;
+
+    const VextReel =
+      QextReel * dureeExtReelle * concentration;
+
+    // Bilan des volumes effectivement consommés pendant la simulation.
+    const VtotalReel = totalEmulseurConsomme(data);
+
+    $("pillQextReel").innerHTML =
+      `Q ext <sub>réel</sub> : ${fmt(QextReel)} L/min`;
+
+    $("pillQtempoReel").innerHTML =
+      `Q tempo <sub>réel</sub> : ${fmt(QtempoReel)} L/min`;
+
+    $("pilltExtReel").innerHTML =
+      `Durée extinction <sub>réelle</sub> : ${fmt(dureeExtReelle)} min`;
+
+    $("pillBesoinReel").innerHTML =
+      `V émulseur extinction <sub>réel</sub> : ${fmt(VextReel)} L`;
+
+    $("pillVtotalReel").innerHTML =
+      `V émulseur total <sub>réel</sub> : ${fmt(VtotalReel)} L`;
+    $("pillVtotalReel").title =
+      `Consommations simulées : temporisation ${fmt(data.volumeTempoConsomme)} L + extinction ${fmt(data.volumeExtConsomme)} L + entretien ${fmt(data.volumeEntretienConsomme)} L. Les volumes manquants ne sont pas consommés et ne sont pas ajoutés à ce total.`;
+    $("pillDebitRetenu").textContent = data.tExtStart === null
+      ? "Débit extinction retenu : —"
+      : `Débit extinction retenu : ${fmt(data.debitExtinctionRetenu)} L/min`;
+    $("pillBesoinRetenu").textContent = data.tExtStart === null
+      ? "V émulseur extinction retenu : —"
+      : `V émulseur extinction retenu : ${fmt(data.needExtTotal)} L`;
     $("pillT0").textContent = `T0 : ${minToHHMM(data.t0Abs)}`;
 
     const t0Str = minToHHMM(data.t0Abs);
 
-    $("pillStockOK").textContent =
-      (data.tStockOK === null) ? "Volume émulseur OK : —" : `Stock OK : ${addMinToHHMM(t0Str, data.tStockOK)}`;
-
-    // Pastilles DU HAUT (on les garde ou on les masque au choix)
+       // Pastilles DU HAUT (on les garde ou on les masque au choix)
     // Ici : on les garde visibles ET on les met à jour
     $("pillExtStart").style.display = "";
     $("pillExtEnd").style.display = "";
@@ -1227,13 +1666,23 @@ $("pillBesoin").textContent = `V émulseur extinction : ${fmt(data.needExtTotal)
       }
     }
         const bulleManque = $("pillEmulseurManquant");
-    const volumeManquant = data.emulseurManquantEntretien;
+    const extinctionImpossible = data.tExtStart === null;
+    const volumeManquant = extinctionImpossible
+      ? manqueEmulseurExtinction(data)
+      : data.emulseurManquantEntretien;
 
     bulleManque.style.display =
-      volumeManquant > 0.000001 ? "" : "none";
+      extinctionImpossible || volumeManquant > 0.000001 ? "" : "none";
+    bulleManque.title = extinctionImpossible
+      ? "Manque minimal pour l’extinction parmi les instants où le débit est suffisant. Si le débit est toujours insuffisant, comparaison du meilleur stock au besoin théorique. Un manque de 0 L signifie que le débit seul empêche l’extinction."
+      : "Volume d’émulseur non fourni pendant les quatre créneaux d’entretien.";
 
     bulleManque.textContent =
       `V émulseur manquant : ${fmt(Math.ceil(volumeManquant))} L`;
+    const alerteExtinction = $("alerteExtinction");
+    const messageExtinction = messageAlerteExtinction(data);
+    alerteExtinction.textContent = messageExtinction;
+    alerteExtinction.style.display = messageExtinction ? "block" : "none";
     blocCourbe.style.display = "block";
     drawChart(data);
     blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });

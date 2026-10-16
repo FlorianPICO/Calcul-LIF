@@ -391,9 +391,25 @@ a.lif-btn {
 .lif-feedback { margin: 10px 0; padding: 10px 12px; border-radius: 9px; background: #fff7ed; color: #7c2d12; font-size: 0.9rem; line-height: 1.5; }
 .lif-feedback[hidden] { display: none; }
 .lif-btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
-.lif-ref-table { width: 100%; table-layout: fixed; }
-.lif-ref-table th, .lif-ref-table td { overflow-wrap: anywhere; }
-.lif-ref-table th:first-child { width: 50%; }
+.lif-rates { margin: 10px 0; background: #fff; border: 1px solid #dce2eb; border-radius: 10px; overflow: hidden; color: #172033; }
+.lif-rates-header { background: #0b1220; color: #fff; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap; }
+.lif-rates .lif-rates-title { font-size: 16px; font-weight: 850; margin: 0; line-height: 1.3; color: #fff; }
+.lif-rates-info { font-size: 11px; color: #cbd5e1; white-space: nowrap; }
+.lif-rates .lif-ref-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; line-height: 1.25; margin: 0; }
+.lif-rates col.lif-rates-scenario { width: 31%; }
+.lif-rates col.lif-rates-attack, .lif-rates col.lif-rates-value { width: 23%; }
+.lif-rates .lif-ref-table th, .lif-rates .lif-ref-table td { padding: 8px 12px; text-align: center; overflow-wrap: normal; }
+.lif-rates .lif-ref-table thead th { background: #e2e8f0; color: #0b1220; font-size: 12px; font-weight: 850; border-bottom: 2px solid #94a3b8; }
+.lif-rates .lif-ref-table thead th:first-child { text-align: left; }
+.lif-rates .lif-ref-table tbody th { background: #edf2f8; color: #0b1220; text-align: left; font-size: 13px; font-weight: 850; border-left: 3px solid #334155; }
+.lif-rates .lif-ref-table tbody td:first-of-type { text-align: left; color: #536176; }
+.lif-rates .lif-ref-table td.lif-rates-number { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; color: #142137; }
+.lif-rates .lif-ref-table tbody tr + tr td { border-top: 1px solid #f0f2f6; }
+.lif-rates .lif-ref-table tbody + tbody tr:first-child > * { border-top: 1px solid #dce2eb; }
+@media (max-width: 400px) {
+  .lif-rates .lif-ref-table th, .lif-rates .lif-ref-table td { padding: 8px; }
+  .lif-rates-header { padding: 10px; }
+}
 @media (max-width: 520px) {
   section.page { padding: 10px 6px; }
   .card { padding: 10px; }
@@ -449,62 +465,46 @@ a.lif-btn {
           </div>
 
 <div id="fixedParams27" style="display:none;">
-  <div class="lif-help" style="margin:6px 0 10px;">
-    SDIS 27 — Concentration fixe : <strong>3 %</strong>.
-    Taux réflexes en L/min/m² :
-  </div>
-
-  <table class="lif-ref-table" style="width:100%;border-collapse:collapse;font-size:0.9rem;">
-    <thead>
-      <tr>
-        <th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">
-          Scénario / Attaque
-        </th>
-        <th style="padding:6px;border-bottom:1px solid #ddd;">
-          Non miscible
-        </th>
-        <th style="padding:6px;border-bottom:1px solid #ddd;">
-          Miscible
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="padding:6px;">Nappe / Direct</td>
-        <td style="text-align:center;">10</td>
-        <td style="text-align:center;">20</td>
-      </tr>
-      <tr>
-        <td style="padding:6px;">Nappe / Indirect</td>
-        <td style="text-align:center;">5</td>
-        <td style="text-align:center;">10</td>
-      </tr>
-      <tr>
-        <td style="padding:6px;">Bac / Rétention / Direct</td>
-        <td style="text-align:center;">10</td>
-        <td style="text-align:center;">20</td>
-      </tr>
-      <tr>
-        <td style="padding:6px;">Bac / Rétention / Indirect</td>
-        <td style="text-align:center;">5</td>
-        <td style="text-align:center;">10</td>
-      </tr>
-    </tbody>
-  </table>
+  <section class="lif-rates" aria-labelledby="ratesTitle27">
+    <div class="lif-rates-header">
+      <h3 id="ratesTitle27" class="lif-rates-title">Taux d’application</h3>
+      <span class="lif-rates-info">SDIS 27 · L/min/m² · Concentration 3 %</span>
+    </div>
+    <table class="lif-ref-table" aria-label="Taux réflexes SDIS 27 par scénario, attaque et produit">
+      <colgroup><col class="lif-rates-scenario"><col class="lif-rates-attack"><col class="lif-rates-value"><col class="lif-rates-value"></colgroup>
+      <thead><tr><th scope="col">Scénario</th><th scope="col">Attaque</th><th scope="col">Non miscible</th><th scope="col">Miscible</th></tr></thead>
+      <tbody>
+        <tr><th rowspan="2" scope="rowgroup">Nappe</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
+        <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">10</td></tr>
+      </tbody>
+      <tbody>
+        <tr><th rowspan="2" scope="rowgroup">Bac / rétention</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
+        <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">10</td></tr>
+      </tbody>
+    </table>
+  </section>
 </div>
-          
-          <div id="fixedParams33" style="display:none;">
-            <div class="lif-help" style="margin:6px 0 10px;">SDIS 33 — Concentration fixe : <strong>3 %</strong>. Taux réflexes en L/min/m² :</div>
-            <table class="lif-ref-table" style="width:100%;border-collapse:collapse;font-size:0.9rem;">
-              <thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid #ddd;">Scénario / Attaque</th><th style="padding:6px;border-bottom:1px solid #ddd;">Non miscible</th><th style="padding:6px;border-bottom:1px solid #ddd;">Miscible</th></tr></thead>
-              <tbody>
-                <tr><td style="padding:6px;">Nappe / Direct</td><td style="text-align:center;">5</td><td style="text-align:center;">10</td></tr>
-                <tr><td style="padding:6px;">Nappe / Indirect</td><td style="text-align:center;">5</td><td style="text-align:center;">8</td></tr>
-                <tr><td style="padding:6px;">Bac / Rétention / Direct</td><td style="text-align:center;">10</td><td style="text-align:center;">20</td></tr>
-                <tr><td style="padding:6px;">Bac / Rétention / Indirect</td><td style="text-align:center;">5</td><td style="text-align:center;">8</td></tr>
-              </tbody>
-            </table>
-          </div>
+
+<div id="fixedParams33" style="display:none;">
+  <section class="lif-rates" aria-labelledby="ratesTitle33">
+    <div class="lif-rates-header">
+      <h3 id="ratesTitle33" class="lif-rates-title">Taux d’application</h3>
+      <span class="lif-rates-info">SDIS 33 · L/min/m² · Concentration 3 %</span>
+    </div>
+    <table class="lif-ref-table" aria-label="Taux réflexes SDIS 33 par scénario, attaque et produit">
+      <colgroup><col class="lif-rates-scenario"><col class="lif-rates-attack"><col class="lif-rates-value"><col class="lif-rates-value"></colgroup>
+      <thead><tr><th scope="col">Scénario</th><th scope="col">Attaque</th><th scope="col">Non miscible</th><th scope="col">Miscible</th></tr></thead>
+      <tbody>
+        <tr><th rowspan="2" scope="rowgroup">Nappe</th><td>Direct</td><td class="lif-rates-number">5</td><td class="lif-rates-number">10</td></tr>
+        <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">8</td></tr>
+      </tbody>
+      <tbody>
+        <tr><th rowspan="2" scope="rowgroup">Bac / rétention</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
+        <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">8</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>
           <div id="customParams" style="display:none;">
             <div class="lif-grid">
               <div class="lif-field">

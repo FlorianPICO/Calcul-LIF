@@ -782,7 +782,7 @@ th, td {
     <div class="small">
       <strong>Axe gauche :</strong> débits des moyens présents, débit d’extinction théorique et débit de temporisation théorique, en <strong>L/min</strong>.<br><br>
       <strong>Axe droit :</strong> volume d’émulseur disponible et volume nécessaire à l’extinction retenue, en <strong>L</strong>.<br><br>
-      <strong>Consommation d’émulseur :</strong> calculée en multipliant la concentration (3 % = 0,03) par le débit de temporisation théorique pendant la phase de temporisation (limité au débit des moyens présents si celui-ci est insuffisant), puis par le débit d’extinction retenu pendant la phase d’extinction, puis par le débit théorique d’entretien du tapis de mousse pendant les quatre créneaux d’entretien de 10 minutes. La consommation est limitée au volume d’émulseur disponible.<br><br>
+      <strong>Consommation d’émulseur :</strong> calculée en multipliant la concentration (3 % = 0,03) par le débit de temporisation théorique pendant la phase de temporisation (limité au débit des moyens présents si celui-ci est insuffisant), puis par le débit d’extinction retenu pendant la phase d’extinction, puis par ce même débit d’extinction retenu pendant les quatre créneaux d’entretien du tapis de mousse de 10 minutes. La consommation est limitée au volume d’émulseur disponible.<br><br>
       <strong>Déclenchement de l’extinction :</strong> automatique lorsque le débit des moyens présents atteint ou dépasse le débit d’extinction théorique requis <strong>ET</strong> que le volume d’émulseur disponible permet de tenir toute la durée d’extinction à ce débit. Le débit retenu au démarrage est conservé jusqu’à la fin de l’extinction.
     </div>
 
@@ -1305,7 +1305,6 @@ tr.innerHTML = `
     }, 0);
     const tExt = params.tExt;
     const conc = params.concPct / 100;
-    const Qentretien = params.Qentretien;
     const QtempoTheorique = params.Qtempo;
     if (!(totalDebitTableau > 0) || !Number.isFinite(totalDebitTableau)) {
       throw new Error("Renseigne au moins un moyen avec un débit supérieur à zéro.");
@@ -1313,7 +1312,6 @@ tr.innerHTML = `
     if (!(params.Qext > 0) || !Number.isFinite(params.Qext) ||
         !Number.isInteger(tExt) || tExt <= 0 ||
         !Number.isFinite(conc) || conc <= 0 || conc > 1 ||
-        !Number.isFinite(Qentretien) || Qentretien < 0 ||
         !Number.isFinite(QtempoTheorique) || QtempoTheorique <= 0) {
       throw new Error("Paramètres de calcul importés invalides.");
     }
@@ -1381,7 +1379,8 @@ tr.innerHTML = `
         if (depuisFinExtinction >= 0 && depuisFinExtinction < 240 &&
             depuisFinExtinction % 60 >= 50) {
           phase = "entretien";
-          demande = Qentretien * conc;
+          // Même débit que celui retenu au démarrage de l’extinction.
+          demande = debitExtinctionRetenu * conc;
           if (demande > emulStock + 0.000001) {
             entretienStockInsuffisant[Math.floor(depuisFinExtinction / 60)] = true;
             emulseurManquantEntretien += demande - emulStock;

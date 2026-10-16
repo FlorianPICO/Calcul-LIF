@@ -637,7 +637,7 @@ a.lif-btn {
             <div class="lif-result-group"><div class="lif-row"><span>Q entretien du tapis sur 4 h (L/min) :</span><span id="oQentretien">—</span></div>
 <small class="lif-conversion"><span id="oQentretienM3h">—</span> m³/h</small></div>
                 <small class="lif-help" style="margin-top:10px;">
- Débit d’entretien = Q ext / 6. Application : 10 min par heure pendant 4 h.
+ Débit d’entretien = Q ext. Volume prévisionnel d’entretien = volume d’extinction. Application : 10 min par heure pendant 4 h.
 </small>
             <div class="lif-result-group"><div class="lif-row"><span>V émulseur pour entretien du tapis sur 4 h (L) :</span><span id="oVentretien">—</span></div>
 <small class="lif-conversion"><span id="oVentretienM3">—</span> m³</small></div>
@@ -1025,9 +1025,11 @@ function compute() {
   const Qext = S * Tex;
   const Qtempo = Qext / 2;
   const Vemul = Qext * tExt * conc;
-  const Qentretien = Qext / 6;
-  // Quatre applications de 10 min, réparties sur une période de 4 h.
-  const VemulEntretien = Qentretien * 40 * conc;
+  const Qentretien = Qext;
+  // Volume prévisionnel demandé : égal au volume d’extinction.
+  // Pour une extinction de 20 min, quatre entretiens de 10 min à Qext
+  // consomment deux fois cette provision ; la CMP calcule ces besoins réels.
+  const VemulEntretien = Vemul;
   const VtempoAff = finRenseignee ? Qtempo * tTempoMin * conc : Vemul / 2;
   if (![Qext, Qtempo, Vemul, Qentretien, VemulEntretien, VtempoAff,
         Vemul + VemulEntretien + VtempoAff].every(Number.isFinite)) {

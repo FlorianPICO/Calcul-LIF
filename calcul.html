@@ -1096,7 +1096,7 @@ function compute() {
   const minutesTotales = Math.round(delai);
   const heures = Math.floor(minutesTotales / 60), minutes = minutesTotales % 60;
   $("oTempsHM").textContent = `soit ${fmt(heures)} ${heures > 1 ? "heures" : "heure"} et ${minutes} ${minutes > 1 ? "minutes" : "minute"}`;
-  $("oDebord").textContent = deb ? "DÉBORDEMENT" : "PAS DE DÉBORDEMENT";
+ $("oDebord").textContent = deb ? "DÉBORDEMENT POTENTIEL" : "PAS DE DÉBORDEMENT";
   $("oDebord").style.background = deb ? "#fee2e2" : "#dcfce7";
   $("oDebord").style.borderColor = deb ? "#fecaca" : "#bbf7d0";
   $("oDebord").style.color = deb ? "#7f1d1d" : "#14532d";

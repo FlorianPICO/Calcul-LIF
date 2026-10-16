@@ -1087,7 +1087,7 @@ function compute() {
   afficher("oAjExt", Vext); afficher("oAjExtM3", Vext / 1000, 2);
   afficher("oMarge", marge); afficher("oMargeM3", marge / 1000, 2);
   $("oTemps").textContent = Vp >= Vt ? "Débordement immédiat (0 min)"
-    : `~${fmt(delai, 1)} min${deb ? "" : " — au-delà des 40 min d’extinction"}`;
+   : `~${fmt(delai, 1)} min`;
   const minutesTotales = Math.round(delai);
   const heures = Math.floor(minutesTotales / 60), minutes = minutesTotales % 60;
   $("oTempsHM").textContent = `soit ${fmt(heures)} ${heures > 1 ? "heures" : "heure"} et ${minutes} ${minutes > 1 ? "minutes" : "minute"}`;

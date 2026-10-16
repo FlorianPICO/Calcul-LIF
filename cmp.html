@@ -728,14 +728,15 @@ th, td {
   <span class="pill" id="pillBesoinReel">
     V émulseur extinction <sub>réel</sub> : —
   </span>
-  <span class="pill pillVtotal" id="pillVtotalReel">
-    V émulseur total <sub>réel</sub> : —
-  </span>
+
 </div>
 
 <div class="small" style="margin-top:10px; line-height:1.6;">
-  Les bulles « Réel » affichent les capacités de tous les engins
-  inscrits dans le tableau, y compris ceux qui ne sont pas encore arrivés.
+  Les bulles ci-dessus décrivent tous les engins inscrits dans le tableau,
+  y compris ceux qui ne sont pas encore arrivés. Q tempo réel vaut la moitié
+  de Q ext réel ; la simulation conserve le débit de temporisation théorique.
+  Le volume émulseur total réel, affiché après les valeurs retenues,
+  additionne uniquement les consommations effectivement simulées.
   <br><br>
   Dans le graphique, chaque engin est pris en compte à l’heure d’arrivée
   renseignée. L’extinction commence dès que les moyens présents disposent
@@ -748,6 +749,9 @@ th, td {
 <div class="row" style="align-items:center; margin-top:10px;">
   <span class="pill pillQextReel" id="pillDebitRetenu">Débit extinction retenu : —</span>
   <span class="pill pillBesoin" id="pillBesoinRetenu">V émulseur extinction retenu : —</span>
+  <span class="pill pillVtotal" id="pillVtotalReel">
+    V émulseur total <sub>réel</sub> : —
+  </span>
 </div>
 
 <div class="row" style="align-items:center; margin-top:14px;">
@@ -1405,6 +1409,31 @@ tr.innerHTML = `
     };
   }
 
+  function totalEmulseurConsomme(data) {
+    return data.volumeTempoConsomme + data.volumeExtConsomme +
+      data.volumeEntretienConsomme;
+  }
+
+  function manqueEmulseurExtinction(data) {
+    if (data.tExtStart !== null) return 0;
+    const concentration = data.concPct / 100;
+    let manqueAvecDebitSuffisant = Infinity;
+    let manqueAuDebitTheorique = Infinity;
+    for (let t = 0; t < data.flowAvailSerie.length; t++) {
+      const debit = data.flowAvailSerie[t];
+      const stock = data.emulSerie[t];
+      // Chaque comparaison porte sur le stock restant au même instant.
+      manqueAuDebitTheorique = Math.min(manqueAuDebitTheorique,
+        Math.max(0, params.Qext * data.tExt * concentration - stock));
+      if (debit >= params.Qext) {
+        manqueAvecDebitSuffisant = Math.min(manqueAvecDebitSuffisant,
+          Math.max(0, debit * data.tExt * concentration - stock));
+      }
+    }
+    return Number.isFinite(manqueAvecDebitSuffisant)
+      ? manqueAvecDebitSuffisant : manqueAuDebitTheorique;
+  }
+
   // Expliquer le blocage à partir des stocks et débits au même instant.
   // Le diagnostic ne modifie aucune règle de simulation.
   function messageAlerteExtinction(data) {
@@ -1813,20 +1842,15 @@ function legendItem(x0, y0, color, label, dash = null) {
       return total + capacites.flow * ligne.qty;
     }, 0);
 
-    const QtempoReel = params.Qtempo;
+    const QtempoReel = QextReel / 2;
     const dureeExtReelle = data.tExt;
     const concentration = data.concPct / 100;
 
     const VextReel =
       QextReel * dureeExtReelle * concentration;
 
-    // Le débit de temporisation est désormais celui du calcul théorique.
-    // Son volume prévisionnel conserve la durée prévue dans le calcul.
-    const VtempoReel = params.VemulTempo;
-    const VentretienReel = params.VemulEntretien;
-
-    const VtotalReel =
-      VextReel + VtempoReel + VentretienReel;
+    // Bilan des volumes effectivement consommés pendant la simulation.
+    const VtotalReel = totalEmulseurConsomme(data);
 
     $("pillQextReel").innerHTML =
       `Q ext <sub>réel</sub> : ${fmt(QextReel)} L/min`;
@@ -1842,6 +1866,8 @@ function legendItem(x0, y0, color, label, dash = null) {
 
     $("pillVtotalReel").innerHTML =
       `V émulseur total <sub>réel</sub> : ${fmt(VtotalReel)} L`;
+    $("pillVtotalReel").title =
+      `Consommations simulées : temporisation ${fmt(data.volumeTempoConsomme)} L + extinction ${fmt(data.volumeExtConsomme)} L + entretien ${fmt(data.volumeEntretienConsomme)} L. Les volumes manquants ne sont pas consommés et ne sont pas ajoutés à ce total.`;
     $("pillDebitRetenu").textContent = data.tExtStart === null
       ? "Débit extinction retenu : —"
       : `Débit extinction retenu : ${fmt(data.debitExtinctionRetenu)} L/min`;
@@ -1903,10 +1929,16 @@ function legendItem(x0, y0, color, label, dash = null) {
       }
     }
         const bulleManque = $("pillEmulseurManquant");
-    const volumeManquant = data.emulseurManquantEntretien;
+    const extinctionImpossible = data.tExtStart === null;
+    const volumeManquant = extinctionImpossible
+      ? manqueEmulseurExtinction(data)
+      : data.emulseurManquantEntretien;
 
     bulleManque.style.display =
-      volumeManquant > 0.000001 ? "" : "none";
+      extinctionImpossible || volumeManquant > 0.000001 ? "" : "none";
+    bulleManque.title = extinctionImpossible
+      ? "Manque minimal pour l’extinction parmi les instants où le débit est suffisant. Si le débit est toujours insuffisant, comparaison du meilleur stock au besoin théorique. Un manque de 0 L signifie que le débit seul empêche l’extinction."
+      : "Volume d’émulseur non fourni pendant les quatre créneaux d’entretien.";
 
     bulleManque.textContent =
       `V émulseur manquant : ${fmt(Math.ceil(volumeManquant))} L`;

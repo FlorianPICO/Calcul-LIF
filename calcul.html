@@ -457,7 +457,7 @@ a.lif-btn {
             <select id="modeSdis">
               <option value="lock" selected>SDIS 27 (taux d'application verrouillés et taux de concentration fixé à 3%)</option>
               <option value="sdis33">SDIS 33 (taux d’application verrouillés et taux de concentration fixée à 3 %)</option>
-              <option value="custom">Autre SDIS (personnalisable)</option>
+              <option value="custom">Autre SDIS (GDO)</option>
             </select>
             <small class="lif-help">
               Choisissez SDIS 27 ou SDIS 33 pour appliquer les paramètres départementaux. En mode « Autre SDIS », les taux et la concentration sont personnalisables.
@@ -474,11 +474,11 @@ a.lif-btn {
       <colgroup><col class="lif-rates-scenario"><col class="lif-rates-attack"><col class="lif-rates-value"><col class="lif-rates-value"></colgroup>
       <thead><tr><th scope="col">Scénario</th><th scope="col">Attaque</th><th scope="col">Non miscible</th><th scope="col">Miscible</th></tr></thead>
       <tbody>
-        <tr><th rowspan="2" scope="rowgroup">Nappe</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
+        <tr><th rowspan="2" scope="rowgroup">Nappe / rétention</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
         <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">10</td></tr>
       </tbody>
       <tbody>
-        <tr><th rowspan="2" scope="rowgroup">Bac / rétention</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
+        <tr><th rowspan="2" scope="rowgroup">Bac (réservoir)</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
         <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">10</td></tr>
       </tbody>
     </table>
@@ -495,11 +495,11 @@ a.lif-btn {
       <colgroup><col class="lif-rates-scenario"><col class="lif-rates-attack"><col class="lif-rates-value"><col class="lif-rates-value"></colgroup>
       <thead><tr><th scope="col">Scénario</th><th scope="col">Attaque</th><th scope="col">Non miscible</th><th scope="col">Miscible</th></tr></thead>
       <tbody>
-        <tr><th rowspan="2" scope="rowgroup">Nappe</th><td>Direct</td><td class="lif-rates-number">5</td><td class="lif-rates-number">10</td></tr>
+        <tr><th rowspan="2" scope="rowgroup">Nappe / rétention</th><td>Direct</td><td class="lif-rates-number">5</td><td class="lif-rates-number">10</td></tr>
         <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">8</td></tr>
       </tbody>
       <tbody>
-        <tr><th rowspan="2" scope="rowgroup">Bac / rétention</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
+        <tr><th rowspan="2" scope="rowgroup">Bac (réservoir)</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
         <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">8</td></tr>
       </tbody>
     </table>
@@ -515,7 +515,7 @@ a.lif-btn {
 
               <div class="lif-field">
                 <label for="texIndNonMisc">Taux d’application réflexe – Indirect – Non miscible (L/min/m²) :</label>
-                <input id="texIndNonMisc" type="number" min="0" step="0.1" value="5" disabled>
+                <input id="texIndNonMisc" type="number" min="0" step="0.1" value="10" disabled>
               </div>
 
               <div class="lif-field">
@@ -525,7 +525,7 @@ a.lif-btn {
 
               <div class="lif-field">
                 <label for="texIndMisc">Taux d’application réflexe – Indirect – Miscible (L/min/m²) :</label>
-                <input id="texIndMisc" type="number" min="0" step="0.1" value="10" disabled>
+                <input id="texIndMisc" type="number" min="0" step="0.1" value="20" disabled>
               </div>
 
               <div class="lif-field">
@@ -554,7 +554,8 @@ a.lif-btn {
             <label for="typeFeu">Type de feu / Scénario :</label>
             <select id="typeFeu">
               <option value="nappe">Feu de nappe</option>
-              <option value="bac">Feu de bac / rétention</option>
+              <option value="bac">Feu de bac (réservoir)</option>
+              <option value="retention">Feu de rétention</option>
             </select>
           </div>
 
@@ -724,13 +725,13 @@ Application : 10 min par heure pendant 4 h
 
 
            <div class="lif-result-group"><div class="lif-row">
-  <span>Volume émulseur (L)</span>
+  <span>Volume émulseur pour création du tapis préventif (L) :</span>
   <span id="oVtapis">—</span>
 </div>
 <small class="lif-conversion"><span id="oVtapisM3">—</span> m³</small></div>
 
 <div class="lif-result-group"><div class="lif-row">
-  <span>Débit entretien (L/min)</span>
+  <span>Débit entretien du tapis préventif (L/min) :</span>
   <span id="oDentretien">—</span>
 </div>
 <small class="lif-conversion"><span id="oDentretienM3h">—</span> m³/h</small></div>
@@ -969,17 +970,17 @@ champsNumeriques.forEach(champ => {
   }
 
   function updateUI() {
-    const isBac = $("typeFeu").value === "bac";
+    const avecDebordement = ["bac", "retention"].includes($("typeFeu").value);
     const isReflechi = $("reflexe").value === "reflechi";
 
-    $("blocDebordement").style.display = isBac ? "block" : "none";
+    $("blocDebordement").style.display = avecDebordement ? "block" : "none";
 
     $("blocTexPoi").style.display = isReflechi ? "block" : "none";
     $("texPoi").disabled = !isReflechi;
     if (!isReflechi) $("texPoi").value = "";
 
     setDebordUI(false);
-if (!isBac) $("surfaceCuvette").value = "";
+if (!avecDebordement) $("surfaceCuvette").value = "";
   }
 
 function compute() {
@@ -997,7 +998,7 @@ function compute() {
   const prod = $("produit").value;
   const ref = $("reflexe").value;
   if (!["lock", "sdis33", "custom"].includes(mode) ||
-      !["nappe", "bac"].includes(type) || !["direct", "indirect"].includes(atk) ||
+      !["nappe", "bac", "retention"].includes(type) || !["direct", "indirect"].includes(atk) ||
       !["miscible", "non_miscible"].includes(prod) || !["reflexe", "reflechi"].includes(ref)) {
     invaliderCalcul("Vérifiez les paramètres du scénario."); return;
   }
@@ -1012,7 +1013,7 @@ function compute() {
   }
   let Tex;
   if (ref === "reflechi") Tex = n($("texPoi").value);
-  else if (mode === "sdis33") Tex = tauxSdis33(type, atk, prod);
+  else if (mode === "sdis33") Tex = tauxSdis33(type === "retention" ? "nappe" : type, atk, prod);
   else {
     const [indNon, dirNon, indMisc, dirMisc] = taux;
     Tex = atk === "indirect" ? (prod === "miscible" ? indMisc : indNon)
@@ -1071,7 +1072,7 @@ function compute() {
   $("oDebord").style.background = "#fff";
   $("oDebord").style.borderColor = "#ddd";
   $("oDebord").style.color = "#111";
-  if (type !== "bac") return;
+  if (!["bac", "retention"].includes(type)) return;
 
   const debordIds = ["vPresent", "vTotal", "tReel"];
   const valeurs = debordIds.map(id => n($(id).value));
@@ -1081,7 +1082,7 @@ function compute() {
     return;
   }
   const Vtempo = Qtempo * tr;
-  const Vext = Qext * 40;
+  const Vext = Qext * tExt;
   const marge = Vt - (Vp + Vtempo + Vext);
   const margeInit = Vt - Vp;
   const delai = Vp >= Vt ? 0 : Vtempo >= margeInit ? margeInit / Qtempo
@@ -1089,7 +1090,7 @@ function compute() {
   if (![Vtempo, Vext, marge, delai].every(Number.isFinite)) {
     afficherMessage("Calcul principal valide. Les valeurs de débordement sont trop élevées."); return;
   }
-  const deb = Vp >= Vt || Vtempo >= margeInit || delai - tr <= 40;
+  const deb = Vp >= Vt || Vtempo >= margeInit || delai - tr <= tExt;
   afficher("oAjTempo", Vtempo); afficher("oAjTempoM3", Vtempo / 1000, 2);
   afficher("oAjExt", Vext); afficher("oAjExtM3", Vext / 1000, 2);
   afficher("oMarge", marge); afficher("oMargeM3", marge / 1000, 2);
@@ -1138,7 +1139,15 @@ initialiserHorairesTempo();
     afficherMessage();
   }
 
-  $("modeSdis").addEventListener("change", updateLockUI);
+  $("modeSdis").addEventListener("change", () => {
+    if (isCustomMode()) {
+      $("texIndNonMisc").value = 10;
+      $("texDirNonMisc").value = 10;
+      $("texIndMisc").value = 20;
+      $("texDirMisc").value = 20;
+    }
+    updateLockUI();
+  });
   $("typeFeu").addEventListener("change", () => { updateUI(); compute(); });
   $("reflexe").addEventListener("change", () => { updateUI(); compute(); });
 

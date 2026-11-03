@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Calcul LIF – SDIS 27 / SDIS 33 / Autre SDIS</title>
+  <title>Calcul LIF – SDIS 27 / SDIS 33 / Autre SDIS (GDO)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -460,7 +460,7 @@ a.lif-btn {
               <option value="custom">Autre SDIS (GDO)</option>
             </select>
             <small class="lif-help">
-              Choisissez SDIS 27 ou SDIS 33 pour appliquer les paramètres départementaux. En mode « Autre SDIS », les taux et la concentration sont personnalisables.
+              Choisissez SDIS 27 ou SDIS 33 pour appliquer les paramètres départementaux. En mode « Autre SDIS (GDO) », les taux et la concentration sont personnalisables.
             </small>
           </div>
 
@@ -510,7 +510,7 @@ a.lif-btn {
               <div class="lif-field">
                 <label for="concentrationPct">Concentration émulseur (%) :</label>
                 <input id="concentrationPct" type="number" min="0" step="0.1" value="3" disabled>
-                <small class="lif-help">Déverrouillé uniquement en mode “Autre SDIS”.</small>
+                <small class="lif-help">Déverrouillé uniquement en mode “Autre SDIS (GDO)”.</small>
               </div>
 
               <div class="lif-field">
@@ -573,7 +573,7 @@ a.lif-btn {
               <option value="non_miscible">Non miscible</option>
               <option value="miscible">Miscible (alcool)</option>
             </select>
-            <small class="lif-help">Concentration par défaut : 3 % (modifiable en mode “Autre SDIS”).</small>
+            <small class="lif-help">Concentration par défaut : 3 % (modifiable en mode “Autre SDIS (GDO)”).</small>
           </div>
 
           <div class="lif-field" id="blocReflexe">
@@ -659,7 +659,8 @@ Application : 10 min par heure pendant 4 h
             <div class="lif-result-group"><div class="lif-row"><span>V émulseur tempo (L) :</span><span id="oVtempo">—</span></div>
 <small class="lif-conversion"><span id="oVtempoM3">—</span> m³</small></div>
            <small class="lif-help" style="margin-top:10px;">
-  Sans heure de fin renseignée : V émulseur tempo = V émulseur extinction / 2.
+  Sans heure de fin renseignée :<br>
+  V émulseur tempo = V émulseur extinction / 2.
 </small>
           </div>
         </div>

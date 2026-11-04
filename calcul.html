@@ -590,6 +590,12 @@ a.lif-btn {
             <small class="lif-help">Visible uniquement si “Réfléchi (POI)”</small>
           </div>
 
+          <div class="lif-field" id="blocDureeExtinction" style="display:none;">
+            <label for="dureeExtinction">Durée d’extinction (min) :</label>
+            <input id="dureeExtinction" type="number" min="1" step="1" placeholder="Automatique : 20 ou 40 min" disabled>
+            <small class="lif-help">Modifiable en mode « Autre SDIS (GDO) ». Laissez vide pour conserver la durée automatique du scénario.</small>
+          </div>
+
           <div class="lif-grid-2">
             <div class="lif-field">
               <label for="tempoDebut">Heure de début de temporisation réelle :</label>
@@ -951,6 +957,8 @@ champsNumeriques.forEach(champ => {
         $("fixedParams27").style.display =
       $("modeSdis").value === "lock" ? "block" : "none";
     $("customParams").style.display = custom ? "block" : "none";
+    $("blocDureeExtinction").style.display = custom ? "block" : "none";
+    $("dureeExtinction").disabled = !custom;
 
     const ids = [
       "concentrationPct",
@@ -1028,7 +1036,15 @@ function compute() {
   if (finRenseignee && !Number.isFinite(tTempoMin)) {
     invaliderCalcul("Renseignez une heure de début valide pour calculer la temporisation."); return;
   }
-  const tExt = type === "bac" ? 40 : S < 400 ? 20 : 40;
+  const dureeAutomatique = type === "bac" ? 40 : S < 400 ? 20 : 40;
+  $("dureeExtinction").placeholder = `Automatique : ${dureeAutomatique} min`;
+  const dureeSaisie = $("dureeExtinction").value.trim();
+  const tExt = isCustomMode() && dureeSaisie !== ""
+    ? n(dureeSaisie) : dureeAutomatique;
+  if (!Number.isInteger(tExt) || tExt <= 0) {
+    invaliderCalcul("Renseignez une durée d’extinction en minutes entières, supérieure à zéro.");
+    return;
+  }
   const Qext = S * Tex;
   const Qtempo = Qext / 2;
   const Vemul = Qext * tExt * conc;
@@ -1125,6 +1141,7 @@ function compute() {
     $("produit").value = "non_miscible";
     $("reflexe").value = "reflexe";
     $("texPoi").value = "";
+    $("dureeExtinction").value = "";
 initialiserHorairesTempo();
     $("surfaceCuvette").value = "";
 

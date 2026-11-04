@@ -419,7 +419,143 @@ a.lif-btn {
   .resume-actions > * { width: 100%; }
   .lif-badges { grid-template-columns: 1fr; }
 }
-  </style>
+  
+/* ===== AIDE AU REMPLISSAGE - RISQUE DE DÉBORDEMENT ===== */
+.lif-debord-title-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:8px;
+}
+
+.lif-debord-title-row .lif-panel-title{
+  margin-bottom:0;
+}
+
+.lif-help-btn{
+  flex-shrink:0;
+  padding:6px 10px;
+  border:1px solid #93c5fd;
+  border-radius:8px;
+  background:#eff6ff;
+  color:#1d4ed8;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  line-height:1.2;
+}
+
+.lif-help-btn:hover{
+  background:#dbeafe;
+}
+
+.lif-help-btn:focus-visible,
+.lif-help-modal-close:focus-visible,
+.lif-help-back:focus-visible{
+  outline:3px solid rgba(37,99,235,.35);
+  outline-offset:2px;
+}
+
+.lif-help-modal[hidden]{
+  display:none;
+}
+
+.lif-help-modal{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+
+.lif-help-modal-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(15,23,42,.72);
+}
+
+.lif-help-modal-content{
+  position:relative;
+  z-index:1;
+  width:min(920px,96vw);
+  max-height:94vh;
+  overflow-y:auto;
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 24px 60px rgba(0,0,0,.30);
+}
+
+.lif-help-modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.lif-help-modal-header h3{
+  margin:0;
+  color:#172a46;
+  font-size:18px;
+  line-height:1.3;
+}
+
+.lif-help-modal-close{
+  width:38px;
+  height:38px;
+  flex-shrink:0;
+  border:0;
+  border-radius:50%;
+  background:#f1f5f9;
+  color:#0f172a;
+  font-size:25px;
+  line-height:1;
+  cursor:pointer;
+}
+
+.lif-help-modal-image{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:10px;
+  border:1px solid #e2e8f0;
+}
+
+.lif-help-back{
+  width:100%;
+  margin-top:14px;
+}
+
+@media (max-width:520px){
+  .lif-debord-title-row{
+    align-items:flex-start;
+  }
+
+  .lif-help-btn{
+    font-size:11px;
+    padding:6px 8px;
+  }
+
+  .lif-help-modal{
+    padding:8px;
+  }
+
+  .lif-help-modal-content{
+    width:100%;
+    padding:10px;
+    border-radius:12px;
+  }
+
+  .lif-help-modal-header h3{
+    font-size:15px;
+  }
+}
+
+</style>
 </head>
 
 <body>
@@ -673,7 +809,17 @@ Application : 10 min par heure pendant 4 h
         </div>
 
         <div class="lif-panel lif-panel-muted" id="blocDebordement" style="display:none;margin-top:12px;">
-          <div class="lif-panel-title">RISQUE DE DÉBORDEMENT - Feu de bac / rétention</div>
+          <div class="lif-debord-title-row">
+  <div class="lif-panel-title">RISQUE DE DÉBORDEMENT - Feu de bac / rétention</div>
+  <button
+    type="button"
+    id="btnAideDebordement"
+    class="lif-help-btn"
+    aria-haspopup="dialog"
+    aria-controls="modalAideDebordement">
+    ? Aide au remplissage
+  </button>
+</div>
 
           <div class="lif-grid">
             <div class="lif-field">
@@ -713,6 +859,47 @@ Application : 10 min par heure pendant 4 h
           <div class="lif-result-group"><div class="lif-row"><span>Avec ces débits, débordement au bout de :</span><span id="oTemps">—</span></div>
 <small class="lif-conversion"><span id="oTempsHM">—</span></small></div>
           <div class="lif-debord" id="oDebord">—</div>
+        </div>
+
+
+        <!-- ===== FENÊTRE D'AIDE AU REMPLISSAGE ===== -->
+        <div
+          id="modalAideDebordement"
+          class="lif-help-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="titreAideDebordement"
+          hidden>
+
+          <div class="lif-help-modal-backdrop" data-close-help></div>
+
+          <div class="lif-help-modal-content">
+            <div class="lif-help-modal-header">
+              <h3 id="titreAideDebordement">
+                Aide au remplissage – Risque de débordement
+              </h3>
+
+              <button
+                type="button"
+                class="lif-help-modal-close"
+                data-close-help
+                aria-label="Fermer l’aide">
+                ×
+              </button>
+            </div>
+
+            <img
+              src="aide-debordement-bac.png"
+              alt="Schéma explicatif des données à renseigner pour le risque de débordement"
+              class="lif-help-modal-image">
+
+            <button
+              type="button"
+              class="lif-btn lif-btn-primary lif-help-back"
+              data-close-help>
+              ← Retour au calcul
+            </button>
+          </div>
         </div>
 
         <div class="lif-panel lif-panel-muted" id="blocTapisPreventif" style="display:none;margin-top:12px;">
@@ -1287,6 +1474,55 @@ btnCmp.addEventListener("click", (e) => {
   // Le bouton Réinitialiser enregistre aussi les champs remis à zéro.
   // Son gestionnaire resetAll, déjà présent plus haut, est exécuté avant.
   $("btnReset").addEventListener("click", sauvegarderCalcul);
+
+
+// ================== AIDE RISQUE DE DÉBORDEMENT ==================
+const btnAideDebordement = $("btnAideDebordement");
+const modalAideDebordement = $("modalAideDebordement");
+
+function ouvrirAideDebordement() {
+  if (!modalAideDebordement) return;
+
+  modalAideDebordement.hidden = false;
+  document.body.style.overflow = "hidden";
+
+  const boutonFermer =
+    modalAideDebordement.querySelector(".lif-help-modal-close");
+
+  boutonFermer?.focus();
+}
+
+function fermerAideDebordement() {
+  if (!modalAideDebordement) return;
+
+  modalAideDebordement.hidden = true;
+  document.body.style.overflow = "";
+  btnAideDebordement?.focus();
+}
+
+btnAideDebordement?.addEventListener(
+  "click",
+  ouvrirAideDebordement
+);
+
+modalAideDebordement
+  ?.querySelectorAll("[data-close-help]")
+  .forEach(element => {
+    element.addEventListener(
+      "click",
+      fermerAideDebordement
+    );
+  });
+
+document.addEventListener("keydown", event => {
+  if (
+    event.key === "Escape" &&
+    modalAideDebordement &&
+    !modalAideDebordement.hidden
+  ) {
+    fermerAideDebordement();
+  }
+});
 
 })();
 </script>

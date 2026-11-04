@@ -607,6 +607,7 @@ a.lif-btn {
               <input id="tempoFin" type="time">
             </div>
           </div>
+          <small class="lif-help" style="display:block; margin-top:6px;">Si pas de temporisation (attaque directe) alors les heures de début et de fin de temporisation doivent être identiques</small>
           
         <div class="lif-actions">
           <button id="btnCalculer" class="lif-btn lif-btn-primary" type="button">Calculer</button>
@@ -1079,7 +1080,7 @@ function compute() {
       line("Taux d’application", `${fmt(Tex, 2)} L/min/m²`) +
       line("Concentration", `${fmt(concPct, 2)} %`) +
       line("Débit extinction", `${fmt(Qext)} L/min <span style="font-size:0.9em;color:#475569;">soit ${fmt(Qext * 0.06, 1)} m³/h</span>`) +
-      line("Volume émulseur total", `${fmt(total)} L <span style="font-size:0.9em;color:#475569;">soit ${fmt(total / 1000, 2)} m³ (Ext ${fmt(Vemul)} L / Tempo ${fmt(VtempoAff)} L / Entretien ${fmt(VemulEntretien)} L / Tapis ${fmt(vTapis)} L)</span>`);
+      line("Volume émulseur total", `${fmt(total)} L <span style="font-size:0.9em;color:#475569;">soit ${fmt(total / 1000, 2)} m³ (Ext ${fmt(Vemul)} L / Tempo ${fmt(VtempoAff)} L / Entretien ${fmt(VemulEntretien)} L${vTapis > 0 ? ` / Tapis ${fmt(vTapis)} L` : ""})</span>`);
   }
   updateResume();
   ["oAjTempo", "oAjExt", "oMarge", "oAjTempoM3", "oAjExtM3", "oMargeM3",

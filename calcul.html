@@ -729,7 +729,7 @@ a.lif-btn {
           <div class="lif-field" id="blocDureeExtinction" style="display:none;">
             <label for="dureeExtinction">Durée d’extinction (min) :</label>
             <input id="dureeExtinction" type="number" min="1" step="1" placeholder="Automatique : 20 ou 40 min" disabled>
-            <small class="lif-help">Modifiable en mode « Autre SDIS (GDO) » et, pour les modes SDIS 27 / SDIS 33, uniquement si « Réfléchi (POI) » est sélectionné. Laissez vide pour conserver la durée automatique du scénario.</small>
+            <small class="lif-help" id="aideDureeExtinction">Laissez vide pour conserver la durée automatique du scénario.</small>
           </div>
 
           <div class="lif-grid-2">
@@ -1159,6 +1159,21 @@ champsNumeriques.forEach(champ => {
 
     if (!dureeDisponible) {
       $("dureeExtinction").value = "";
+    }
+
+    // Adapter le texte d'aide à la durée d'extinction selon le mode choisi.
+    const aideDureeExtinction = $("aideDureeExtinction");
+    if (aideDureeExtinction) {
+      if ($("modeSdis").value === "lock") {
+        aideDureeExtinction.textContent =
+          'En mode SDIS 27, la "Durée d’extinction" est visible uniquement si « Réfléchi (POI) » est sélectionné. Laissez vide pour conserver la durée automatique du scénario.';
+      } else if ($("modeSdis").value === "sdis33") {
+        aideDureeExtinction.textContent =
+          'En mode SDIS 33, la "Durée d’extinction" est visible uniquement si « Réfléchi (POI) » est sélectionné. Laissez vide pour conserver la durée automatique du scénario.';
+      } else {
+        aideDureeExtinction.textContent =
+          'En mode « Autre SDIS (GDO) », la "Durée d’extinction" est modifiable. Laissez vide pour conserver la durée automatique du scénario.';
+      }
     }
 
     const ids = [

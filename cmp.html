@@ -571,7 +571,68 @@ th, td {
 #liste .capacite-editable.capacite-superieure {
   color: #dc2626;
 }
-  </style>
+  
+/* ===== AIDE AU REMPLISSAGE - SAISIR LES ENGINS ===== */
+.cmp-title-help-btn{
+  margin-left:auto;
+  width:auto;
+  flex-shrink:0;
+  padding:7px 10px;
+  border:1px solid rgba(147,197,253,.55);
+  border-radius:8px;
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.2;
+  cursor:pointer;
+}
+.cmp-title-help-btn:hover{ background:rgba(255,255,255,.18); }
+.cmp-help-modal[hidden]{ display:none; }
+.cmp-help-modal{
+  position:fixed; inset:0; z-index:10000;
+  display:flex; align-items:center; justify-content:center;
+  padding:16px;
+}
+.cmp-help-modal-backdrop{
+  position:absolute; inset:0; background:rgba(15,23,42,.72);
+}
+.cmp-help-modal-content{
+  position:relative; z-index:1;
+  width:min(980px,96vw); max-height:94vh; overflow-y:auto;
+  background:#fff; border-radius:16px; padding:16px;
+  box-shadow:0 24px 60px rgba(0,0,0,.30);
+}
+.cmp-help-modal-header{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; margin-bottom:12px;
+}
+.cmp-help-modal-header h3{
+  margin:0; color:#172a46; font-size:18px; line-height:1.3;
+}
+.cmp-help-modal-close{
+  width:38px; height:38px; flex-shrink:0; padding:0;
+  border:0; border-radius:50%; background:#f1f5f9;
+  color:#0f172a; font-size:25px; line-height:1; cursor:pointer;
+}
+.cmp-help-modal-image{
+  display:block; width:100%; height:auto;
+  border-radius:10px; border:1px solid #e2e8f0;
+}
+.cmp-help-back{ width:100%; margin-top:14px; }
+.cmp-title-help-btn:focus-visible,
+.cmp-help-modal-close:focus-visible,
+.cmp-help-back:focus-visible{
+  outline:3px solid rgba(37,99,235,.35); outline-offset:2px;
+}
+@media (max-width:520px){
+  .cmp-title-help-btn{ font-size:11px; padding:6px 8px; }
+  .cmp-help-modal{ padding:8px; }
+  .cmp-help-modal-content{ width:100%; padding:10px; border-radius:12px; }
+  .cmp-help-modal-header h3{ font-size:15px; }
+}
+
+</style>
 </head>
 
 <body>
@@ -606,6 +667,14 @@ th, td {
   <span>Saisir les engins
     <span style="font-weight:400; color:#cbd5e1;">(arrivée échelonnée)</span>
   </span>
+  <button
+    type="button"
+    id="btnAideEngins"
+    class="cmp-title-help-btn"
+    aria-haspopup="dialog"
+    aria-controls="modalAideEngins">
+    ? Aide
+  </button>
 </h2>
 
     <div class="grid">
@@ -680,6 +749,47 @@ th, td {
       <u>Logique :</u> Temporisation tant que le débit présent (somme des débits des engins présents) est inférieur à Q ext théorique ou que le volume d'émulseur disponible est inférieur au volume d'émulseur nécessaire pour la phase d'extinction.<br>
       <u>Temporisation :</u> conso = débit de temporisation théorique × concentration.<br>
       <u>Extinction :</u> conso = débit retenu au démarrage de la phase d'extinction × concentration, pendant la durée d’extinction.
+    </div>
+  </div>
+
+
+  <!-- ===== FENÊTRE D'AIDE - SAISIR LES ENGINS ===== -->
+  <div
+    id="modalAideEngins"
+    class="cmp-help-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titreAideEngins"
+    hidden>
+
+    <div class="cmp-help-modal-backdrop" data-close-engins-help></div>
+
+    <div class="cmp-help-modal-content">
+      <div class="cmp-help-modal-header">
+        <h3 id="titreAideEngins">
+          Aide à l’utilisation – Saisir les engins
+        </h3>
+
+        <button
+          type="button"
+          class="cmp-help-modal-close"
+          data-close-engins-help
+          aria-label="Fermer l’aide">
+          ×
+        </button>
+      </div>
+
+      <img
+        src="aide-cmp-engins.png"
+        alt="Aide à l’utilisation de la saisie des engins et à l’ajustement du débit et de l’émulseur"
+        class="cmp-help-modal-image">
+
+      <button
+        type="button"
+        class="btn btn-primary cmp-help-back"
+        data-close-engins-help>
+        ← Retour à la saisie des engins
+      </button>
     </div>
   </div>
 
@@ -1952,6 +2062,44 @@ function legendItem(x0, y0, color, label, dash = null) {
 
   restaurerEngins();
   render();
+
+  // ===== AIDE PARTIE 5 - SAISIR LES ENGINS =====
+  const btnAideEngins = $("btnAideEngins");
+  const modalAideEngins = $("modalAideEngins");
+
+  function ouvrirAideEngins() {
+    if (!modalAideEngins) return;
+    modalAideEngins.hidden = false;
+    document.body.style.overflow = "hidden";
+    const boutonFermer = modalAideEngins.querySelector(".cmp-help-modal-close");
+    boutonFermer?.focus();
+  }
+
+  function fermerAideEngins() {
+    if (!modalAideEngins) return;
+    modalAideEngins.hidden = true;
+    document.body.style.overflow = "";
+    btnAideEngins?.focus();
+  }
+
+  btnAideEngins?.addEventListener("click", ouvrirAideEngins);
+
+  modalAideEngins
+    ?.querySelectorAll("[data-close-engins-help]")
+    .forEach(element => {
+      element.addEventListener("click", fermerAideEngins);
+    });
+
+  document.addEventListener("keydown", evenement => {
+    if (
+      evenement.key === "Escape" &&
+      modalAideEngins &&
+      !modalAideEngins.hidden
+    ) {
+      fermerAideEngins();
+    }
+  });
+
 })();
 </script>
   

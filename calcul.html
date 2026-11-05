@@ -729,7 +729,7 @@ a.lif-btn {
           <div class="lif-field" id="blocDureeExtinction" style="display:none;">
             <label for="dureeExtinction">Durée d’extinction (min) :</label>
             <input id="dureeExtinction" type="number" min="1" step="1" placeholder="Automatique : 20 ou 40 min" disabled>
-            <small class="lif-help">Modifiable en mode « Autre SDIS (GDO) ». Laissez vide pour conserver la durée automatique du scénario.</small>
+            <small class="lif-help">Modifiable en mode « Autre SDIS (GDO) » et, pour les modes SDIS 27 / SDIS 33, uniquement si « Réfléchi (POI) » est sélectionné. Laissez vide pour conserver la durée automatique du scénario.</small>
           </div>
 
           <div class="lif-grid-2">
@@ -1145,8 +1145,21 @@ champsNumeriques.forEach(champ => {
         $("fixedParams27").style.display =
       $("modeSdis").value === "lock" ? "block" : "none";
     $("customParams").style.display = custom ? "block" : "none";
-    $("blocDureeExtinction").style.display = custom ? "block" : "none";
-    $("dureeExtinction").disabled = !custom;
+
+    // Durée d'extinction :
+    // - toujours disponible en mode Autre SDIS (GDO) ;
+    // - disponible en SDIS 27 / SDIS 33 uniquement en mode Réfléchi (POI).
+    const dureeDisponible =
+      custom || $("reflexe").value === "reflechi";
+
+    $("blocDureeExtinction").style.display =
+      dureeDisponible ? "block" : "none";
+
+    $("dureeExtinction").disabled = !dureeDisponible;
+
+    if (!dureeDisponible) {
+      $("dureeExtinction").value = "";
+    }
 
     const ids = [
       "concentrationPct",
@@ -1227,8 +1240,14 @@ function compute() {
   const dureeAutomatique = type === "bac" ? 40 : S < 400 ? 20 : 40;
   $("dureeExtinction").placeholder = `Automatique : ${dureeAutomatique} min`;
   const dureeSaisie = $("dureeExtinction").value.trim();
-  const tExt = isCustomMode() && dureeSaisie !== ""
-    ? n(dureeSaisie) : dureeAutomatique;
+
+  const dureePersonnalisable =
+    isCustomMode() || ref === "reflechi";
+
+  const tExt =
+    dureePersonnalisable && dureeSaisie !== ""
+      ? n(dureeSaisie)
+      : dureeAutomatique;
   if (!Number.isInteger(tExt) || tExt <= 0) {
     invaliderCalcul("Renseignez une durée d’extinction en minutes entières, supérieure à zéro.");
     return;
@@ -1355,7 +1374,11 @@ initialiserHorairesTempo();
     updateLockUI();
   });
   $("typeFeu").addEventListener("change", () => { updateUI(); compute(); });
-  $("reflexe").addEventListener("change", () => { updateUI(); compute(); });
+  $("reflexe").addEventListener("change", () => {
+    updateUI();
+    updateLockUI();
+    compute();
+  });
 
   document.querySelectorAll("input,select").forEach(e => {
     e.addEventListener("input", compute);

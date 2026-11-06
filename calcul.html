@@ -425,7 +425,27 @@ a.lif-btn {
 /* Aide au remplissage : styles limités au titre et à la fenêtre d’aide. */
 .lif-debordement-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 12px; }
 .lif-debordement-heading .lif-panel-title { margin-bottom:0; }
-#btnAideRetention { width:auto; padding:6px 10px; font-size:12px; white-space:nowrap; }
+#btnAideRetention {
+  margin-left:auto;
+  width:auto;
+  flex-shrink:0;
+  padding:7px 10px;
+  border:1px solid rgba(147,197,253,.55);
+  border-radius:8px;
+  background:#172a46;
+  color:#fff;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.2;
+  white-space:nowrap;
+  cursor:pointer;
+}
+#btnAideRetention:hover { background:#233c61; }
+#btnAideRetention:focus-visible { outline:3px solid #93c5fd; outline-offset:3px; }
+@media (max-width:520px) {
+  #btnAideRetention { font-size:11px; padding:6px 8px; }
+}
 #aideRetention { box-sizing:border-box; width:calc(100% - 24px); max-width:1200px; max-height:90vh; max-height:90dvh; padding:14px; border:1px solid #cbd5e1; border-radius:14px; background:#fff; color:#111; overflow:auto; }
 #aideRetention::backdrop { background:rgba(11,18,32,.72); }
 #aideRetention .lif-aide-actions { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
@@ -688,7 +708,7 @@ Application : 10 min par heure pendant 4 h
         <div class="lif-panel lif-panel-muted" id="blocDebordement" style="display:none;margin-top:12px;">
           <div class="lif-debordement-heading">
             <div class="lif-panel-title">RISQUE DE DÉBORDEMENT - Feu de rétention</div>
-            <button type="button" id="btnAideRetention" class="lif-btn lif-btn-ghost" aria-haspopup="dialog" aria-controls="aideRetention">ⓘ Aide au remplissage</button>
+            <button type="button" id="btnAideRetention" class="lif-btn lif-btn-ghost" aria-haspopup="dialog" aria-controls="aideRetention">? Aide au remplissage</button>
           </div>
 
           <div class="lif-grid">

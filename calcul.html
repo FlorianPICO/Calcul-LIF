@@ -390,6 +390,8 @@ a.lif-btn {
 .lif-field input, .lif-field select { font: inherit; font-size: 16px; max-width: 100%; }
 .lif-feedback { margin: 10px 0; padding: 10px 12px; border-radius: 9px; background: #fff7ed; color: #7c2d12; font-size: 0.9rem; line-height: 1.5; }
 .lif-feedback[hidden] { display: none; }
+.lif-doctrine { margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: #fff3cd; border: 1px solid #ffeeba; color: #664d03; font-size: 0.95rem; line-height: 1.6; }
+.lif-doctrine[hidden] { display: none; }
 .lif-btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
 .lif-rates { margin: 10px 0; background: #fff; border: 1px solid #dce2eb; border-radius: 10px; overflow: hidden; color: #172033; }
 .lif-rates-header { background: #0b1220; color: #fff; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap; }
@@ -419,143 +421,7 @@ a.lif-btn {
   .resume-actions > * { width: 100%; }
   .lif-badges { grid-template-columns: 1fr; }
 }
-  
-/* ===== AIDE AU REMPLISSAGE - RISQUE DE DÉBORDEMENT ===== */
-.lif-debord-title-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:8px;
-}
-
-.lif-debord-title-row .lif-panel-title{
-  margin-bottom:0;
-}
-
-.lif-help-btn{
-  flex-shrink:0;
-  padding:6px 10px;
-  border:1px solid #93c5fd;
-  border-radius:8px;
-  background:#eff6ff;
-  color:#1d4ed8;
-  font-size:12px;
-  font-weight:800;
-  cursor:pointer;
-  line-height:1.2;
-}
-
-.lif-help-btn:hover{
-  background:#dbeafe;
-}
-
-.lif-help-btn:focus-visible,
-.lif-help-modal-close:focus-visible,
-.lif-help-back:focus-visible{
-  outline:3px solid rgba(37,99,235,.35);
-  outline-offset:2px;
-}
-
-.lif-help-modal[hidden]{
-  display:none;
-}
-
-.lif-help-modal{
-  position:fixed;
-  inset:0;
-  z-index:10000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:16px;
-}
-
-.lif-help-modal-backdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(15,23,42,.72);
-}
-
-.lif-help-modal-content{
-  position:relative;
-  z-index:1;
-  width:min(920px,96vw);
-  max-height:94vh;
-  overflow-y:auto;
-  background:#fff;
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 24px 60px rgba(0,0,0,.30);
-}
-
-.lif-help-modal-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:12px;
-}
-
-.lif-help-modal-header h3{
-  margin:0;
-  color:#172a46;
-  font-size:18px;
-  line-height:1.3;
-}
-
-.lif-help-modal-close{
-  width:38px;
-  height:38px;
-  flex-shrink:0;
-  border:0;
-  border-radius:50%;
-  background:#f1f5f9;
-  color:#0f172a;
-  font-size:25px;
-  line-height:1;
-  cursor:pointer;
-}
-
-.lif-help-modal-image{
-  display:block;
-  width:100%;
-  height:auto;
-  border-radius:10px;
-  border:1px solid #e2e8f0;
-}
-
-.lif-help-back{
-  width:100%;
-  margin-top:14px;
-}
-
-@media (max-width:520px){
-  .lif-debord-title-row{
-    align-items:flex-start;
-  }
-
-  .lif-help-btn{
-    font-size:11px;
-    padding:6px 8px;
-  }
-
-  .lif-help-modal{
-    padding:8px;
-  }
-
-  .lif-help-modal-content{
-    width:100%;
-    padding:10px;
-    border-radius:12px;
-  }
-
-  .lif-help-modal-header h3{
-    font-size:15px;
-  }
-}
-
-</style>
+  </style>
 </head>
 
 <body>
@@ -689,7 +555,7 @@ a.lif-btn {
           <div class="lif-field">
             <label for="typeFeu">Type de feu / Scénario :</label>
             <select id="typeFeu">
-              <option value="nappe">Feu de nappe</option>
+              <option value="nappe">Feu de nappe (non contenu)</option>
               <option value="bac">Feu de bac (réservoir)</option>
               <option value="retention">Feu de rétention</option>
             </select>
@@ -729,7 +595,7 @@ a.lif-btn {
           <div class="lif-field" id="blocDureeExtinction" style="display:none;">
             <label for="dureeExtinction">Durée d’extinction (min) :</label>
             <input id="dureeExtinction" type="number" min="1" step="1" placeholder="Automatique : 20 ou 40 min" disabled>
-            <small class="lif-help" id="aideDureeExtinction">Laissez vide pour conserver la durée automatique du scénario.</small>
+            <small class="lif-help">Modifiable en mode « Autre SDIS (GDO) ». Laissez vide pour conserver la durée automatique du scénario.</small>
           </div>
 
           <div class="lif-grid-2">
@@ -809,17 +675,7 @@ Application : 10 min par heure pendant 4 h
         </div>
 
         <div class="lif-panel lif-panel-muted" id="blocDebordement" style="display:none;margin-top:12px;">
-          <div class="lif-debord-title-row">
-  <div class="lif-panel-title">RISQUE DE DÉBORDEMENT - Feu de bac / rétention</div>
-  <button
-    type="button"
-    id="btnAideDebordement"
-    class="lif-help-btn"
-    aria-haspopup="dialog"
-    aria-controls="modalAideDebordement">
-    ? Aide au remplissage
-  </button>
-</div>
+          <div class="lif-panel-title">RISQUE DE DÉBORDEMENT - Feu de bac / rétention</div>
 
           <div class="lif-grid">
             <div class="lif-field">
@@ -861,47 +717,6 @@ Application : 10 min par heure pendant 4 h
           <div class="lif-debord" id="oDebord">—</div>
         </div>
 
-
-        <!-- ===== FENÊTRE D'AIDE AU REMPLISSAGE ===== -->
-        <div
-          id="modalAideDebordement"
-          class="lif-help-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="titreAideDebordement"
-          hidden>
-
-          <div class="lif-help-modal-backdrop" data-close-help></div>
-
-          <div class="lif-help-modal-content">
-            <div class="lif-help-modal-header">
-              <h3 id="titreAideDebordement">
-                Aide au remplissage – Risque de débordement
-              </h3>
-
-              <button
-                type="button"
-                class="lif-help-modal-close"
-                data-close-help
-                aria-label="Fermer l’aide">
-                ×
-              </button>
-            </div>
-
-            <img
-              src="aide-debordement-bac.png"
-              alt="Schéma explicatif des données à renseigner pour le risque de débordement"
-              class="lif-help-modal-image">
-
-            <button
-              type="button"
-              class="lif-btn lif-btn-primary lif-help-back"
-              data-close-help>
-              ← Retour au calcul
-            </button>
-          </div>
-        </div>
-
         <div class="lif-panel lif-panel-muted" id="blocTapisPreventif" style="display:none;margin-top:12px;">
           <div class="lif-panel-title">TAPIS PRÉVENTIF</div>
           <div class="lif-grid" style="margin-top:10px;">
@@ -932,6 +747,12 @@ Application : 10 min par heure pendant 4 h
 <small class="lif-conversion"><span id="oDentretienM3h">—</span> m³/h</small></div>
         </div>
       </section>
+
+      <aside id="rappelDoctrineNappe" class="lif-doctrine" role="note" hidden>
+        <strong>Rappel doctrinal :</strong> privilégier une <strong>projection de mousse continue et maîtrisée</strong> plutôt que la recherche d’un débit élevé.<br>
+        Un débit excessif peut provoquer <strong>l’étalement du liquide inflammable</strong>, augmenter la <strong>surface en feu</strong> et aggraver la situation.<br>
+        Le COS doit donc rechercher avant tout la <strong>continuité de l’application</strong> et garantir une <strong>autonomie suffisante en émulseur</strong>.
+      </aside>
 
       <!-- ================== RÉSUMÉ COMMANDEMENT ================== -->
       <section class="lif-card" id="blocResumeCmd">
@@ -1145,36 +966,8 @@ champsNumeriques.forEach(champ => {
         $("fixedParams27").style.display =
       $("modeSdis").value === "lock" ? "block" : "none";
     $("customParams").style.display = custom ? "block" : "none";
-
-    // Durée d'extinction :
-    // - toujours disponible en mode Autre SDIS (GDO) ;
-    // - disponible en SDIS 27 / SDIS 33 uniquement en mode Réfléchi (POI).
-    const dureeDisponible =
-      custom || $("reflexe").value === "reflechi";
-
-    $("blocDureeExtinction").style.display =
-      dureeDisponible ? "block" : "none";
-
-    $("dureeExtinction").disabled = !dureeDisponible;
-
-    if (!dureeDisponible) {
-      $("dureeExtinction").value = "";
-    }
-
-    // Adapter le texte d'aide à la durée d'extinction selon le mode choisi.
-    const aideDureeExtinction = $("aideDureeExtinction");
-    if (aideDureeExtinction) {
-      if ($("modeSdis").value === "lock") {
-        aideDureeExtinction.textContent =
-          'En mode SDIS 27, la "Durée d’extinction" est visible uniquement si « Réfléchi (POI) » est sélectionné. Laissez vide pour conserver la durée automatique du scénario.';
-      } else if ($("modeSdis").value === "sdis33") {
-        aideDureeExtinction.textContent =
-          'En mode SDIS 33, la "Durée d’extinction" est visible uniquement si « Réfléchi (POI) » est sélectionné. Laissez vide pour conserver la durée automatique du scénario.';
-      } else {
-        aideDureeExtinction.textContent =
-          'En mode « Autre SDIS (GDO) », la "Durée d’extinction" est modifiable. Laissez vide pour conserver la durée automatique du scénario.';
-      }
-    }
+    $("blocDureeExtinction").style.display = custom ? "block" : "none";
+    $("dureeExtinction").disabled = !custom;
 
     const ids = [
       "concentrationPct",
@@ -1195,7 +988,7 @@ champsNumeriques.forEach(champ => {
   }
 
   function updateUI() {
-    const avecDebordement = ["bac", "retention"].includes($("typeFeu").value);
+    const avecDebordement = $("typeFeu").value === "retention";
     const isReflechi = $("reflexe").value === "reflechi";
 
     $("blocDebordement").style.display = avecDebordement ? "block" : "none";
@@ -1209,6 +1002,7 @@ if (!avecDebordement) $("surfaceCuvette").value = "";
   }
 
 function compute() {
+  $("rappelDoctrineNappe").hidden = $("typeFeu").value !== "nappe";
   resultatsCourants = null;
   $("btnCmp").setAttribute("aria-disabled", "true");
   afficherMessage();
@@ -1252,17 +1046,12 @@ function compute() {
   if (finRenseignee && !Number.isFinite(tTempoMin)) {
     invaliderCalcul("Renseignez une heure de début valide pour calculer la temporisation."); return;
   }
-  const dureeAutomatique = type === "bac" ? 40 : S < 400 ? 20 : 40;
+  const dureeAutomatique = type === "bac" || (mode === "custom" && type === "nappe")
+    ? 40 : S < 400 ? 20 : 40;
   $("dureeExtinction").placeholder = `Automatique : ${dureeAutomatique} min`;
   const dureeSaisie = $("dureeExtinction").value.trim();
-
-  const dureePersonnalisable =
-    isCustomMode() || ref === "reflechi";
-
-  const tExt =
-    dureePersonnalisable && dureeSaisie !== ""
-      ? n(dureeSaisie)
-      : dureeAutomatique;
+  const tExt = isCustomMode() && dureeSaisie !== ""
+    ? n(dureeSaisie) : dureeAutomatique;
   if (!Number.isInteger(tExt) || tExt <= 0) {
     invaliderCalcul("Renseignez une durée d’extinction en minutes entières, supérieure à zéro.");
     return;
@@ -1311,7 +1100,7 @@ function compute() {
   $("oDebord").style.background = "#fff";
   $("oDebord").style.borderColor = "#ddd";
   $("oDebord").style.color = "#111";
-  if (!["bac", "retention"].includes(type)) return;
+  if (type !== "retention") return;
 
   const debordIds = ["vPresent", "vTotal", "tReel"];
   const valeurs = debordIds.map(id => n($(id).value));
@@ -1389,11 +1178,7 @@ initialiserHorairesTempo();
     updateLockUI();
   });
   $("typeFeu").addEventListener("change", () => { updateUI(); compute(); });
-  $("reflexe").addEventListener("change", () => {
-    updateUI();
-    updateLockUI();
-    compute();
-  });
+  $("reflexe").addEventListener("change", () => { updateUI(); compute(); });
 
   document.querySelectorAll("input,select").forEach(e => {
     e.addEventListener("input", compute);
@@ -1512,55 +1297,6 @@ btnCmp.addEventListener("click", (e) => {
   // Le bouton Réinitialiser enregistre aussi les champs remis à zéro.
   // Son gestionnaire resetAll, déjà présent plus haut, est exécuté avant.
   $("btnReset").addEventListener("click", sauvegarderCalcul);
-
-
-// ================== AIDE RISQUE DE DÉBORDEMENT ==================
-const btnAideDebordement = $("btnAideDebordement");
-const modalAideDebordement = $("modalAideDebordement");
-
-function ouvrirAideDebordement() {
-  if (!modalAideDebordement) return;
-
-  modalAideDebordement.hidden = false;
-  document.body.style.overflow = "hidden";
-
-  const boutonFermer =
-    modalAideDebordement.querySelector(".lif-help-modal-close");
-
-  boutonFermer?.focus();
-}
-
-function fermerAideDebordement() {
-  if (!modalAideDebordement) return;
-
-  modalAideDebordement.hidden = true;
-  document.body.style.overflow = "";
-  btnAideDebordement?.focus();
-}
-
-btnAideDebordement?.addEventListener(
-  "click",
-  ouvrirAideDebordement
-);
-
-modalAideDebordement
-  ?.querySelectorAll("[data-close-help]")
-  .forEach(element => {
-    element.addEventListener(
-      "click",
-      fermerAideDebordement
-    );
-  });
-
-document.addEventListener("keydown", event => {
-  if (
-    event.key === "Escape" &&
-    modalAideDebordement &&
-    !modalAideDebordement.hidden
-  ) {
-    fermerAideDebordement();
-  }
-});
 
 })();
 </script>

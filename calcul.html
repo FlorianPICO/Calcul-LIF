@@ -491,9 +491,10 @@ a.lif-btn {
               <option value="lock" selected>SDIS 27 (taux d'application verrouillés et taux de concentration fixé à 3%)</option>
               <option value="sdis33">SDIS 33 (taux d’application verrouillés et taux de concentration fixée à 3 %)</option>
               <option value="custom">Autre SDIS (GDO)</option>
+              <option value="petroineos">PETROINEOS</option>
             </select>
             <small class="lif-help">
-              Choisissez SDIS 27 ou SDIS 33 pour appliquer les paramètres départementaux. En mode « Autre SDIS (GDO) », les taux et la concentration sont personnalisables.
+              Choisissez SDIS 27, SDIS 33 ou PETROINEOS pour appliquer leurs paramètres spécifiques. En mode « Autre SDIS (GDO) », les taux et la concentration sont personnalisables.
             </small>
           </div>
 
@@ -533,6 +534,26 @@ a.lif-btn {
       </tbody>
       <tbody>
         <tr><th rowspan="2" scope="rowgroup">Bac (réservoir)</th><td>Direct</td><td class="lif-rates-number">10</td><td class="lif-rates-number">20</td></tr>
+        <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">8</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+<div id="fixedParamsPetroineos" style="display:none;">
+  <section class="lif-rates" aria-labelledby="ratesTitlePetroineos">
+    <div class="lif-rates-header">
+      <h3 id="ratesTitlePetroineos" class="lif-rates-title">Taux d’application</h3>
+      <span class="lif-rates-info">PETROINEOS · L/min/m² · Concentration 3 %</span>
+    </div>
+    <table class="lif-ref-table" aria-label="Taux réflexes PETROINEOS par scénario, attaque et produit">
+      <colgroup><col class="lif-rates-scenario"><col class="lif-rates-attack"><col class="lif-rates-value"><col class="lif-rates-value"></colgroup>
+      <thead><tr><th scope="col">Scénario</th><th scope="col">Attaque</th><th scope="col">Non miscible</th><th scope="col">Miscible</th></tr></thead>
+      <tbody>
+        <tr><th rowspan="2" scope="rowgroup">Nappe / rétention</th><td>Direct</td><td class="lif-rates-number">7</td><td class="lif-rates-number">15</td></tr>
+        <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">8</td></tr>
+      </tbody>
+      <tbody>
+        <tr><th rowspan="2" scope="rowgroup">Bac (réservoir)</th><td>Direct</td><td class="lif-rates-number">7</td><td class="lif-rates-number">15</td></tr>
         <tr><td>Indirect</td><td class="lif-rates-number">5</td><td class="lif-rates-number">8</td></tr>
       </tbody>
     </table>
@@ -1004,8 +1025,18 @@ champsNumeriques.forEach(champ => {
     return taux[type]?.[attaque]?.[produit] ?? NaN;
   }
 
+  // Même grille PETROINEOS pour nappe, bac et rétention.
+  function tauxPetroineos(attaque, produit) {
+    const taux = {
+      direct: { non_miscible: 7, miscible: 15 },
+      indirect: { non_miscible: 5, miscible: 8 }
+    };
+    return taux[attaque]?.[produit] ?? NaN;
+  }
+
   function updateLockUI() {
     const custom = isCustomMode();
+    $("fixedParamsPetroineos").style.display = $("modeSdis").value === "petroineos" ? "block" : "none";
     $("fixedParams33").style.display = $("modeSdis").value === "sdis33" ? "block" : "none";
         $("fixedParams27").style.display =
       $("modeSdis").value === "lock" ? "block" : "none";
@@ -1060,7 +1091,7 @@ function compute() {
   const atk = $("attaque").value;
   const prod = $("produit").value;
   const ref = $("reflexe").value;
-  if (!["lock", "sdis33", "custom"].includes(mode) ||
+  if (!["lock", "sdis33", "custom", "petroineos"].includes(mode) ||
       !["nappe", "bac", "retention"].includes(type) || !["direct", "indirect"].includes(atk) ||
       !["miscible", "non_miscible"].includes(prod) || !["reflexe", "reflechi"].includes(ref)) {
     invaliderCalcul("Vérifiez les paramètres du scénario."); return;
@@ -1077,6 +1108,7 @@ function compute() {
   let Tex;
   if (ref === "reflechi") Tex = n($("texPoi").value);
   else if (mode === "sdis33") Tex = tauxSdis33(type === "retention" ? "nappe" : type, atk, prod);
+  else if (mode === "petroineos") Tex = tauxPetroineos(atk, prod);
   else {
     const [indNon, dirNon, indMisc, dirMisc] = taux;
     Tex = atk === "indirect" ? (prod === "miscible" ? indMisc : indNon)
@@ -1124,7 +1156,8 @@ function compute() {
   afficher("oVtempo", VtempoAff); afficher("oVtempoM3", VtempoAff / 1000, 2);
   resultatsCourants = { mode, Qext, Qtempo, tExt, concPct, besoinExt: Vemul,
     Qentretien, VemulEntretien, VemulTempo: VtempoAff };
-  $("btnCmp").setAttribute("aria-disabled", "false");
+  $("btnCmp").setAttribute("aria-disabled", mode === "petroineos" ? "true" : "false");
+  $("btnCmp").title = mode === "petroineos" ? "CMP PETROINEOS : catalogue des moyens à définir." : "";
 
   function updateResume(vTapis = 0) {
     const total = Vemul + VtempoAff + VemulEntretien + vTapis;
@@ -1251,6 +1284,10 @@ btnCmp.addEventListener("click", (e) => {
   compute();
   if (!resultatsCourants) {
     afficherMessage("Complétez ou corrigez le calcul avant d’ouvrir la CMP.");
+    return;
+  }
+  if (resultatsCourants.mode === "petroineos") {
+    afficherMessage("Les calculs PETROINEOS sont disponibles. Sa CMP reste à configurer avec le catalogue des moyens.");
     return;
   }
   const payload = { ...resultatsCourants, savedAt: Date.now() };

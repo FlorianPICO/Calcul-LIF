@@ -421,6 +421,17 @@ a.lif-btn {
   .resume-actions > * { width: 100%; }
   .lif-badges { grid-template-columns: 1fr; }
 }
+
+/* Aide au remplissage : styles limités au titre et à la fenêtre d’aide. */
+.lif-debordement-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 12px; }
+.lif-debordement-heading .lif-panel-title { margin-bottom:0; }
+#btnAideRetention { width:auto; padding:6px 10px; font-size:12px; white-space:nowrap; }
+#aideRetention { box-sizing:border-box; width:calc(100% - 24px); max-width:1200px; max-height:90vh; max-height:90dvh; padding:14px; border:1px solid #cbd5e1; border-radius:14px; background:#fff; color:#111; overflow:auto; }
+#aideRetention::backdrop { background:rgba(11,18,32,.72); }
+#aideRetention .lif-aide-actions { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+#aideRetention .lif-aide-actions button { width:auto; }
+#aideRetention .lif-aide-image { width:100%; height:auto; display:block; }
+#aideRetention .lif-aide-close { font-size:20px; padding:5px 12px; }
   </style>
 </head>
 
@@ -675,7 +686,10 @@ Application : 10 min par heure pendant 4 h
         </div>
 
         <div class="lif-panel lif-panel-muted" id="blocDebordement" style="display:none;margin-top:12px;">
-          <div class="lif-panel-title">RISQUE DE DÉBORDEMENT - Feu de bac / rétention</div>
+          <div class="lif-debordement-heading">
+            <div class="lif-panel-title">RISQUE DE DÉBORDEMENT - Feu de rétention</div>
+            <button type="button" id="btnAideRetention" class="lif-btn lif-btn-ghost" aria-haspopup="dialog" aria-controls="aideRetention">ⓘ Aide au remplissage</button>
+          </div>
 
           <div class="lif-grid">
             <div class="lif-field">
@@ -749,7 +763,8 @@ Application : 10 min par heure pendant 4 h
       </section>
 
       <aside id="rappelDoctrineNappe" class="lif-doctrine" role="note" hidden>
-        <strong>Rappel doctrinal :</strong> privilégier une <strong>projection de mousse continue et maîtrisée</strong> plutôt que la recherche d’un débit élevé.<br>
+        <span aria-hidden="true">⚠️</span> <strong>Rappel doctrinal :</strong><br>
+        Privilégier une <strong>projection de mousse continue et maîtrisée</strong> plutôt que la recherche d’un débit élevé.<br>
         Un débit excessif peut provoquer <strong>l’étalement du liquide inflammable</strong>, augmenter la <strong>surface en feu</strong> et aggraver la situation.<br>
         Le COS doit donc rechercher avant tout la <strong>continuité de l’application</strong> et garantir une <strong>autonomie suffisante en émulseur</strong>.
       </aside>
@@ -794,6 +809,15 @@ Application : 10 min par heure pendant 4 h
     </div>
   </div>
 </section>
+
+
+<dialog id="aideRetention" aria-label="Aide au remplissage du risque de débordement — Feu de rétention">
+  <div class="lif-aide-actions">
+    <button type="button" id="retourAideRetention" class="lif-btn lif-btn-ghost">← Retour au calcul</button>
+    <button type="button" id="fermerAideRetention" class="lif-btn lif-btn-ghost lif-aide-close" aria-label="Fermer l’aide">×</button>
+  </div>
+  <img class="lif-aide-image" src="aide-debordement-retention.png" alt="Risque de débordement — Feu de rétention : volume déjà présent dans la cuvette avant notre arrivée en litres, capacité totale de la cuvette en litres et durée réelle de temporisation en minutes. Consigne au COS : si fuite alimentée, alors extinction impossible. Rester en réduction de flux thermique.">
+</dialog>
 
 <script>
 /*
@@ -1299,6 +1323,27 @@ btnCmp.addEventListener("click", (e) => {
   $("btnReset").addEventListener("click", sauvegarderCalcul);
 
 })();
+
+// L’aide ne modifie pas les valeurs ni les règles de calcul.
+(() => {
+  const bouton = document.getElementById("btnAideRetention");
+  const aide = document.getElementById("aideRetention");
+  const scenario = document.getElementById("typeFeu");
+  bouton.addEventListener("click", () => {
+    if (scenario.value === "retention" && !aide.open) aide.showModal();
+  });
+  const fermer = () => { if (aide.open) aide.close(); };
+  document.getElementById("retourAideRetention").addEventListener("click", fermer);
+  document.getElementById("fermerAideRetention").addEventListener("click", fermer);
+  aide.addEventListener("click", evenement => {
+    if (evenement.target !== aide) return;
+    const rect = aide.getBoundingClientRect();
+    if (evenement.clientX < rect.left || evenement.clientX > rect.right ||
+        evenement.clientY < rect.top || evenement.clientY > rect.bottom) fermer();
+  });
+  scenario.addEventListener("change", () => { if (scenario.value !== "retention") fermer(); });
+})();
+
 </script>
  
 </body>

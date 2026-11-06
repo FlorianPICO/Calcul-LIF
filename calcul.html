@@ -1156,8 +1156,8 @@ function compute() {
   afficher("oVtempo", VtempoAff); afficher("oVtempoM3", VtempoAff / 1000, 2);
   resultatsCourants = { mode, Qext, Qtempo, tExt, concPct, besoinExt: Vemul,
     Qentretien, VemulEntretien, VemulTempo: VtempoAff };
-  $("btnCmp").setAttribute("aria-disabled", mode === "petroineos" ? "true" : "false");
-  $("btnCmp").title = mode === "petroineos" ? "CMP PETROINEOS : catalogue des moyens à définir." : "";
+  $("btnCmp").setAttribute("aria-disabled", "false");
+  $("btnCmp").title = "";
 
   function updateResume(vTapis = 0) {
     const total = Vemul + VtempoAff + VemulEntretien + vTapis;
@@ -1286,10 +1286,6 @@ btnCmp.addEventListener("click", (e) => {
     afficherMessage("Complétez ou corrigez le calcul avant d’ouvrir la CMP.");
     return;
   }
-  if (resultatsCourants.mode === "petroineos") {
-    afficherMessage("Les calculs PETROINEOS sont disponibles. Sa CMP reste à configurer avec le catalogue des moyens.");
-    return;
-  }
   const payload = { ...resultatsCourants, savedAt: Date.now() };
   try {
     localStorage.setItem("LIF_CMP_INPUTS", JSON.stringify(payload));
@@ -1297,7 +1293,8 @@ btnCmp.addEventListener("click", (e) => {
     afficherMessage("Le navigateur ne permet pas d’enregistrer les paramètres. Vérifiez l’autorisation du stockage avant d’ouvrir la CMP.");
     return;
   }
-  const target = payload.mode === "sdis33" ? "cmp_sdis33.html"
+  const target = payload.mode === "petroineos" ? "cmp_petroineos.html"
+    : payload.mode === "sdis33" ? "cmp_sdis33.html"
     : payload.mode === "custom" ? "cmp_autre_sdis.html" : "cmp.html";
   sauvegarderCalcul();
   window.location.href = target;

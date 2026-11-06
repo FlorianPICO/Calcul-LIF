@@ -647,7 +647,7 @@ a.lif-btn {
           <div class="lif-field" id="blocDureeExtinction" style="display:none;">
             <label for="dureeExtinction">Durée d’extinction (min) :</label>
             <input id="dureeExtinction" type="number" min="1" step="1" placeholder="Automatique : 20 ou 40 min" disabled>
-            <small class="lif-help">Modifiable en mode « Autre SDIS (GDO) ». Laissez vide pour conserver la durée automatique du scénario.</small>
+            <small class="lif-help">Modifiable en modes « Autre SDIS (GDO) » et « PETROINEOS ». Laissez vide pour conserver la durée automatique du scénario.</small>
           </div>
 
           <div class="lif-grid-2">
@@ -1034,6 +1034,10 @@ champsNumeriques.forEach(champ => {
     return taux[attaque]?.[produit] ?? NaN;
   }
 
+  function dureeExtinctionModifiable() {
+    return ["custom", "petroineos"].includes($("modeSdis").value);
+  }
+
   function updateLockUI() {
     const custom = isCustomMode();
     $("fixedParamsPetroineos").style.display = $("modeSdis").value === "petroineos" ? "block" : "none";
@@ -1041,8 +1045,9 @@ champsNumeriques.forEach(champ => {
         $("fixedParams27").style.display =
       $("modeSdis").value === "lock" ? "block" : "none";
     $("customParams").style.display = custom ? "block" : "none";
-    $("blocDureeExtinction").style.display = custom ? "block" : "none";
-    $("dureeExtinction").disabled = !custom;
+    const dureeModifiable = dureeExtinctionModifiable();
+    $("blocDureeExtinction").style.display = dureeModifiable ? "block" : "none";
+    $("dureeExtinction").disabled = !dureeModifiable;
 
     const ids = [
       "concentrationPct",
@@ -1126,7 +1131,7 @@ function compute() {
     ? 40 : S < 400 ? 20 : 40;
   $("dureeExtinction").placeholder = `Automatique : ${dureeAutomatique} min`;
   const dureeSaisie = $("dureeExtinction").value.trim();
-  const tExt = isCustomMode() && dureeSaisie !== ""
+  const tExt = dureeExtinctionModifiable() && dureeSaisie !== ""
     ? n(dureeSaisie) : dureeAutomatique;
   if (!Number.isInteger(tExt) || tExt <= 0) {
     invaliderCalcul("Renseignez une durée d’extinction en minutes entières, supérieure à zéro.");

@@ -634,9 +634,44 @@ th, td {
 
 /* Établissement : un seul engin par ligne. */
     .grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); }
-    .btn-etabli { background:#0f172a; color:#fff; padding:8px 10px; font-size:0.85rem; }
+    .etabli-cell, .etabli-heading { text-align:center; }
+    .etabli-control {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:3px;
+      padding:6px 4px;
+    }
+    .btn.btn-etabli {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:auto;
+      max-width:100%;
+      min-height:30px;
+      margin:0;
+      padding:6px 12px;
+      border-radius:7px;
+      background:#0f172a;
+      color:#fff;
+      font-size:0.78rem;
+      font-weight:800;
+      line-height:1.2;
+      white-space:nowrap;
+    }
     .btn-etabli:disabled { background:#166534; opacity:1; cursor:default; }
-    .etat-etabli { display:block; font-size:0.75rem; color:#166534; margin-top:4px; }
+    .btn-etabli:focus-visible { outline:3px solid #93c5fd; outline-offset:2px; }
+    .etat-etabli {
+      display:block;
+      margin:0;
+      font-size:0.7rem;
+      line-height:1.2;
+      font-variant-numeric:tabular-nums;
+      color:#166534;
+      text-align:center;
+      white-space:nowrap;
+    }
     @media (max-width:768px) {
       .grid { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); }
       .grid .cell-add { grid-column:1 / -1; display:block; }
@@ -741,7 +776,7 @@ th, td {
         <tr>
           <th>Type</th>
           <th>Heure</th>
-          <th>Établissement</th>
+          <th class="etabli-heading">Établissement</th>
           <th>Débit</th>
           <th>Émulseur</th>
           <th></th>
@@ -1210,13 +1245,15 @@ function fmt(valeur) {
 tr.innerHTML = `
   <td data-label="Type"><b>${r.type === "INDUSTRIEL" ? "Moyens industriels" : ENGINS[r.type].label}</b></td>
   <td data-label="Arrivée">${r.atStr}</td>
- <td data-label="Établissement">
+ <td data-label="Établissement" class="etabli-cell">
+   <div class="etabli-control">
    <button type="button" class="btn btn-etabli" data-etabli="${idx}"
      ${estEtabli(r) ? 'disabled' : ''}
      aria-label="Confirmer l’établissement de l’engin de la ligne ${idx + 1}">
      ${estEtabli(r) ? '✓ Établi' : 'Établi'}
    </button>
    ${estEtabli(r) ? `<span class="etat-etabli">à ${heureEtablissement(r)}</span>` : ''}
+   </div>
  </td>
 <td data-label="Débit (L/min)">
   <input

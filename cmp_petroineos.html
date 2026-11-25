@@ -859,7 +859,7 @@ th, td {
   Le volume émulseur total réel, affiché après les valeurs retenues,
   additionne uniquement les consommations effectivement simulées.
   <br><br>
-  Les pointillés noirs représentent les débits attendus à l’heure d’arrivée prévue.
+  La courbe noire est unique : ses paliers sont en pointillés tant que leur débit dépend d’un engin non établi, et en trait plein lorsque ce débit est confirmé.
   Cliquez sur « Établi » lorsque l’engin est prêt à projeter : l’heure du clic
   devient son heure réelle de mise en œuvre. Son débit apparaît en trait plein
   et son stock devient disponible. Avant ce clic, cet engin ne consomme pas d’émulseur.
@@ -1828,37 +1828,35 @@ ctx.restore();
 
       ctx.restore();
     }
-    // NOIR : prévision en pointillés, uniquement là où elle dépasse le débit établi.
+    // Une seule courbe noire : débit cumulé prévu, confirmé en trait plein.
+    // Dès qu’une partie du débit dépend d’un engin non établi, le palier
+    // est prévisionnel. Aucun second palier noir n’est tracé en dessous.
     ctx.strokeStyle = "#111";
     ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
+    const debitTrace = data.flowPrevisionSerie;
+    const estPrevisionnel = t =>
+      debitTrace[t] > data.flowAvailSerie[t] + 0.000001;
+    let pointilles = estPrevisionnel(0);
+    ctx.setLineDash(pointilles ? [5, 5] : []);
     ctx.beginPath();
-    for (let t = 0; t < HORIZON_MIN; t++) {
-      if (data.flowPrevisionSerie[t] <= data.flowAvailSerie[t]) continue;
-      if (t > 0 && data.flowPrevisionSerie[t - 1] !== data.flowPrevisionSerie[t]) {
-        ctx.moveTo(x(t), yFlow(data.flowPrevisionSerie[t - 1]));
-        ctx.lineTo(x(t), yFlow(data.flowPrevisionSerie[t]));
+    ctx.moveTo(x(0), yFlow(debitTrace[0]));
+    for (let t = 1; t <= HORIZON_MIN; t++) {
+      const precedent = debitTrace[t - 1];
+      const courant = debitTrace[t];
+      const xx = x(t);
+      ctx.lineTo(xx, yFlow(precedent));
+      const nouveauStyle = estPrevisionnel(t);
+      if (nouveauStyle !== pointilles) {
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(xx, yFlow(precedent));
+        pointilles = nouveauStyle;
+        ctx.setLineDash(pointilles ? [5, 5] : []);
       }
-      ctx.moveTo(x(t), yFlow(data.flowPrevisionSerie[t]));
-      ctx.lineTo(x(t + 1), yFlow(data.flowPrevisionSerie[t]));
-      ctx.lineTo(x(t + 1), yFlow(data.flowPrevisionSerie[t + 1]));
+      if (courant !== precedent) ctx.lineTo(xx, yFlow(courant));
     }
     ctx.stroke();
     ctx.setLineDash([]);
-
-    // NOIR : débit des seuls moyens établis, en trait plein.
-    ctx.strokeStyle = "#111";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x(0), yFlow(data.flowAvailSerie[0] || 0));
-    for (let t = 1; t <= HORIZON_MIN; t++) {
-      const prev = data.flowAvailSerie[t - 1] || 0;
-      const cur = data.flowAvailSerie[t] || 0;
-      const xx = x(t);
-      ctx.lineTo(xx, yFlow(prev));
-      if (cur !== prev) ctx.lineTo(xx, yFlow(cur));
-    }
-    ctx.stroke();
 
     // ROUGE : stock émulseur (escaliers)
     ctx.strokeStyle = "#ef4444";

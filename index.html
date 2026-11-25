@@ -6,207 +6,311 @@
   <meta name="description" content="Outil de calcul opérationnel pour feux de liquides inflammables (LIF). Aide à la décision pour la sécurité incendie.">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  
-<style>
-  body {
-    margin: 0;
-    font-family: system-ui, Arial, sans-serif;
-    background: #f5f7fa;
-    color: #111;
-    line-height: 1.6;
-  }
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: #f5f7fa;
+      color: #111;
+      line-height: 1.6;
+    }
 
-  /* ===== HEADER RESPONSIVE ===== */
-  header {
-    background: #0b1220;
-    color: white;
-    padding: 42px 16px;
-    text-align: center;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-  }
-
-  header h1 {
-    margin: 0;
-    font-size: clamp(1.4rem, 5vw, 2.2rem);
-    line-height: 1.2;
-    max-width: 28ch;
-  }
-.hero-title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  line-height: 1.2;
-  text-align: center;
-}
-
-.hero-title span {
-  display: block;
-  white-space: nowrap;
-}
-
-  header p {
-    opacity: 0.9;
-    font-size: clamp(0.95rem, 3.2vw, 1.1rem);
-    margin: 0;
-    line-height: 1.25;
-  }
-
-  /* ===== CONTENU ===== */
-  section {
-    max-width: 900px;
-    margin: auto;
-    padding: 30px 20px;
-  }
-
-  .card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-  }
-
-  .btn {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 14px 20px;
-    background: #2563eb;
-    color: white;
-    border-radius: 10px;
-    font-weight: 700;
-    text-decoration: none;
-  }
-
-  .warning {
-    background: #fff3cd;
-    border: 1px solid #ffeeba;
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 0.95em;
-  }
-
-  footer {
-    text-align: center;
-    font-size: 12px;
-    color: #555;
-    padding: 20px;
-  }
-
-  /* ===== LOGO RESPONSIVE ===== */
-  .logo {
-    display: block;
-    height: auto;
-    width: min(150px, 45vw);
-    max-height: 80px;
-    object-fit: contain;
-    margin: 0;
-  }
-
-.header-sub{
-  margin: 0;
-  display: flex;
-  flex-direction: column;   /* ✅ force 2 lignes */
-  gap: 18px;                 /* ✅ espace entre les lignes */
-  text-align: center;
-  line-height: 1.25;
-}
-  
-.header-mail{
-  color: #fff;           /* blanc lisible sur fond sombre */
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.header-mail:hover{
-  text-decoration: underline;
- opacity: 0.9;
-}
-  
-  /* ===== AJUSTEMENTS MOBILE ===== */
-  @media (max-width: 420px) {
+    /* ===== HEADER RESPONSIVE ===== */
     header {
-      padding: 34px 14px;
+      background: #0b1220;
+      color: white;
+      padding: 42px 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
     }
     header h1 {
-      max-width: 20ch;
+      margin: 0;
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      line-height: 1.2;
+      max-width: 28ch;
     }
+    .hero-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      line-height: 1.2;
+      text-align: center;
+    }
+    .hero-title span { display: block; white-space: nowrap; }
+    header p {
+      opacity: 0.9;
+      font-size: clamp(0.95rem, 3.2vw, 1.1rem);
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    /* ===== CONTENU ===== */
+    section { max-width: 900px; margin: auto; padding: 30px 20px; }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 14px 20px;
+      background: #2563eb;
+      color: white;
+      border-radius: 10px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .warning {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 0.95em;
+    }
+    footer { text-align: center; font-size: 12px; color: #555; padding: 20px; }
     .logo {
-      width: min(135px, 42vw);
+      display: block;
+      height: auto;
+      width: min(150px, 45vw);
+      max-height: 80px;
+      object-fit: contain;
+      margin: 0;
     }
-    .licence-inline {
-  margin-top: 18px;
-  font-size: 0.8rem;
-  color: #64748b;
-  text-align: center;
-}
+    .header-sub {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      text-align: center;
+      line-height: 1.25;
+    }
+    .header-mail { color: #fff; text-decoration: none; font-weight: 700; }
+    .header-mail:hover { text-decoration: underline; opacity: 0.9; }
 
+    /* ===== DEMANDE DE PARAMÉTRAGE ===== */
+    .btn-demande {
+      background: #facc15;
+      color: #111;
+      border: 1px solid #eab308;
+      font-family: inherit;
+      font-size: 1rem;
+      line-height: inherit;
+      cursor: pointer;
+    }
+    .btn-demande:hover { background: #fde047; }
+    .accueil-actions { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; margin-top: 15px; }
+    .accueil-actions .btn { margin-top: 0; box-sizing: border-box; text-align: center; }
+    #demandeParametrage {
+      box-sizing: border-box;
+      width: calc(100% - 24px);
+      max-width: 620px;
+      max-height: 90vh;
+      max-height: 90dvh;
+      padding: 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      background: #fff;
+      color: #111;
+      overflow: auto;
+    }
+    #demandeParametrage::backdrop { background: rgba(11,18,32,0.72); }
+    #demandeParametrage .form-entete {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 20px;
+      background: #0b1220;
+      color: #fff;
+      border-bottom: 3px solid #facc15;
+    }
+    #demandeParametrage h2 { margin: 0; font-size: 1.15rem; line-height: 1.35; }
+    #demandeParametrage .form-fermer {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    #formParametrage { padding: 18px 20px 20px; }
+    #formParametrage .form-champ { margin-bottom: 14px; }
+    #formParametrage label { display: block; margin-bottom: 5px; font-weight: 700; }
+    #formParametrage input:not([type="hidden"]), #formParametrage textarea {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      border: 1px solid #b8c2cf;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 16px;
+      line-height: 1.4;
+      background: #fff;
+      color: #111;
+    }
+    #formParametrage textarea { min-height: 130px; resize: vertical; }
+    #formParametrage .form-note { margin: 0 0 14px; font-size: 12px; color: #555; }
+    #formParametrage .form-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+    #formParametrage .form-actions .btn { margin-top: 0; }
+    #formParametrage .form-envoyer { flex: 1 1 240px; }
+    #formParametrage .form-annuler {
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #fff;
+      color: #334155;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .btn-demande:focus-visible, #demandeParametrage button:focus-visible,
+    #formParametrage input:focus-visible, #formParametrage textarea:focus-visible {
+      outline: 3px solid #2563eb;
+      outline-offset: 3px;
+    }
 
-</style>
-
+    /* ===== AJUSTEMENTS MOBILE ===== */
+    @media (max-width: 420px) {
+      header { padding: 34px 14px; }
+      header h1 { max-width: 20ch; }
+      .logo { width: min(135px, 42vw); }
+      .licence-inline { margin-top: 18px; font-size: 0.8rem; color: #64748b; text-align: center; }
+      .accueil-actions .btn { width: 100%; }
+      #demandeParametrage .form-entete { padding: 14px; }
+      #formParametrage { padding: 16px 14px; }
+      #formParametrage .form-actions > * { width: 100%; }
+    }
+  </style>
 </head>
-
 <body>
-
-<header>
-   <img src="Logo.png" alt="Logo SDIS 27" class="Logo">
-<h1 class="hero-title">
-  <span>Calcul LIF</span>
-  <span>Outil opérationnel</span>
-</h1>
-
-<p class="header-sub">
-  <span>SDIS 27 – GGOC – Capitaine Florian PICO</span>
-  <a href="mailto:florian.pico@sdis27.fr" class="header-mail">
-    florian.pico@sdis27.fr
-  </a>
-</p>
-
-
-</header>
-
-
-<section>
-
-  <div class="card">
-    <h2>Présentation de l'Outil LIF</h2>
-    <p>
-      L’Outil LIF met à disposition des calculs automatisés d’aide à la décision pour les interventions impliquant des feux de liquides inflammables (LIF).<br>
-      Développé pour un usage strictement professionnel au sein des Services Départementaux d’Incendie et de Secours, il contribue à l’analyse opérationnelle et à l’anticipation des besoins.<br>
-      Afin de garantir son adéquation avec les doctrines et référentiels départementaux, l’outil peut faire l’objet d’un paramétrage spécifique propre à chaque SDIS.<br>
-      Toute demande de configuration personnalisée peut être adressée par mail.
+  <header>
+    <img src="Logo.png" alt="Logo SDIS 27" class="Logo">
+    <h1 class="hero-title">
+      <span>Calcul LIF</span>
+      <span>Outil opérationnel</span>
+    </h1>
+    <p class="header-sub">
+      <span>SDIS 27 – GGOC – Capitaine Florian PICO</span>
+      <a href="mailto:florian.pico@sdis27.fr" class="header-mail">florian.pico@sdis27.fr</a>
     </p>
-    <a class="btn" href="calcul.html">Accéder au calcul LIF</a>
-  </div>
+  </header>
 
-  <div class="card warning">
-    ⚠️ <strong>Avertissement</strong><br>
-    Cet outil est une aide à la décision.<br>
-  Les résultats affichés ne constituent ni un ordre, ni une prescription opérationnelle
-  et ne se substituent pas à l’analyse du COS, aux procédures opérationnelles en vigueur,
-  ni à la réglementation applicable.<br><br>
+  <section>
+    <div class="card">
+      <h2>Présentation de l'Outil LIF</h2>
+      <p>
+        L’Outil LIF met à disposition des calculs automatisés d’aide à la décision pour les interventions impliquant des feux de liquides inflammables (LIF).<br>
+        Développé pour un usage strictement professionnel au sein des Services Départementaux d’Incendie et de Secours, il contribue à l’analyse opérationnelle et à l’anticipation des besoins.<br>
+        Afin de garantir son adéquation avec les doctrines et référentiels départementaux, l’outil peut faire l’objet d’un paramétrage spécifique propre à chaque SDIS.<br>
+        Toute demande de configuration personnalisée peut être adressée par mail ou à l’aide du formulaire.
+      </p>
+      <div class="accueil-actions">
+        <a class="btn" href="calcul.html">Accéder au calcul LIF</a>
+        <button type="button" id="ouvrirDemandeParametrage" class="btn btn-demande" aria-haspopup="dialog" aria-controls="demandeParametrage">Demander un paramétrage</button>
+      </div>
+    </div>
 
-  Le COS demeure seul responsable des choix tactiques, de leur adaptation aux conditions
-  réelles de l’intervention, de la mise en œuvre et de l'engagement des moyens.
-  </div>
+    <div class="card warning">
+      ⚠️ <strong>Avertissement</strong><br>
+      Cet outil est une aide à la décision.<br>
+      Les résultats affichés ne constituent ni un ordre, ni une prescription opérationnelle
+      et ne se substituent pas à l’analyse du COS, aux procédures opérationnelles en vigueur,
+      ni à la réglementation applicable.<br><br>
+      Le COS demeure seul responsable des choix tactiques, de leur adaptation aux conditions
+      réelles de l’intervention, de la mise en œuvre et de l'engagement des moyens.
+    </div>
+  </section>
 
-</section>
+  <footer>
+    © Capitaine Florian PICO – Tous droits réservés<br><br>
+    <p class="licence-inline">
+      Licence d’utilisation : usage autorisé pour les SIS (cadre opérationnel/pédagogique).
+      Toute utilisation commerciale ou appropriation du code est interdite.
+    </p>
+  </footer>
 
-<footer>
-  © Capitaine Florian PICO – Tous droits réservés<br><br>
+  <dialog id="demandeParametrage" aria-labelledby="titreDemandeParametrage" aria-describedby="noteDemandeParametrage">
+    <div class="form-entete">
+      <h2 id="titreDemandeParametrage">Demande de paramétrage</h2>
+      <button type="button" id="fermerDemandeParametrage" class="form-fermer" aria-label="Fermer le formulaire">×</button>
+    </div>
 
-  <p class="licence-inline">
-  Licence d’utilisation : usage autorisé pour les SIS (cadre opérationnel/pédagogique).
-  Toute utilisation commerciale ou appropriation du code est interdite.
-</p>
+    <!-- Envoi automatique via FormSubmit.
+         Première utilisation : valider le mail d’activation reçu à pico.florian@gmail.com.
+         Conserver la protection anti-spam proposée par FormSubmit.
+         Après l’envoi, FormSubmit affiche sa page de confirmation. -->
+    <form id="formParametrage" action="https://formsubmit.co/pico.florian@gmail.com" method="POST" accept-charset="UTF-8">
+      <input type="hidden" name="_subject" value="Outil LIF — Demande de paramétrage">
+      <input type="hidden" name="_template" value="table">
+      <p id="noteDemandeParametrage" class="form-note">Tous les champs sont obligatoires.</p>
 
-</footer>
+      <div class="form-champ">
+        <label for="demandeEmail">Adresse mail :</label>
+        <input id="demandeEmail" name="email" type="email" autocomplete="email" maxlength="254" required>
+      </div>
+      <div class="form-champ">
+        <label for="demandeOrganisation">SDIS ou Société :</label>
+        <input id="demandeOrganisation" name="SDIS ou Société" type="text" autocomplete="organization" maxlength="150" required>
+      </div>
+      <div class="form-champ">
+        <label for="demandeNom">Nom et prénom :</label>
+        <input id="demandeNom" name="Nom et prénom" type="text" autocomplete="name" maxlength="150" required>
+      </div>
+      <div class="form-champ">
+        <label for="demandeMessage">Votre demande :</label>
+        <textarea id="demandeMessage" name="Demande" rows="5" maxlength="6000" placeholder="Précisez votre besoin, les paramètres souhaités et les particularités à prendre en compte…" required></textarea>
+      </div>
 
+      <p class="form-note">Les informations saisies sont transmises via FormSubmit à pico.florian@gmail.com pour traiter votre demande.</p>
+      <div class="form-actions">
+        <button type="button" id="annulerDemandeParametrage" class="form-annuler">Annuler</button>
+        <button type="submit" class="btn btn-demande form-envoyer">Envoyer la demande de paramétrage</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    (() => {
+      const ouvrir = document.getElementById("ouvrirDemandeParametrage");
+      const formulaire = document.getElementById("demandeParametrage");
+      let debordementInitial = "";
+
+      ouvrir.addEventListener("click", () => {
+        if (formulaire.open) return;
+        debordementInitial = document.body.style.overflow;
+        formulaire.showModal();
+        document.body.style.overflow = "hidden";
+        document.getElementById("demandeEmail").focus();
+      });
+
+      const fermer = () => { if (formulaire.open) formulaire.close(); };
+      document.getElementById("fermerDemandeParametrage").addEventListener("click", fermer);
+      document.getElementById("annulerDemandeParametrage").addEventListener("click", fermer);
+      formulaire.addEventListener("close", () => {
+        document.body.style.overflow = debordementInitial;
+        ouvrir.focus();
+      });
+      formulaire.addEventListener("click", evenement => {
+        if (evenement.target !== formulaire) return;
+        const rect = formulaire.getBoundingClientRect();
+        if (evenement.clientX < rect.left || evenement.clientX > rect.right ||
+            evenement.clientY < rect.top || evenement.clientY > rect.bottom) fermer();
+      });
+    })();
+  </script>
 </body>
 </html>

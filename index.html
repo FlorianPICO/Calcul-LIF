@@ -96,6 +96,24 @@
     .header-mail { color: #fff; text-decoration: none; font-weight: 700; }
     .header-mail:hover { text-decoration: underline; opacity: 0.9; }
 
+    /* Confirmation au retour du service d’envoi. */
+    .confirmation-demande {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 16px 18px;
+      border: 1px solid #86c89b;
+      border-left: 4px solid #16a34a;
+      border-radius: 12px;
+      background: #ecfdf3;
+      color: #14532d;
+    }
+    .confirmation-demande[hidden] { display: none; }
+    .confirmation-demande strong { display: block; }
+    .confirmation-demande p { margin: 4px 0 0; }
+    .confirmation-demande .confirmation-icone { font-size: 24px; font-weight: 800; line-height: 1.3; }
+
     /* ===== DEMANDE DE PARAMÉTRAGE ===== */
     .btn-demande {
       background: #facc15;
@@ -210,6 +228,14 @@
   </header>
 
   <section>
+    <div id="confirmationDemande" class="confirmation-demande" role="status" aria-live="polite" tabindex="-1" hidden>
+      <span class="confirmation-icone" aria-hidden="true">✓</span>
+      <div>
+        <strong>Demande envoyée</strong>
+        <p>Votre demande de paramétrage a bien été transmise. Merci pour votre message.</p>
+      </div>
+    </div>
+
     <div class="card">
       <h2>Présentation de l'Outil LIF</h2>
       <p>
@@ -252,10 +278,12 @@
     <!-- Envoi automatique via FormSubmit.
          Première utilisation : valider le mail d’activation reçu à pico.florian@gmail.com.
          Conserver la protection anti-spam proposée par FormSubmit.
-         Après l’envoi, FormSubmit affiche sa page de confirmation. -->
+         Après l’envoi, FormSubmit redirige vers la page index.html du site LIF.
+         Le paramètre demande=envoyee déclenche l’encadré de confirmation. -->
     <form id="formParametrage" action="https://formsubmit.co/pico.florian@gmail.com" method="POST" accept-charset="UTF-8">
       <input type="hidden" name="_subject" value="Outil LIF — Demande de paramétrage">
       <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_next" value="https://florianpico.github.io/Calcul-LIF/index.html?demande=envoyee">
       <p id="noteDemandeParametrage" class="form-note">Tous les champs sont obligatoires.</p>
 
       <div class="form-champ">
@@ -285,6 +313,16 @@
 
   <script>
     (() => {
+      const retour = new URL(window.location.href);
+      if (retour.searchParams.get("demande") === "envoyee") {
+        const confirmation = document.getElementById("confirmationDemande");
+        confirmation.hidden = false;
+        confirmation.focus();
+        // Éviter de réafficher la confirmation lors d’un simple rechargement.
+        retour.searchParams.delete("demande");
+        window.history.replaceState(window.history.state, "", retour.pathname + retour.search + retour.hash);
+      }
+
       const ouvrir = document.getElementById("ouvrirDemandeParametrage");
       const formulaire = document.getElementById("demandeParametrage");
       let debordementInitial = "";

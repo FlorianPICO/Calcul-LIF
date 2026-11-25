@@ -632,7 +632,16 @@ th, td {
   .cmp-help-modal-header h3{ font-size:15px; }
 }
 
-</style>
+/* Établissement : un seul engin par ligne. */
+    .grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); }
+    .btn-etabli { background:#0f172a; color:#fff; padding:8px 10px; font-size:0.85rem; }
+    .btn-etabli:disabled { background:#166534; opacity:1; cursor:default; }
+    .etat-etabli { display:block; font-size:0.75rem; color:#166534; margin-top:4px; }
+    @media (max-width:768px) {
+      .grid { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); }
+      .grid .cell-add { grid-column:1 / -1; display:block; }
+    }
+  </style>
 </head>
 
 <body>
@@ -702,13 +711,10 @@ th, td {
        <div class="cell cell-time">
         <label>Heure d’arrivée :</label>
         <input id="arrivee" class="field" type="time">
-        <div class="small">Heure à laquelle l'engin commence à projeter de la mousse.</div>
+        <div class="small">Heure prévue. Le bouton « Établi » enregistrera l’heure réelle de mise en œuvre.</div>
       </div>
 
-      <div class="cell cell-qty">
-        <label>Quantité :</label>
-        <input id="qty" class="field" type="number" min="1" step="1" value="1">
-      </div>
+      <input id="qty" type="hidden" value="1">
 
      <div class="cell cell-add">
         <button id="btnAdd" class="btn btn-primary field-btn" type="button">Ajouter</button>
@@ -726,7 +732,7 @@ th, td {
         <label for="industrialEmul">Volume émulseur par moyen (L) :</label>
         <input id="industrialEmul" class="field" type="number" min="0" step="any"
                inputmode="decimal" placeholder="Ex : 1 000" disabled>
-        <div class="small">Stock d’émulseur par moyen, multiplié par la quantité.</div>
+        <div class="small">Stock d’émulseur pour cet engin. Un seul engin par ligne.</div>
       </div>
     </div>
 
@@ -735,7 +741,7 @@ th, td {
         <tr>
           <th>Type</th>
           <th>Heure</th>
-          <th>Qté</th>
+          <th>Établissement</th>
           <th>Débit</th>
           <th>Émulseur</th>
           <th></th>
@@ -750,7 +756,8 @@ th, td {
     </div>
 
     <div class="small">
-      <u>Logique :</u> Temporisation tant que le débit présent (somme des débits des engins présents) est inférieur à Q ext théorique ou que le volume d'émulseur disponible est inférieur au volume d'émulseur nécessaire pour la phase d'extinction.<br>
+      <u>Établissement :</u> un engin par ligne. Cliquez sur « Établi » quand il est prêt à projeter. Les pointillés sont prévisionnels ; le trait plein et le stock ne prennent en compte que les engins établis, à l’heure du clic.<br>
+      <u>Logique :</u> Temporisation tant que le débit présent (somme des débits des engins établis) est inférieur à Q ext théorique ou que le volume d'émulseur disponible est inférieur au volume d'émulseur nécessaire pour la phase d'extinction.<br>
       <u>Temporisation :</u> conso = débit de temporisation théorique × concentration.<br>
       <u>Extinction :</u> conso = débit retenu au démarrage de la phase d'extinction × concentration, pendant la durée d’extinction.
     </div>
@@ -852,12 +859,15 @@ th, td {
   Le volume émulseur total réel, affiché après les valeurs retenues,
   additionne uniquement les consommations effectivement simulées.
   <br><br>
-  Dans le graphique, chaque engin est pris en compte à l’heure d’arrivée
-  renseignée. L’extinction commence dès que les moyens présents disposent
-  d’un débit et d’un stock d’émulseur suffisants.
+  Les pointillés noirs représentent les débits attendus à l’heure d’arrivée prévue.
+  Cliquez sur « Établi » lorsque l’engin est prêt à projeter : l’heure du clic
+  devient son heure réelle de mise en œuvre. Son débit apparaît en trait plein
+  et son stock devient disponible. Avant ce clic, cet engin ne consomme pas d’émulseur.
+  La temporisation continue avec les seuls engins établis.
+  L’extinction commence dès que ces moyens disposent d’un débit et d’un stock suffisants.
   Le débit utilisé est alors conservé jusqu’à la fin de l’extinction.
   <br><br>
-  Les engins arrivant ensuite augmentent le stock d’émulseur disponible,
+  Les engins établis ensuite augmentent le stock d’émulseur disponible,
   mais n’augmentent pas automatiquement le débit utilisé pour l’extinction si il est suffisant.
 </div>
 <div class="row" style="align-items:center; margin-top:10px;">
@@ -896,10 +906,10 @@ th, td {
     </div>
 
     <div class="small">
-      <strong>Axe gauche :</strong> débits des moyens présents, débit d’extinction théorique et débit de temporisation théorique, en <strong>L/min</strong>.<br><br>
+      <strong>Axe gauche :</strong> débits établis (trait plein), débits prévus (pointillés), débit d’extinction théorique et débit de temporisation théorique, en <strong>L/min</strong>.<br><br>
       <strong>Axe droit :</strong> volume d’émulseur disponible et volume nécessaire à l’extinction retenue, en <strong>L</strong>.<br><br>
-      <strong>Consommation d’émulseur :</strong> calculée en multipliant la concentration (3 % = 0,03) par le débit de temporisation théorique pendant la phase de temporisation (limité au débit des moyens présents si celui-ci est insuffisant), puis par le débit d’extinction retenu pendant la phase d’extinction, puis par ce même débit d’extinction retenu pendant les quatre créneaux d’entretien du tapis de mousse de 10 minutes. La consommation est limitée au volume d’émulseur disponible.<br><br>
-      <strong>Déclenchement de l’extinction :</strong> automatique lorsque le débit des moyens présents atteint ou dépasse le débit d’extinction théorique requis <strong>ET</strong> que le volume d’émulseur disponible permet de tenir toute la durée d’extinction à ce débit. Le débit retenu au démarrage est conservé jusqu’à la fin de l’extinction.
+      <strong>Consommation d’émulseur :</strong> calculée en multipliant la concentration (3 % = 0,03) par le débit de temporisation théorique pendant la phase de temporisation (limité au débit des moyens établis si celui-ci est insuffisant), puis par le débit d’extinction retenu pendant la phase d’extinction, puis par ce même débit d’extinction retenu pendant les quatre créneaux d’entretien du tapis de mousse de 10 minutes. La consommation est limitée au volume d’émulseur disponible.<br><br>
+      <strong>Déclenchement de l’extinction :</strong> automatique lorsque le débit des moyens établis atteint ou dépasse le débit d’extinction théorique requis <strong>ET</strong> que le volume d’émulseur disponible permet de tenir toute la durée d’extinction à ce débit. Le débit retenu au démarrage est conservé jusqu’à la fin de l’extinction.
     </div>
 
 <div class="lif-signature">
@@ -1108,6 +1118,23 @@ function fmt(valeur) {
     // Sauvegarde propre à la CMP PETROINEOS.
   const CLE_ENGINS_CMP = "LIF_CMP_PETROINEOS_ENGINS";
 
+  // Les dates complètes évitent de confondre 23 h 55 et 00 h 15 le lendemain.
+  const estEtabli = ligne => Number.isFinite(ligne.establishedAt) && ligne.establishedAt > 0;
+  function datePourHeure(heure, reference = Date.now()) {
+    const date = new Date(reference);
+    const minutes = timeToMin(heure);
+    date.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
+    if (date.getTime() - reference > 12 * 3600000) date.setDate(date.getDate() - 1);
+    if (reference - date.getTime() > 12 * 3600000) date.setDate(date.getDate() + 1);
+    return date.getTime();
+  }
+  function heureEtablissement(ligne) {
+    const date = new Date(ligne.establishedAt);
+    return `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+  }
+  const minuteHorodatee = date => Math.floor(date / 60000);
+
+
   function sauvegarderEngins() {
     try {
       localStorage.setItem(CLE_ENGINS_CMP, JSON.stringify(rows));
@@ -1142,7 +1169,17 @@ function fmt(valeur) {
           capacites.emul >= 0;
       });
 
-      rows.push(...lignesValides);
+      const reference = Date.now();
+      lignesValides.forEach(ligne => {
+        // Migrer les anciennes lignes groupées sans perdre leurs capacités.
+        const quantite = ligne.qty;
+        for (let i = 0; i < quantite; i++) {
+          const copie = { ...ligne, qty: 1 };
+          if (!Number.isFinite(copie.plannedAt)) copie.plannedAt = datePourHeure(copie.atStr, reference);
+          if (!estEtabli(copie)) delete copie.establishedAt;
+          rows.push(copie);
+        }
+      });
     } catch (erreur) {
       console.warn("Restauration des engins impossible.", erreur);
     }
@@ -1173,7 +1210,14 @@ function fmt(valeur) {
 tr.innerHTML = `
   <td data-label="Type"><b>${r.type === "INDUSTRIEL" ? "Moyens industriels" : ENGINS[r.type].label}</b></td>
   <td data-label="Arrivée">${r.atStr}</td>
- <td data-label="Qté">${fmt(r.qty)}</td>
+ <td data-label="Établissement">
+   <button type="button" class="btn btn-etabli" data-etabli="${idx}"
+     ${estEtabli(r) ? 'disabled' : ''}
+     aria-label="Confirmer l’établissement de l’engin de la ligne ${idx + 1}">
+     ${estEtabli(r) ? '✓ Établi' : 'Établi'}
+   </button>
+   ${estEtabli(r) ? `<span class="etat-etabli">à ${heureEtablissement(r)}</span>` : ''}
+ </td>
 <td data-label="Débit (L/min)">
   <input
     type="text"
@@ -1312,6 +1356,15 @@ tr.innerHTML = `
         blocCourbe.style.display = "none";
       });
     });
+    tbody.querySelectorAll("button[data-etabli]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const ligne = rows[Number(btn.dataset.etabli)];
+        if (!ligne || estEtabli(ligne)) return;
+        ligne.establishedAt = Date.now();
+        render();
+        tracerCourbe(false);
+      });
+    });
     tbody.querySelectorAll("button[data-edit]").forEach(btn => {
       btn.addEventListener("click", () => {
         indexModification = Number(btn.dataset.edit);
@@ -1355,9 +1408,8 @@ tr.innerHTML = `
     $("btnAdd").addEventListener("click", () => {
     const type = $("enginType").value;
     const atStr = $("arrivee").value || "00:00";
-    const qty = Math.max(1, Math.floor(n($("qty").value) || 1));
-
-    const ligne = { type, atStr, qty };
+    const qty = 1;
+    const ligne = { type, atStr, qty, plannedAt: datePourHeure(atStr) };
 
     if (type === "INDUSTRIEL") {
       const customFlow = n($("industrialFlow").value);
@@ -1386,7 +1438,9 @@ tr.innerHTML = `
     if (indexModification !== null) {
             const ancienne = rows[indexModification];
 
+      if (ancienne.atStr === ligne.atStr) ligne.plannedAt = ancienne.plannedAt;
       if (ancienne.type === ligne.type) {
+        if (estEtabli(ancienne)) ligne.establishedAt = ancienne.establishedAt;
         if (Number.isFinite(ancienne.flowOverride)) {
           ligne.flowOverride = ancienne.flowOverride;
         }
@@ -1435,23 +1489,31 @@ tr.innerHTML = `
         !Number.isFinite(QtempoTheorique) || QtempoTheorique <= 0) {
       throw new Error("Paramètres de calcul importés invalides.");
     }
-    const t0Abs = getFirstArrivalMin(rows);
-    if (!Number.isFinite(t0Abs)) throw new Error("Aucune arrivée valide.");
-    const derniereArrivee = Math.max(0, ...rows.map(r =>
-      arrivalRelMin(r.atStr, t0Abs)).filter(Number.isFinite));
+    const dates = rows.flatMap(r => [r.plannedAt, ...(estEtabli(r) ? [r.establishedAt] : [])]);
+    const origine = Math.min(...dates.map(minuteHorodatee));
+    const dateOrigine = new Date(origine * 60000);
+    const t0Abs = dateOrigine.getHours() * 60 + dateOrigine.getMinutes();
+    const derniereArrivee = Math.max(...dates.map(d => minuteHorodatee(d) - origine));
     HORIZON_MIN = Math.max(HORIZON_H * 60,
       Math.ceil((derniereArrivee + tExt + 240) / STEP_MIN) * STEP_MIN);
 
     const addFlow = Array(HORIZON_MIN + 1).fill(0);
     const addEmul = Array(HORIZON_MIN + 1).fill(0);
+    const addPrevision = Array(HORIZON_MIN + 1).fill(0);
     rows.forEach(r => {
-      const rel = arrivalRelMin(r.atStr, t0Abs);
-      if (!Number.isFinite(rel) || rel < 0 || rel > HORIZON_MIN) return;
       const capacites = getEnginCapacites(r);
-      const minute = Math.round(rel);
-      addFlow[minute] += capacites.flow * r.qty;
-      addEmul[minute] += capacites.emul * r.qty;
+      if (estEtabli(r)) {
+        const minute = minuteHorodatee(r.establishedAt) - origine;
+        addFlow[minute] += capacites.flow;
+        addEmul[minute] += capacites.emul;
+      } else {
+        // Les moyens attendus n’alimentent ni le stock ni la consommation.
+        const minute = minuteHorodatee(r.plannedAt) - origine;
+        addPrevision[minute] += capacites.flow;
+      }
     });
+    const flowPrevisionSerie = Array(HORIZON_MIN + 1).fill(0);
+    let debitAttendu = 0;
 
     let flowAvail = 0, emulStock = 0;
     let tExtStart = null, tStockOK = null;
@@ -1464,9 +1526,11 @@ tr.innerHTML = `
     const entretienStockInsuffisant = [false, false, false, false];
 
     for (let t = 0; t <= HORIZON_MIN; t++) {
-      // Les renforts n'existent dans le scénario qu'à leur arrivée.
+      // Seul un clic « Établi » confirme le débit et le stock à son heure réelle.
       flowAvail += addFlow[t];
       emulStock += addEmul[t];
+      debitAttendu += addPrevision[t];
+      flowPrevisionSerie[t] = flowAvail + debitAttendu;
 
       if (tExtStart === null) {
         const besoinAvecMoyensPresents = flowAvail * tExt * conc;
@@ -1523,7 +1587,7 @@ tr.innerHTML = `
       volumeExtConsomme, volumeEntretienConsomme,
       t0Abs, labels: buildTimeLabels(t0Abs), tStockOK, tExtStart,
       tExtEnd: tExtStart === null ? null : tExtStart + tExt,
-      flowAvailSerie, emulSerie, tempoFlowSerie,
+      flowAvailSerie, flowPrevisionSerie, emulSerie, tempoFlowSerie,
       entretienStockInsuffisant, emulseurManquantEntretien
     };
   }
@@ -1764,7 +1828,25 @@ ctx.restore();
 
       ctx.restore();
     }
-    // NOIR : débit dispo (escaliers)
+    // NOIR : prévision en pointillés, uniquement là où elle dépasse le débit établi.
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    for (let t = 0; t < HORIZON_MIN; t++) {
+      if (data.flowPrevisionSerie[t] <= data.flowAvailSerie[t]) continue;
+      if (t > 0 && data.flowPrevisionSerie[t - 1] !== data.flowPrevisionSerie[t]) {
+        ctx.moveTo(x(t), yFlow(data.flowPrevisionSerie[t - 1]));
+        ctx.lineTo(x(t), yFlow(data.flowPrevisionSerie[t]));
+      }
+      ctx.moveTo(x(t), yFlow(data.flowPrevisionSerie[t]));
+      ctx.lineTo(x(t + 1), yFlow(data.flowPrevisionSerie[t]));
+      ctx.lineTo(x(t + 1), yFlow(data.flowPrevisionSerie[t + 1]));
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // NOIR : débit des seuls moyens établis, en trait plein.
     ctx.strokeStyle = "#111";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1898,7 +1980,7 @@ function legendItem(x0, y0, color, label, dash = null) {
     legendItem(
       legendX, legendY + 22,
       "#111",
-      "Q ext réel (sommes débits engins)"
+      "Débit établi (plein) / prévu (pointillés)"
     );
 
     legendItem(
@@ -1933,7 +2015,7 @@ function legendItem(x0, y0, color, label, dash = null) {
   }
 
   // ===== Tracer (une seule fois) =====
-  $("btnTracer").addEventListener("click", () => {
+  function tracerCourbe(defiler = true) {
     if (rows.length === 0) { alert("Ajoute au moins un engin (ex : 1 FMOGP1 à 00:00)."); return; }
 
     let data;
@@ -2067,8 +2149,9 @@ function legendItem(x0, y0, color, label, dash = null) {
     alerteExtinction.style.display = messageExtinction ? "block" : "none";
     blocCourbe.style.display = "block";
     drawChart(data);
-    blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+    if (defiler) blocCourbe.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  $("btnTracer").addEventListener("click", () => tracerCourbe());
 
   restaurerEngins();
   render();
